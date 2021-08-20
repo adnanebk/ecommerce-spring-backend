@@ -19,4 +19,13 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     @Override
     @CacheEvict(value = "creditCardCache",key="#s.appUser.userName")
     <S extends CreditCard> S save(S s);
+    
+        @Override
+    @CacheEvict(value = "creditCardCache",allEntries = true)
+    void deleteById(Long aLong);
+
+    @Override
+    @CacheEvict(value = "creditCardCache",key="#creditCard.appUser.userName")
+    void delete(CreditCard creditCard);
+    
 }
