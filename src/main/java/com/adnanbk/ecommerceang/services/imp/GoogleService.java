@@ -9,15 +9,12 @@ import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import org.apache.poi.hpsf.GUID;
-import org.hibernate.id.GUIDGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.UUID;
 
 @Service
 public class GoogleService implements SocialService {

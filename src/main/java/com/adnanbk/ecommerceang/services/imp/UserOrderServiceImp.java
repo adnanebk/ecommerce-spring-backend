@@ -11,12 +11,6 @@ import com.adnanbk.ecommerceang.services.UserOderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
-import java.time.LocalDate;
-import java.util.List;
-
 @Service
 public class UserOrderServiceImp implements UserOderService {
     private OrderRepository orderRepository;

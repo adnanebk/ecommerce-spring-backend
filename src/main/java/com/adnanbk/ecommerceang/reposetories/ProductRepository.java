@@ -3,24 +3,16 @@ package com.adnanbk.ecommerceang.reposetories;
 
 import com.adnanbk.ecommerceang.dto.ProductProjection;
 import com.adnanbk.ecommerceang.models.Product;
-import org.hibernate.annotations.Cache;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
+import javax.persistence.QueryHint;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @RepositoryRestResource(excerptProjection = ProductProjection.class)
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -52,11 +44,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByNameIgnoreCaseContainsOrDescriptionIgnoreCaseContains(String name,String description, Pageable pageable);
 
     @RestResource(path="byName")
-    @Cacheable("byName")
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
-
-    @Cacheable("allPro")
+    @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Page<Product> findAll(Pageable pageable);
 
     @RestResource(path="byDate")
@@ -70,10 +60,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
     @Override
-    @CacheEvict(value = {"allPro"},allEntries = true)
     void delete(Product product);
 
     @Override
-    @CacheEvict(value = {"allPro"},allEntries = true)
     void deleteById(Long id);
 }

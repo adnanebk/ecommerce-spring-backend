@@ -1,6 +1,6 @@
 package com.adnanbk.ecommerceang.Controllers;
 
-import com.adnanbk.ecommerceang.models.*;
+import com.adnanbk.ecommerceang.models.Product;
 import com.adnanbk.ecommerceang.services.ImageService;
 import com.adnanbk.ecommerceang.services.ProductService;
 import io.swagger.annotations.ApiOperation;
@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.*;
+import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,7 +29,6 @@ public class ProductController {
 
     private final ImageService imageService;
     private final ProductService productService;
-    private String baseUrl="";
 
 
     public ProductController(ImageService imageService, ProductService productService) {
@@ -43,11 +42,6 @@ public class ProductController {
         binder.addValidators(productValidator);
     }*/
 
-
-    @GetMapping("/products/searchInAll/{query}")
-    public List<Product> searchProducts(@PathVariable(required = false) String query){
-        return this.productService.searchProducts(query);
-    }
 
     @PostMapping(value = "/products/images",consumes ="multipart/form-data")
     @ApiOperation(value = "Create product image",notes = "this endpoint uploads an image",response = String.class,consumes ="multipart/form-data")
@@ -107,7 +101,7 @@ public class ProductController {
     @ApiOperation(value = "add products from excel file",notes = "you have to download an excel file and fill it")
     public Callable<ResponseEntity<List<Product>>> addProductsFromExcel(MultipartFile file)
     {
-            List<Product> products = productService.saveAllFromExcel(file, baseUrl);
+            List<Product> products = productService.saveAllFromExcel(file);
             return ()-> new ResponseEntity(products,HttpStatus.CREATED);
     }
 

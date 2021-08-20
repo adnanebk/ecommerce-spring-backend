@@ -1,20 +1,16 @@
 package com.adnanbk.ecommerceang.reposetories;
 
 import com.adnanbk.ecommerceang.dto.OrderProjection;
-import com.adnanbk.ecommerceang.dto.ProductProjection;
 import com.adnanbk.ecommerceang.models.UserOrder;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @RepositoryRestResource(excerptProjection = OrderProjection.class)
@@ -24,7 +20,10 @@ public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
 
 
     @RestResource(path="byUserName")
+    @Cacheable(value="orderCache",key="#userName")
     List<UserOrder> findByAppUser_UserName(String userName);
 
-
+    @Override
+    @CacheEvict(value = "orderCache",key="#s.appUser.userName")
+    <S extends UserOrder> S save(S s);
 }

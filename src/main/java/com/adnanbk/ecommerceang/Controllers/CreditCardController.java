@@ -25,8 +25,6 @@ public class CreditCardController {
 
     @PostMapping
     public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal){
-        if(principal==null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you have no access");
         CreditCard savedCreditCard =creditCardService.saveCard(creditCard,principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedCreditCard.getId()).toUri();

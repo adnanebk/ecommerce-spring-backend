@@ -1,15 +1,15 @@
 package com.adnanbk.ecommerceang.models;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 @Table(name="product_category")
 @Data
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProductCategory {
 
 

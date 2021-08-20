@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerceang.Controllers;
 
 
+import com.adnanbk.ecommerceang.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
@@ -10,9 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -45,17 +44,17 @@ public class AuthController {
 
     }
     @PostMapping("/login")
-    public JwtResponse authenticateUser(@RequestBody LoginUserDto appUser) {
+    public JwtResponse authenticateUser(@RequestBody @Valid LoginUserDto appUser) {
     return authService.handleLogin(appUser);
 }
 
 @PostMapping("/google")
-public JwtResponse googleLogin(@RequestBody JwtResponse jwtResponse){
+public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
             return googleService.verify(jwtResponse);
 
 }
     @PostMapping("/facebook")
-    public JwtResponse facebookLogin(@RequestBody JwtResponse jwtResponse) {
+    public JwtResponse facebookLogin(@RequestBody @Valid JwtResponse jwtResponse) {
         return facebookService.verify(jwtResponse);
     }
 
@@ -73,5 +72,10 @@ public JwtResponse googleLogin(@RequestBody JwtResponse jwtResponse){
         authService.sendEmailConfirmation(email);
         return ResponseEntity.ok().build();
      }
+    @PostMapping("/appUsers/change-password")
+    public ResponseEntity<?> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto,Principal principal) {
+      this.authService.changePassword(changeUserPasswordDto,principal.getName());
+        return ResponseEntity.ok().build();
+    }
 
 }

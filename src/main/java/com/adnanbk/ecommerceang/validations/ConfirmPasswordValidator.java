@@ -3,7 +3,6 @@ package com.adnanbk.ecommerceang.validations;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

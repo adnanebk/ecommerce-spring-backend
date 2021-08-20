@@ -5,8 +5,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,5 +101,19 @@ public class JwtTokenUtil{
 
 	public void setValidityTime(int validityTime) {
 		this.validityTime = validityTime;
+	}
+
+    public void setAuthenticationToken(String userName, String password, HttpServletRequest request) {
+		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+				userName, password, Collections.singletonList(new SimpleGrantedAuthority("ROLE-USER")));
+		// Stores additional details about the authentication request (IP address, certificate serial number etc.).
+		if(request!=null)
+		usernamePasswordAuthenticationToken
+				.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+		// After setting the Authentication in the context, we specify
+		// that the current user is authenticated. So it passes the
+		// Spring Security Configurations successfully.
+		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
 	}
 }

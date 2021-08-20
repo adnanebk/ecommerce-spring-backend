@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerceang.services.imp;
 
 import com.adnanbk.ecommerceang.Jwt.JwtTokenUtil;
+import com.adnanbk.ecommerceang.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
 import com.adnanbk.ecommerceang.dto.RegisterUserDto;
@@ -10,9 +11,6 @@ import com.adnanbk.ecommerceang.services.AuthService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,18 +40,17 @@ public class AuthServiceImp implements AuthService {
        if (currentUser==null)
             throw new BadCredentialsException("Invalid username or password");
 
-        UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword());
+        //UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword());
 
-        try {
-
+/*        try {
             Authentication authentication = authenticationManager.authenticate(authRequest);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-
             throw new BadCredentialsException("Invalid username or password");
-
-        }
+        }*/
+        if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
+            throw new BadCredentialsException("Invalid username or password");
 
 
         final String token = jwtTokenUtil.generateToken(appUser.getUserName(),generateClaims(currentUser));
@@ -92,6 +89,14 @@ public class AuthServiceImp implements AuthService {
         emailSenderService.sendEmailConfirmation(user);
     }
 
+    @Override
+    public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName) {
+        var user = userRepo.findByUserName(userName);
+        if(user==null || !passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(),user.getPassword()))
+            throw new BadCredentialsException("current password not exists or invalid");
+      user.setPassword(passwordEncode.encode(changeUserPasswordDto.getNewPassword()));
+      userRepo.save(user);
+    }
 
 
     private HashMap<String,Object> generateClaims(AppUser appUser){

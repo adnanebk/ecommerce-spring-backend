@@ -1,4 +1,5 @@
 package com.adnanbk.ecommerceang.config;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -10,7 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/userOrders","/api/appUsers").authenticated()
+                .antMatchers("/api/userOrders","/api/appUsers","/api/appUsers/change-password","/api/creditCards/**").authenticated()
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
                 //.and().oauth2Login().permitAll(true).authorizationEndpoint()..and().permitAll();

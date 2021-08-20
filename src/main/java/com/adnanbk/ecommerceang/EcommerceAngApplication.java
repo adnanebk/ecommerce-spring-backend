@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerceang;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.apache.v2.ApacheHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.boot.SpringApplication;
@@ -15,7 +14,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Locale;
 
 
 @SpringBootApplication
@@ -45,7 +45,7 @@ public GoogleIdTokenVerifier googleverifier() {
     }
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("allPro","byProId","ordersByUserName","creditCardByUserName","userByUserName");
+        return new ConcurrentMapCacheManager("findByUserNameCache","creditCardCache","orderCache");
     }
 /*
     @Bean

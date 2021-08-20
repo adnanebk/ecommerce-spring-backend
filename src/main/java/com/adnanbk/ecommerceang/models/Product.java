@@ -1,21 +1,23 @@
 package com.adnanbk.ecommerceang.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Objects;
 
 @Entity
 @Table(name="product")
 @Data
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Product {
 
     @Id
@@ -60,6 +62,8 @@ public class Product {
     @Column(name = "date_created")
     @CreationTimestamp
     private Date dateCreated;
+
+    private Date expirationDate;
 
     @Column(name = "last_updated")
     @UpdateTimestamp

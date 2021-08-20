@@ -5,12 +5,10 @@ import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.models.ConfirmationToken;
 import com.adnanbk.ecommerceang.reposetories.ConfirmationTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;

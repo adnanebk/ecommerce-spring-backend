@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerceang.dto;
 
-import com.adnanbk.ecommerceang.models.*;
+import com.adnanbk.ecommerceang.models.OrderItem;
+import com.adnanbk.ecommerceang.models.UserOrder;
 import org.springframework.data.rest.core.config.Projection;
 
 import java.time.LocalDate;

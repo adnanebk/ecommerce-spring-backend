@@ -6,7 +6,6 @@ import com.adnanbk.ecommerceang.models.Product;
 import com.adnanbk.ecommerceang.reposetories.ProductRepository;
 import com.adnanbk.ecommerceang.services.ProductService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,14 +28,12 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    @CacheEvict(value =  "allPro",allEntries = true)
     public Product addProduct(Product product) {
            mapProductImage(product);
         return productRepo.save(product);
     }
 
     @Override
-    @CacheEvict(value =  "allPro",allEntries = true)
     public  Product updateProduct(Product product) {
         Product prod= productRepo.getOne(product.getId());
         mapProduct(product, prod);
@@ -44,7 +41,6 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    @CacheEvict(value =  "allPro",allEntries = true)
     public List<Product> updateProducts(List<Product> products) {
         var updatedProducts = mapProducts(products);
         return productRepo.saveAll(updatedProducts);
@@ -52,13 +48,11 @@ public class ProductServiceImp implements ProductService {
 
 
     @Override
-    @CacheEvict(value =  "allPro",allEntries = true)
     public void removeProducts(List<Long> productsIds) {
         productRepo.deleteInBatch(productRepo.findAllById(productsIds));
     }
 
-    @CacheEvict(value =  "allPro",allEntries = true)
-    public List<Product> saveAllFromExcel(MultipartFile multipartFile, String baseUrl) {
+    public List<Product> saveAllFromExcel(MultipartFile multipartFile) {
         try {
             List<Product> products = excelHelper.excelToList(multipartFile.getInputStream())
                                     .stream().map(this::mapProductImage).toList();
@@ -72,15 +66,6 @@ public class ProductServiceImp implements ProductService {
         }
 
     }
-
-    @Override
-    public List<Product> searchProducts(String query) {
-        if(query==null|| query.isEmpty() || query.trim().isEmpty())
-            return productRepo.findAll();
-        return productRepo.findAll().stream().filter(prod -> prod.getName().toLowerCase().contains(query)
-                || prod.getDescription().toLowerCase().contains(query)).collect(Collectors.toList());
-    }
-
 
 
 
@@ -100,11 +85,12 @@ public class ProductServiceImp implements ProductService {
         return  productSrc;
     }
     private List<Product> mapProducts(List<Product> products) {
-        return productRepo.findAllById(products.stream()
-                .map(Product::getId).collect(Collectors.toList()))
-                .stream().peek(prod -> {
-                    var product = products.stream().filter(p -> p.getId().equals(prod.getId())).findFirst();
-                    product.ifPresent(value -> mapProduct(value, prod));
-                }).collect(Collectors.toList());
+        var productsInDb= productRepo.findAllById(products.stream()
+                .map(Product::getId).collect(Collectors.toList()));
+        for (Product prod : productsInDb) {
+            var product = products.stream().filter(p -> p.getId().equals(prod.getId())).findFirst();
+            product.ifPresent(value -> mapProduct(value, prod));
+        }
+         return productsInDb;
     }
 }

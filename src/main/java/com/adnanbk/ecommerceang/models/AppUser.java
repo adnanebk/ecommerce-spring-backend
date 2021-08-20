@@ -3,14 +3,13 @@ package com.adnanbk.ecommerceang.models;
 import com.adnanbk.ecommerceang.validations.ConfirmPassword;
 import com.adnanbk.ecommerceang.validations.UniqueUser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
