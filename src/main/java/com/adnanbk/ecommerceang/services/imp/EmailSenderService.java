@@ -4,6 +4,7 @@ import com.adnanbk.ecommerceang.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.models.ConfirmationToken;
 import com.adnanbk.ecommerceang.reposetories.ConfirmationTokenRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,21 +17,17 @@ import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class EmailSenderService {
 
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
+    private final ConfirmationTokenRepository confirmationTokenRepo;
     @Value("${spring.mail.name}")
     private String name;
     @Value("${spring.mail.email}")
     private String email;
     @Value("${api.url}")
     private String url;
-    private ConfirmationTokenRepository confirmationTokenRepo;
-
-    public EmailSenderService(JavaMailSender javaMailSender, ConfirmationTokenRepository confirmationTokenRepo) {
-        this.javaMailSender = javaMailSender;
-        this.confirmationTokenRepo = confirmationTokenRepo;
-    }
 
     @Async
     public void sendEmailConfirmation(AppUser user) {

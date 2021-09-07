@@ -16,4 +16,5 @@ public interface AuthService {
 
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName);
 
+    JwtResponse refreshNewToken(String refreshToken);
 }

@@ -2,13 +2,14 @@ package com.adnanbk.ecommerceang.services.imp;
 
 import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
-import com.adnanbk.ecommerceang.dto.RegisterUserDto;
+import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
@@ -17,26 +18,22 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleService implements SocialService {
 
 
-   private GoogleIdTokenVerifier googleverifier;
-   private UserRepo userRepo;
-   private AuthService authService;
+   private final GoogleIdTokenVerifier googleverifier;
+   private final UserRepo userRepo;
+   private final AuthService authService;
 
    @Value("${social.password}")
    private String password;
 
-   public GoogleService(GoogleIdTokenVerifier googleverifier, UserRepo userRepo, AuthService authService) {
-      this.googleverifier = googleverifier;
-      this.userRepo = userRepo;
-      this.authService = authService;
-   }
 
    @Override
    public JwtResponse verify(JwtResponse jwtResponse)  {
       String token=jwtResponse.getToken();
-      RegisterUserDto user=jwtResponse.getAppUser();
+      UserDto user=jwtResponse.getAppUser();
       if(token==null)
          throw new BadCredentialsException("Invalid credentials");
       GoogleIdToken idToken;

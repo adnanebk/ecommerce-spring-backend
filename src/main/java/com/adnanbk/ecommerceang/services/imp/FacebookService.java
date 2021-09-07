@@ -3,11 +3,12 @@ package com.adnanbk.ecommerceang.services.imp;
 
 import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
-import com.adnanbk.ecommerceang.dto.RegisterUserDto;
+import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,30 +16,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class FacebookService implements SocialService {
 
+    private final UserRepo userRepo;
+    private final AuthService authService;
+    private final RestTemplate restTemplate;
 
     @Value("${facebook.clientId}")
     private String clientId;
     @Value("${facebook.clientSecret}")
     private String clientSecret;
-    private final String apiInspector ="https://graph.facebook.com/debug_token";
-    private UserRepo userRepo;
+    private  String apiInspector ="https://graph.facebook.com/debug_token";
     @Value("${social.password}")
     private String password;
-    private RestTemplate restTemplate;
-    private AuthService authService;
 
-    public FacebookService(UserRepo userRepo, RestTemplate restTemplate, AuthService authService) {
-        this.userRepo = userRepo;
-        this.restTemplate = restTemplate;
-        this.authService = authService;
-    }
 
 
     public JwtResponse verify(JwtResponse jwtResponse)  {
         String token=jwtResponse.getToken();
-        RegisterUserDto user=jwtResponse.getAppUser();
+        UserDto user=jwtResponse.getAppUser();
         if(token==null)
             throw new BadCredentialsException("Invalid credentials");
         String accessToken=clientId+'|'+clientSecret;

@@ -5,6 +5,8 @@ import com.adnanbk.ecommerceang.dto.ResponseError;
 import com.adnanbk.ecommerceang.exceptions.CustomFileException;
 import com.adnanbk.ecommerceang.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerceang.exceptions.UserNotEnabledException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -96,6 +98,11 @@ public class ControllerAdvice {
     public ResponseEntity<?> BadCredentialsException(BadCredentialsException ex) {
         return ResponseEntity.badRequest().body(ex);
     }
+        @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<?> JWTVerificationException(JWTVerificationException ex) {
+        return ResponseEntity.badRequest().body(ex);
+    }
+
     @ExceptionHandler(CustomFileException.class)
     public ResponseEntity<?> CustomFilException(CustomFileException ex) {
         return ResponseEntity.badRequest().body(ex);

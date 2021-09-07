@@ -2,6 +2,7 @@ package com.adnanbk.ecommerceang.Controllers;
 
 import com.adnanbk.ecommerceang.models.CreditCard;
 import com.adnanbk.ecommerceang.services.CreditCardService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,12 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/creditCards")
+@AllArgsConstructor
 public class CreditCardController {
 
 
     private CreditCardService creditCardService;
 
-    public CreditCardController(CreditCardService creditCardService) {
-        this.creditCardService = creditCardService;
-    }
 
     @PostMapping
     public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal){

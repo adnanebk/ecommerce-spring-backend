@@ -3,6 +3,8 @@ package com.adnanbk.ecommerceang.Controllers;
 import com.adnanbk.ecommerceang.models.UserOrder;
 import com.adnanbk.ecommerceang.services.UserOderService;
 import com.adnanbk.ecommerceang.validations.OrderValidator;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class OrderController {
 
 
@@ -26,11 +29,6 @@ public class OrderController {
     private final UserOderService userOderService;
     private final OrderValidator orderValidator;
 
-    public OrderController(UserOderService userOderService, OrderValidator orderValidator) {
-
-        this.userOderService = userOderService;
-        this.orderValidator = orderValidator;
-    }
 
 
     @PostMapping("/userOrders")

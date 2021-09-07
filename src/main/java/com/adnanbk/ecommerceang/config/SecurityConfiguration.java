@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerceang.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -21,15 +22,13 @@ import java.util.List;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final Filter jwtAuthorizationFilter;
 
 
-    public SecurityConfiguration(UserDetailsService userDetailsService, Filter jwtAuthorizationFilter) {
-        this.userDetailsService = userDetailsService;
-        this.jwtAuthorizationFilter = jwtAuthorizationFilter;
-    }
+
 
 
     public @Bean PasswordEncoder passwordEncoder() {
@@ -61,13 +60,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    public @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
         final var source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("authorization", "content-type", "x-auth-token"));
+        configuration.setAllowedHeaders(List.of("authorization", "content-type", "x-auth-token","refresh-token"));
         configuration.setExposedHeaders(List.of("x-auth-token"));
         source.registerCorsConfiguration("/**", configuration);
         return source;

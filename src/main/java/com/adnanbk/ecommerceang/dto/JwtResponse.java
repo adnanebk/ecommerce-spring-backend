@@ -11,11 +11,14 @@ import javax.validation.constraints.NotNull;
 public class JwtResponse {
     @NotEmpty
     private String token;
+    @NotEmpty
+    private String refreshToken;
     @NotNull
-    private RegisterUserDto appUser;
+    private UserDto appUser;
 
-    public JwtResponse(String token,RegisterUserDto appUser) {
+    public JwtResponse(String token, String refreshToken, UserDto appUser) {
         this.token = token;
+        this.refreshToken=refreshToken;
         this.appUser=appUser;
     }
 

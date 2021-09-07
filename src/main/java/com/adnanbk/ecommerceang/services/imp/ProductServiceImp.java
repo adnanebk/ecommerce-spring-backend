@@ -5,6 +5,8 @@ import com.adnanbk.ecommerceang.exceptions.CustomFileException;
 import com.adnanbk.ecommerceang.models.Product;
 import com.adnanbk.ecommerceang.reposetories.ProductRepository;
 import com.adnanbk.ecommerceang.services.ProductService;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,17 +17,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImp implements ProductService {
 
-    private ProductRepository productRepo;
-    private ExcelHelperI<Product> excelHelper;
+    private final ProductRepository productRepo;
+    private final ExcelHelperI<Product> excelHelper;
 
     @Value("${api.url}")
     private String baseUrl;
-    public ProductServiceImp(ProductRepository productRepo, ExcelHelperI<Product> excelHelper) {
-        this.productRepo = productRepo;
-        this.excelHelper = excelHelper;
-    }
 
     @Override
     public Product addProduct(Product product) {

@@ -4,35 +4,33 @@ import com.adnanbk.ecommerceang.Jwt.JwtTokenUtil;
 import com.adnanbk.ecommerceang.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
-import com.adnanbk.ecommerceang.dto.RegisterUserDto;
+import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
 
-    private  UserRepo userRepo;
-    private final JwtTokenUtil jwtTokenUtil;
-    private PasswordEncoder passwordEncode;
-    private AuthenticationManager authenticationManager;
-    private EmailSenderService emailSenderService;
+    private final   UserRepo userRepo;
+    private final   JwtTokenUtil jwtTokenUtil;
+    private final PasswordEncoder passwordEncode;
+    private final EmailSenderService emailSenderService;
 
 
-    public AuthServiceImp(UserRepo userRepo, JwtTokenUtil jwtTokenUtil, PasswordEncoder passwordEncode, AuthenticationManager authenticationManager, EmailSenderService emailSenderService) throws BadCredentialsException {
-        this.userRepo = userRepo;
-        this.jwtTokenUtil = jwtTokenUtil;
-        this.passwordEncode = passwordEncode;
-        this.authenticationManager = authenticationManager;
-        this.emailSenderService = emailSenderService;
-    }
+    @Value("${jwt.expiration-time}")
+    private long expirationTime;
 
     @Override
     public JwtResponse handleLogin(LoginUserDto appUser){
@@ -52,24 +50,18 @@ public class AuthServiceImp implements AuthService {
         if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
             throw new BadCredentialsException("Invalid username or password");
 
-
-        final String token = jwtTokenUtil.generateToken(appUser.getUserName(),generateClaims(currentUser));
-        RegisterUserDto registerUserDto = new RegisterUserDto();
-        BeanUtils.copyProperties(currentUser,registerUserDto);
-        return new JwtResponse(token,registerUserDto);
+        return generateTokens(currentUser,null);
     }
     @Override
     public JwtResponse handleRegister(AppUser user)
     {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user= userRepo.save(user);
-        String token = this.jwtTokenUtil.generateToken(user.getUserName(),generateClaims(user));
-        RegisterUserDto registerUserDto = new RegisterUserDto();
-        BeanUtils.copyProperties(user,registerUserDto);
+
            if(!user.isEnabled())
             emailSenderService.sendEmailConfirmation(user);
 
-        return   new JwtResponse(token,registerUserDto);
+        return  generateTokens(user,null);
     }
 
     @Override
@@ -98,11 +90,27 @@ public class AuthServiceImp implements AuthService {
       userRepo.save(user);
     }
 
+    @Override
+    public JwtResponse refreshNewToken(String refreshToken) {
+        String userName = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
+        var user=this.userRepo.findByUserName(userName);
+        return user!=null?generateTokens(user,refreshToken):null;
+    }
+
+    private JwtResponse generateTokens(AppUser user,String refreshToken){
+        String token = this.jwtTokenUtil.generateToken(user.getUserName(),generateClaims(user));
+        refreshToken = Objects.requireNonNullElse(refreshToken,
+                       this.jwtTokenUtil.generateRefreshToken(user.getUserName(),new HashMap<>()));
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user, userDto);
+        userDto.setExpirationDate(new Date(System.currentTimeMillis()+ (expirationTime*60*1000)));
+        return   new JwtResponse(token,refreshToken, userDto);
+    }
 
     private HashMap<String,Object> generateClaims(AppUser appUser){
        var claims =new HashMap<String,Object>();
        claims.put("email",appUser.getEmail());
-
        return claims;
-   };
+   }
+
 }

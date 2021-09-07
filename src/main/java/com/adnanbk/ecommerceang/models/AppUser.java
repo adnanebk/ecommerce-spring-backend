@@ -56,7 +56,7 @@ public class AppUser {
 	@Transient
 	private String confirmPassword;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "appUser",orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "appUser")
 	@JsonIgnore
 	private Set<UserOrder> userOrders;
 

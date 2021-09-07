@@ -5,21 +5,19 @@ import com.adnanbk.ecommerceang.models.CreditCard;
 import com.adnanbk.ecommerceang.reposetories.CreditCardRepo;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.CreditCardService;
+import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 
 @Service
+@AllArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
 
     private CreditCardRepo creditCardRepo;
     private UserRepo  userRepo;
 
-    public CreditCardServiceImpl(CreditCardRepo creditCardRepo, UserRepo userRepo) {
-        this.creditCardRepo = creditCardRepo;
-        this.userRepo = userRepo;
-    }
 
     @Override
     public CreditCard saveCard(CreditCard creditCard, String userName) {

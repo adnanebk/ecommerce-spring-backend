@@ -4,6 +4,7 @@ import com.adnanbk.ecommerceang.models.Product;
 import com.adnanbk.ecommerceang.services.ImageService;
 import com.adnanbk.ecommerceang.services.ProductService;
 import io.swagger.annotations.ApiOperation;
+import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -25,17 +26,11 @@ import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api")
+@AllArgsConstructor
 public class ProductController {
 
     private final ImageService imageService;
     private final ProductService productService;
-
-
-    public ProductController(ImageService imageService, ProductService productService) {
-        this.imageService = imageService;
-        this.productService = productService;
-    }
-
 
   /*  @InitBinder("product") // add this parameter to apply this binder only to request parameters with this name
     protected void bidValidator(WebDataBinder binder) {
