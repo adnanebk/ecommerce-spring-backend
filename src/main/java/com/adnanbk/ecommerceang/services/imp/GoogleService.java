@@ -43,17 +43,11 @@ public class GoogleService implements SocialService {
          if(appUser==null){
            appUser=new AppUser(user.getUserName(),user.getEmail(),user.getFirstName(),user.getLastName(),generateRandomPassword(6));
            appUser.setEnabled(true);
-           var resp= authService.handleRegister(appUser);
-           resp.getAppUser().setIsSocial(true);
-           return resp;
+            appUser= userRepo.save(appUser);
          }
-         else
-         {
-            LoginUserDto loginUserDto=new LoginUserDto(user.getUserName(),appUser.getPassword());
-            var resp= authService.handleLogin(loginUserDto);
-            resp.getAppUser().setIsSocial(true);
-            return resp;
-         }
+         var resp= authService.generateTokens(appUser);
+         resp.getAppUser().setIsSocial(true);
+         return resp;
 
       } else {
          System.out.println("Invalid ID token.");

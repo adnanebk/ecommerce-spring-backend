@@ -32,6 +32,7 @@ public class AuthServiceImp implements AuthService {
     @Value("${jwt.expiration-time}")
     private long expirationTime;
 
+
     @Override
     public JwtResponse handleLogin(LoginUserDto appUser){
       var currentUser  = userRepo.findByUserName(appUser.getUserName());
@@ -50,7 +51,7 @@ public class AuthServiceImp implements AuthService {
         if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
             throw new BadCredentialsException("Invalid username or password");
 
-        return generateTokens(currentUser,null);
+        return generateTokens(currentUser);
     }
     @Override
     public JwtResponse handleRegister(AppUser user)
@@ -106,7 +107,10 @@ public class AuthServiceImp implements AuthService {
         userDto.setExpirationDate(new Date(System.currentTimeMillis()+ (expirationTime*60*1000)));
         return   new JwtResponse(token,refreshToken, userDto);
     }
-
+    @Override
+    public JwtResponse generateTokens(AppUser user){
+    return generateTokens(user,null);
+    }
     private HashMap<String,Object> generateClaims(AppUser appUser){
        var claims =new HashMap<String,Object>();
        claims.put("email",appUser.getEmail());
