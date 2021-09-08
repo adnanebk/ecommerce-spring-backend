@@ -26,8 +26,6 @@ public class GoogleService implements SocialService {
    private final UserRepo userRepo;
    private final AuthService authService;
 
-   @Value("${social.password}")
-   private String password;
 
 
    @Override
@@ -41,14 +39,15 @@ public class GoogleService implements SocialService {
          idToken = googleverifier.verify(token);
       if (idToken != null) {
        //  GoogleIdToken.Payload payload = idToken.getPayload();
-         if(!userRepo.existsByUserName(user.getUserName())){
-         AppUser appUser=new AppUser(user.getUserName(),user.getEmail(),user.getFirstName(),user.getLastName(),password);
-            appUser.setEnabled(true);
-         return authService.handleRegister(appUser);
+         var appUser = userRepo.findByUserName(user.getUserName());
+         if(appUser==null){
+           appUser=new AppUser(user.getUserName(),user.getEmail(),user.getFirstName(),user.getLastName(),generateRandomPassword(6));
+           appUser.setEnabled(true);
+           return authService.handleRegister(appUser);
          }
          else
          {
-            LoginUserDto loginUserDto=new LoginUserDto(user.getUserName(),password);
+            LoginUserDto loginUserDto=new LoginUserDto(user.getUserName(),appUser.getPassword());
             return authService.handleLogin(loginUserDto);
          }
 

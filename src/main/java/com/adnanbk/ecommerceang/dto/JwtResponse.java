@@ -11,7 +11,6 @@ import javax.validation.constraints.NotNull;
 public class JwtResponse {
     @NotEmpty
     private String token;
-    @NotEmpty
     private String refreshToken;
     @NotNull
     private UserDto appUser;
