@@ -16,6 +16,8 @@ public class UserDto {
 
     private String lastName;
 
+    private Boolean isSocial=false;
+
     private boolean enabled;
 
     private Date expirationDate;

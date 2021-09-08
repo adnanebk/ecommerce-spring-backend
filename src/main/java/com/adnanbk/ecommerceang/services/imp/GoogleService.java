@@ -43,12 +43,16 @@ public class GoogleService implements SocialService {
          if(appUser==null){
            appUser=new AppUser(user.getUserName(),user.getEmail(),user.getFirstName(),user.getLastName(),generateRandomPassword(6));
            appUser.setEnabled(true);
-           return authService.handleRegister(appUser);
+           var resp= authService.handleRegister(appUser);
+           resp.getAppUser().setIsSocial(true);
+           return resp;
          }
          else
          {
             LoginUserDto loginUserDto=new LoginUserDto(user.getUserName(),appUser.getPassword());
-            return authService.handleLogin(loginUserDto);
+            var resp= authService.handleLogin(loginUserDto);
+            resp.getAppUser().setIsSocial(true);
+            return resp;
          }
 
       } else {
