@@ -69,11 +69,7 @@ public class AppUser {
 		this.confirmPassword = password;
 	}
 
-	public void addOrder(UserOrder order){
 
-		userOrders.add(order);
-		order.setAppUser(this);
-	}
 
 
 
