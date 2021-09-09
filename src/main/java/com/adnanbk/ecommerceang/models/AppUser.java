@@ -56,9 +56,7 @@ public class AppUser {
 	@Transient
 	private String confirmPassword;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "appUser")
-	@JsonIgnore
-	private Set<UserOrder> userOrders;
+
 
 	public AppUser(String userName, String email, String firstName, String lastName, String password) {
 		this.userName = userName;
