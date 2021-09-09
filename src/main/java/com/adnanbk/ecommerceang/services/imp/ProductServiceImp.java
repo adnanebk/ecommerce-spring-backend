@@ -74,10 +74,7 @@ public class ProductServiceImp implements ProductService {
         return excelHelper.listToExcel(productRepo.findAll());
     }
 
-    private void mapProduct(Product productSrc, Product productDest) {
-        productDest.setFromProduct(productSrc);
-            mapProductImage(productDest);
-    }
+
     private Product mapProductImage(Product productSrc) {
         if (!productSrc.getImage().startsWith("http") && !productSrc.getImage().startsWith("assets"))
             productSrc.setImage(baseUrl + "/products/images/" + productSrc.getImage());
@@ -91,5 +88,17 @@ public class ProductServiceImp implements ProductService {
             product.ifPresent(value -> mapProduct(value, prod));
         }
          return productsInDb;
+    }
+
+    private void mapProduct(Product productSrc, Product productDest) {
+        productDest.setCategory(productSrc.getCategory());
+        productDest.setImage(productSrc.getImage());
+        productDest.setSku(productSrc.getSku());
+        productDest.setName(productSrc.getName());
+        productDest.setDescription(productSrc.getDescription());
+        productDest.setUnitPrice(productSrc.getUnitPrice());
+        productDest.setActive(productSrc.isActive());
+        productDest.setUnitsInStock(productSrc.getUnitsInStock());
+        mapProductImage(productDest);
     }
 }

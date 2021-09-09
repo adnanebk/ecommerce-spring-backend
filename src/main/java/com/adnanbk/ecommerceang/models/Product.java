@@ -69,16 +69,4 @@ public class Product {
     @UpdateTimestamp
     private Date lastUpdated;
 
-
-
-    public void setFromProduct(Product product) {
-        this.setCategory(product.category);
-        this.setImage(product.image);
-        this.setSku(product.sku);
-        this.setName(product.name);
-        this.setDescription(product.description);
-        this.setUnitPrice(product.unitPrice);
-        this.setActive(product.active);
-        this.setUnitsInStock(product.unitsInStock);
-    }
 }
