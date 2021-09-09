@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 @AllArgsConstructor
@@ -27,21 +28,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		return !request.getRequestURI().contains("userOrders") &&
-				!request.getRequestURI().contains("creditCards");
+		String reqUri=request.getRequestURI();
+		return !reqUri.contains("userOrders") &&
+				!reqUri.contains("appUsers") &&
+				!reqUri.contains("creditCards");
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		final String requestTokenHeader = request.getHeader("Authorization");
-
+		final String requestTokenHeader = Objects.requireNonNullElse
+				                           (request.getHeader("Authorization"),"");
 		AppUser appUser = null;
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
 		var tokenArr = requestTokenHeader.split("Bearer ");
 		if (tokenArr.length != 2)
-			throw new JWTVerificationException("JWT Token does not begin with Bearer String");
+			throw new JWTVerificationException("Header not contains Authorization or JWT Token does not begin with Bearer");
 
 	/*		response.setContentType("application/json");
 			response.setCharacterEncoding("UTF-8");
@@ -55,7 +58,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 			}catch (JWTVerificationException ex){
 				response.sendError(HttpStatus.FORBIDDEN.value(),ex.getMessage());
 			}
-            if(userName!=null)
 			 appUser=userRepo.findByUserName(userName);
 			// if token is valid
 			boolean isTokenValid = appUser!=null && appUser.isEnabled() ;

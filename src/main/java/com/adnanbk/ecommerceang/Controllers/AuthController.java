@@ -66,7 +66,7 @@ public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
         return ResponseEntity.badRequest().body("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
 
     }
-    @PostMapping("/appUsers/confirm")
+    @PostMapping("/confirm")
     public ResponseEntity<?> sendEmailConfirmation(@RequestBody String email) {
         authService.sendEmailConfirmation(email);
         return ResponseEntity.ok().build();
