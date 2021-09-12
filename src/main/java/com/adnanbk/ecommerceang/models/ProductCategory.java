@@ -5,6 +5,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name="product_category")
@@ -20,6 +21,7 @@ public class ProductCategory {
 
     @Column(name = "name",unique = true)
     @Length(min = 2,message = "{error.min}")
+    @NotEmpty
     private String name;
 
 /*    @OneToMany( mappedBy = "category",orphanRemoval = true,cascade = CascadeType.ALL)
