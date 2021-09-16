@@ -24,7 +24,6 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     @Transactional
-    @CacheEvict(value = "findByUserNameCache",key="#userName")
     public CreditCard saveCard(CreditCard creditCard, String userName) {
 
         AppUser user=userRepo.findByUserName(userName);
