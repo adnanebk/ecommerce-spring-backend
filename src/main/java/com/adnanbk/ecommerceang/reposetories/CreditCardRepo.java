@@ -16,6 +16,7 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     @Cacheable(value="creditCardCache",key="#userName")
     List<CreditCard> findByAppUser_UserNameOrderByActiveDesc(String userName);
 
+    boolean existsByAppUser_UserName(String userName);
     @Override
     @CacheEvict(value = "creditCardCache",key="#s.appUser.userName")
     <S extends CreditCard> S save(S s);
@@ -27,5 +28,4 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     @Override
     @CacheEvict(value = "creditCardCache",key="#creditCard.appUser.userName")
     void delete(CreditCard creditCard);
-    
 }

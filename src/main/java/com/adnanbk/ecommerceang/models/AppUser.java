@@ -34,7 +34,7 @@ public class AppUser {
 	@NotEmpty
 	private String email;
 
-    @OneToMany( mappedBy = "appUser",cascade = CascadeType.ALL)
+    @OneToMany( mappedBy = "appUser",orphanRemoval = true,cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<CreditCard> creditCards=new HashSet<>();
 

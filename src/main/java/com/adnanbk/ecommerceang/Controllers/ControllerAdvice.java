@@ -34,7 +34,7 @@ public class ControllerAdvice {
     @ExceptionHandler({ PersistenceException.class,ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<?> handleConstraintViolation(RuntimeException ex) {
-        System.out.println("******persistence exception******");
+        System.out.println("******persistence exception******"+ex.getMessage());
 
         if(NestedExceptionUtils.getMostSpecificCause(ex)  instanceof ConstraintViolationException cause) {
             ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Try to fix these errors", generateErrors(cause));
@@ -62,6 +62,10 @@ public class ControllerAdvice {
             message="category name already exists";
        else if(message.contains("credit_card(card_name)"))
             message="Card name already exists";
+        else if(message.contains("user(user_name)"))
+            message="User name already exists";
+        else if(message.contains("user(email)"))
+            message="Email already exists";
        else
            message="An error has been thrown during database modification";
 
