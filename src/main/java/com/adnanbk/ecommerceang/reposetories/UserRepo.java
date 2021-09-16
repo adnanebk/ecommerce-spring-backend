@@ -15,6 +15,8 @@ import java.util.Optional;
 public interface UserRepo extends CrudRepository<AppUser,Long> {
 
     boolean existsByUserName(String userName);
+     boolean existsByEmail(String email);
+
 
     @RestResource(path="byUserName")
     @Cacheable(value = "findByUserNameCache",key ="#userName")
@@ -25,4 +27,5 @@ public interface UserRepo extends CrudRepository<AppUser,Long> {
     <S extends AppUser> S save(S s);
 
     Optional<AppUser> findByEmail(String email);
+
 }

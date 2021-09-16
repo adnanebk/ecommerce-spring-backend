@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Constraint(validatedBy = UniqueUserValidator.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
-public @interface UniqueUser {
+public @interface UniqueEmail {
 
 
      String message() default "Already exists";

@@ -8,6 +8,7 @@ import com.adnanbk.ecommerceang.services.CreditCardService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 
@@ -20,10 +21,16 @@ public class CreditCardServiceImpl implements CreditCardService {
 
 
     @Override
+    @Transactional
     public CreditCard saveCard(CreditCard creditCard, String userName) {
 
         AppUser user=userRepo.findByUserName(userName);
+        var userCards=user.getCreditCards();
+        if(userCards.size()==0)
+        creditCard.setActive(true);
+        userCards.add(creditCard);
         creditCard.setAppUser(user);
+
        return creditCardRepo.save(creditCard);
     }
 

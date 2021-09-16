@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 
-public class UniqueUserValidator implements ConstraintValidator<UniqueUser, String> {
+public class UniqueUserValidator implements ConstraintValidator<UniqueEmail, String> {
 
 
    private  UserRepo userRepo;
@@ -30,7 +30,7 @@ public class UniqueUserValidator implements ConstraintValidator<UniqueUser, Stri
       if(userRepo==null)
          return true;
 
-      boolean isValid = !userRepo.existsByUserName(s);
+      boolean isValid = !userRepo.existsByEmail(s);
       return isValid;
    }
 }

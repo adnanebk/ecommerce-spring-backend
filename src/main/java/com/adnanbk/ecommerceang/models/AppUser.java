@@ -1,15 +1,17 @@
 package com.adnanbk.ecommerceang.models;
 
 import com.adnanbk.ecommerceang.validations.ConfirmPassword;
-import com.adnanbk.ecommerceang.validations.UniqueUser;
+import com.adnanbk.ecommerceang.validations.UniqueEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -22,15 +24,19 @@ public class AppUser {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column
-	@UniqueUser
 	@NotEmpty
+	@Column(unique = true,name = "user_name")
 	private String userName;
 
-	@Column
+	@Column(unique = true)
+	@UniqueEmail
 	@Email
 	@NotEmpty
 	private String email;
+
+    @OneToMany( mappedBy = "appUser",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<CreditCard> creditCards=new HashSet<>();
 
 	@Column
 	@NotEmpty

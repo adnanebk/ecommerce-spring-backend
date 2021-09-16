@@ -39,7 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/userOrders/","/api/appUsers","/api/appUsers/change-password","/api/creditCards/**").authenticated()
+                .antMatchers("/api/userOrders/**","/api/appUsers/**","/api/creditCards/**").authenticated()
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
                 //.and().oauth2Login().permitAll(true).authorizationEndpoint()..and().permitAll();
