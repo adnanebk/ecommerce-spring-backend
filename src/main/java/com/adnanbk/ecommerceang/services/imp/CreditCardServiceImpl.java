@@ -7,6 +7,8 @@ import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.CreditCardService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.IterableUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "findByUserNameCache",key="#userName")
     public CreditCard saveCard(CreditCard creditCard, String userName) {
 
         AppUser user=userRepo.findByUserName(userName);
