@@ -3,6 +3,7 @@ package com.adnanbk.ecommerceang.models;
 import com.adnanbk.ecommerceang.validations.ConfirmPassword;
 import com.adnanbk.ecommerceang.validations.UniqueEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Data
 @ConfirmPassword
 @NoArgsConstructor
+@JsonIgnoreProperties(value = "password",allowSetters = true)
 public class AppUser {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,6 +39,10 @@ public class AppUser {
     @OneToMany( mappedBy = "appUser",orphanRemoval = true,cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<CreditCard> creditCards=new HashSet<>();
+
+	@OneToMany( mappedBy = "appUser",orphanRemoval = true,cascade = CascadeType.ALL)
+	@JsonIgnore
+	private Set<UserOrder> userOrders=new HashSet<>();
 
 	@Column
 	@NotEmpty
@@ -61,8 +67,6 @@ public class AppUser {
 	@Length(min = 4,message = "{error.min}")
 	@Transient
 	private String confirmPassword;
-
-
 
 	public AppUser(String userName, String email, String firstName, String lastName, String password) {
 		this.userName = userName;
