@@ -27,7 +27,7 @@ public class AppUser {
 	private Long id;
 
 	@NotEmpty
-	@Column(unique = true,name = "user_name")
+	@Column(name = "user_name")
 	private String userName;
 
 	@Column(unique = true)
