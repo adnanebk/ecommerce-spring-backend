@@ -8,10 +8,15 @@ import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
+import com.sun.mail.imap.protocol.IMAPSaslAuthenticator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +32,7 @@ public class AuthServiceImp implements AuthService {
     private final   JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncode;
     private final EmailSenderService emailSenderService;
+    private final AuthenticationManager authenticationManager;
 
 
     @Value("${jwt.expiration-time}")
@@ -36,18 +42,14 @@ public class AuthServiceImp implements AuthService {
     @Override
     public JwtResponse handleLogin(LoginUserDto appUser){
       var currentUser  = userRepo.findByUserName(appUser.getUserName());
-       if (currentUser==null)
-            throw new BadCredentialsException("Invalid username or password");
 
-        //UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword());
-
-/*        try {
-            Authentication authentication = authenticationManager.authenticate(authRequest);
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        catch (BadCredentialsException e) {
+        catch (BadCredentialsException | NullPointerException e) {
             throw new BadCredentialsException("Invalid username or password");
-        }*/
+        }
         if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
             throw new BadCredentialsException("Invalid username or password");
 

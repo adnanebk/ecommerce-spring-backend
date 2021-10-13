@@ -17,21 +17,6 @@ import java.util.Date;
 @RepositoryRestResource(excerptProjection = ProductProjection.class)
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    boolean existsBySku(String sku);
-
-    @Query("select count(p)>0 from Product p where p.id != ?1 and  p.name = ?2")
-    boolean existsByIdNotAndName(long id,String name);
-
-    boolean existsByName(String name);
-
-    @Query("select count(p)>0 from Product p where p.id != ?1 and  p.sku = ?2")
-    boolean existsByIdNotAndSkuIs(long id,String sku);
-
-
-    @RestResource(path="byCategory")
-    //@Query("select prod from Product as prod where prod.category.Id = ?1")
-    Page<Product> findByCategoryId(Long id, Pageable pageable);
-
 
 
 

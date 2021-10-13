@@ -24,15 +24,11 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public CreditCard saveCard(CreditCard creditCard, String userName) {
-
         AppUser user=userRepo.findByUserName(userName);
         if(!creditCardRepo.existsByAppUser_UserName(userName))
         creditCard.setActive(true);
         creditCard.setAppUser(user);
-        //userCards.add(creditCard);
-        //userRepo.save(user);
        return creditCardRepo.save(creditCard);
-       //return creditCard;
     }
 
     @Override

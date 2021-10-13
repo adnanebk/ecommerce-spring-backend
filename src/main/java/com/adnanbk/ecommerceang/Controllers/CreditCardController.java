@@ -30,9 +30,7 @@ public class CreditCardController {
         return ResponseEntity.created(location).body(savedCreditCard);
     }
     @PatchMapping("/active")
-    public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard, Principal principal){
-        if(principal==null)
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"you have no access");
+    public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard){
         var cards =creditCardService.activatedCreditCard(creditCard);
         return ResponseEntity.ok().body(cards);
     }

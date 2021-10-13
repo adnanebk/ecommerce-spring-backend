@@ -8,19 +8,35 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.security.access.prepost.PreAuthorize;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.Optional;
 
 @ApiImplicitParams(@ApiImplicitParam(name = "authorization",
         value = "Bearer jwt-token",paramType = "header"))
 public interface UserRepo extends CrudRepository<AppUser,Long> {
 
+    @Override
+    @RolesAllowed("ROLE_ADMIN")
+    Iterable<AppUser> findAll();
+
+    @Override
+    @RestResource(exported = false)
+    Optional<AppUser> findById(Long aLong);
+
+    @Override
+    @RestResource(exported = false)
+    Iterable<AppUser> findAllById(Iterable<Long> iterable);
+
     boolean existsByUserName(String userName);
+
      boolean existsByEmail(String email);
 
 
     @RestResource(path="byUserName")
     @Cacheable(value = "findByUserNameCache",key ="#userName")
+    @PreAuthorize("#username == authentication.principal.username")
     AppUser findByUserName(String userName);
 
     @Override
