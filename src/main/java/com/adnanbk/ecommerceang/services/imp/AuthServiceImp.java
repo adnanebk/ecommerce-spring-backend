@@ -50,8 +50,8 @@ public class AuthServiceImp implements AuthService {
         catch (BadCredentialsException | NullPointerException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
-        if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
-            throw new BadCredentialsException("Invalid username or password");
+/*        if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
+            throw new BadCredentialsException("Invalid username or password");*/
 
         return generateTokens(currentUser);
     }
