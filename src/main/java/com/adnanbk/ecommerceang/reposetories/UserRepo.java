@@ -36,7 +36,6 @@ public interface UserRepo extends CrudRepository<AppUser,Long> {
 
     @RestResource(path="byUserName")
     @Cacheable(value = "findByUserNameCache",key ="#userName")
-    @PreAuthorize("#username == authentication.principal.username")
     AppUser findByUserName(String userName);
 
     @Override
