@@ -6,11 +6,13 @@ import io.swagger.annotations.ApiImplicitParams;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import javax.annotation.security.RolesAllowed;
+import javax.persistence.QueryHint;
 import java.util.Optional;
 
 @ApiImplicitParams(@ApiImplicitParam(name = "authorization",
@@ -35,11 +37,11 @@ public interface UserRepo extends CrudRepository<AppUser,Long> {
 
 
     @RestResource(path="byUserName")
-    @Cacheable(value = "findByUserNameCache",key ="#userName")
+    //@Cacheable(value = "findByUserNameCache",key ="#userName")
+    @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     AppUser findByUserName(String userName);
 
     @Override
-    @CachePut(value = "findByUserNameCache",key="#s.userName")
     <S extends AppUser> S save(S s);
 
     Optional<AppUser> findByEmail(String email);
