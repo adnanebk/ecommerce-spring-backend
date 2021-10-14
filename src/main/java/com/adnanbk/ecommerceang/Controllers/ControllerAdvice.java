@@ -37,7 +37,7 @@ public class ControllerAdvice {
         System.out.println("******persistence exception******"+ex.getMessage());
 
         if(NestedExceptionUtils.getMostSpecificCause(ex)  instanceof ConstraintViolationException cause) {
-            ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Try to fix these errors", generateErrors(cause));
+            ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", generateErrors(cause));
             return ResponseEntity.badRequest().body(apiError);
         }
         if(NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause)
@@ -69,7 +69,7 @@ public class ControllerAdvice {
        else
            message="An error has been thrown during database modification";
 
-        return ResponseEntity.badRequest().body(new RuntimeException(message));
+        return ResponseEntity.badRequest().body(new ApiError(message));
     }
 
 
@@ -89,18 +89,18 @@ public class ControllerAdvice {
                           else
                            errors.add(x.getCode());
                 });
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "Try to fix these errors", errors);
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", errors);
         return   ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<?> handleValidationException(ValidationException ex) {
-        return   ResponseEntity.badRequest().body(ex);
+        return   ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> BadCredentialsException(BadCredentialsException ex) {
-        return ResponseEntity.badRequest().body(ex);
+        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
         @ExceptionHandler(JWTVerificationException.class)
     public ResponseEntity<?> JWTVerificationException(JWTVerificationException ex) {
