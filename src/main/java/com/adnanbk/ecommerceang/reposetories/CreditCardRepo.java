@@ -31,7 +31,7 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
     @RestResource(path="byUserName")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    @PreAuthorize("#username == authentication.principal.username")
+    @PreAuthorize("#userName == authentication.name")
     List<CreditCard> findByAppUser_UserNameOrderByActiveDesc(String userName);
 
 

@@ -29,7 +29,7 @@ public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
 
     @RestResource(path="byUserName")
     @Cacheable(value="orderCache",key="#userName")
-    @PreAuthorize("#username == authentication.principal.username")
+    @PreAuthorize("#username == authentication.username")
     List<UserOrder> findByAppUser_UserName(String userName);
 
     @Override

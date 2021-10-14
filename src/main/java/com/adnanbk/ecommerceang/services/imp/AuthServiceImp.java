@@ -41,17 +41,18 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtResponse handleLogin(LoginUserDto appUser){
-      var currentUser  = userRepo.findByUserName(appUser.getUserName());
-
-        try {
+        var currentUser  = userRepo.findByUserName(appUser.getUserName());
+      /*  try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-        catch (BadCredentialsException | NullPointerException e) {
+        catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
-/*        if(!passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
-            throw new BadCredentialsException("Invalid username or password");*/
+        */
+
+        if(currentUser==null || !passwordEncode.matches(appUser.getPassword(),currentUser.getPassword()))
+            throw new BadCredentialsException("Invalid username or password");
 
         return generateTokens(currentUser);
     }
@@ -61,7 +62,7 @@ public class AuthServiceImp implements AuthService {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user= userRepo.save(user);
 
-           if(!user.isEnabled())
+        if(!user.isEnabled())
             emailSenderService.sendEmailConfirmation(user);
 
         return  generateTokens(user,null);
@@ -89,8 +90,8 @@ public class AuthServiceImp implements AuthService {
         var user = userRepo.findByUserName(userName);
         if(user==null || !passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(),user.getPassword()))
             throw new BadCredentialsException("current password not exists or invalid");
-      user.setPassword(passwordEncode.encode(changeUserPasswordDto.getNewPassword()));
-      userRepo.save(user);
+        user.setPassword(passwordEncode.encode(changeUserPasswordDto.getNewPassword()));
+        userRepo.save(user);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class AuthServiceImp implements AuthService {
     private JwtResponse generateTokens(AppUser user,String refreshToken){
         String token = this.jwtTokenUtil.generateToken(user.getUserName(),generateClaims(user));
         refreshToken = Objects.requireNonNullElse(refreshToken,
-                       this.jwtTokenUtil.generateRefreshToken(user.getUserName(),new HashMap<>()));
+                this.jwtTokenUtil.generateRefreshToken(user.getUserName(),new HashMap<>()));
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
         userDto.setExpirationDate(new Date(System.currentTimeMillis()+ (expirationTime*60*1000)));
@@ -111,12 +112,12 @@ public class AuthServiceImp implements AuthService {
     }
     @Override
     public JwtResponse generateTokens(AppUser user){
-    return generateTokens(user,null);
+        return generateTokens(user,null);
     }
     private HashMap<String,Object> generateClaims(AppUser appUser){
-       var claims =new HashMap<String,Object>();
-       claims.put("email",appUser.getEmail());
-       return claims;
-   }
+        var claims =new HashMap<String,Object>();
+        claims.put("email",appUser.getEmail());
+        return claims;
+    }
 
 }
