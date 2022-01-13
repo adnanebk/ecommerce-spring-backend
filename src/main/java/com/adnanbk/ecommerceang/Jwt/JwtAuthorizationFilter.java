@@ -38,8 +38,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		final String requestTokenHeader = Objects.requireNonNullElse
-				                           (request.getHeader("Authorization"),"");
-		AppUser appUser = null;
+				(request.getHeader("Authorization"),"");
 		// JWT Token is in the form "Bearer token". Remove Bearer word and get
 		// only the Token
 		var tokenArr = requestTokenHeader.split("Bearer ");
@@ -52,21 +51,21 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 		// Once we get the token validate it.
 		if (SecurityContextHolder.getContext().getAuthentication() == null) {
-			String userName=null;
 			try {
-				 userName = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
+				String userName = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
+				AppUser appUser=userRepo.findByUserName(userName);
+
+				boolean isUserEnabled = appUser!=null && appUser.isEnabled() ;
+				// authentication
+				if (isUserEnabled) {
+					jwtTokenUtil.setAuthenticationToken(appUser.getUserName(),appUser.getPassword(),request);
+				}
 			}catch (JWTVerificationException ex){
 				response.sendError(HttpStatus.FORBIDDEN.value(),ex.getMessage());
 			}
-			 appUser=userRepo.findByUserName(userName);
-			// if token is valid
-			boolean isTokenValid = appUser!=null && appUser.isEnabled() ;
-			// authentication
-			if (isTokenValid) {
-				jwtTokenUtil.setAuthenticationToken(appUser.getUserName(),appUser.getPassword(),request);
-			}
+
 		}
-			chain.doFilter(request, response);
+		chain.doFilter(request, response);
 
 	}
 }

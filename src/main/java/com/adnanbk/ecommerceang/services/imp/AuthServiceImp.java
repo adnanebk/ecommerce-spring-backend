@@ -8,9 +8,11 @@ import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
+import com.adnanbk.ecommerceang.services.SocialService;
 import com.sun.mail.imap.protocol.IMAPSaslAuthenticator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,11 +34,25 @@ public class AuthServiceImp implements AuthService {
     private final   JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncode;
     private final EmailSenderService emailSenderService;
-    private final AuthenticationManager authenticationManager;
+    private final SocialService googleService;
+    private final SocialService facebookService;
+
 
 
     @Value("${jwt.expiration-time}")
     private long expirationTime;
+
+    @Override
+    public JwtResponse handleLoginWithGoogle(JwtResponse jwtResponse){
+        var user = googleService.verify(jwtResponse);
+        return doLoginSocialUser(user);
+    }
+
+    @Override
+    public JwtResponse handleLoginWithFacebook(JwtResponse jwtResponse){
+        var user = facebookService.verify(jwtResponse);
+        return doLoginSocialUser(user);
+    }
 
 
     @Override
@@ -110,8 +126,19 @@ public class AuthServiceImp implements AuthService {
         userDto.setExpirationDate(new Date(System.currentTimeMillis()+ (expirationTime*60*1000)));
         return   new JwtResponse(token,refreshToken, userDto);
     }
-    @Override
-    public JwtResponse generateTokens(AppUser user){
+    private JwtResponse doLoginSocialUser(UserDto user) {
+        AppUser appUser=userRepo.findByUserName(user.getUserName());
+        if(appUser==null){
+            appUser=new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(),generateRandomPassword(6));
+            appUser.setEnabled(true);
+            appUser=userRepo.save(appUser);
+        }
+
+        var response= generateTokens(appUser);
+        response.getAppUser().setIsSocial(true);
+        return response;
+    }
+    private JwtResponse generateTokens(AppUser user){
         return generateTokens(user,null);
     }
     private HashMap<String,Object> generateClaims(AppUser appUser){

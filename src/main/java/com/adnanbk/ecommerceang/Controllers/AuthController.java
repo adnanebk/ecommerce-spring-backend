@@ -7,9 +7,11 @@ import com.adnanbk.ecommerceang.dto.LoginUserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
+import com.adnanbk.ecommerceang.services.imp.GoogleService;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +29,7 @@ public class AuthController {
 
 
     private final AuthService authService;
-    private final SocialService googleService;
-    private final SocialService facebookService;
+
     @Value("${front.url}")
     private String frontUrl;
 
@@ -49,12 +50,12 @@ public class AuthController {
 
 @PostMapping("/google")
 public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
-            return googleService.verify(jwtResponse);
+            return authService.handleLoginWithGoogle(jwtResponse);
 
 }
     @PostMapping("/facebook")
     public JwtResponse facebookLogin(@RequestBody @Valid JwtResponse jwtResponse) {
-        return facebookService.verify(jwtResponse);
+        return authService.handleLoginWithFacebook(jwtResponse);
     }
 
     @GetMapping("/verify")

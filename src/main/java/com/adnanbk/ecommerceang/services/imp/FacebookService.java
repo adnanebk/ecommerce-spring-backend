@@ -2,9 +2,7 @@ package com.adnanbk.ecommerceang.services.imp;
 
 
 import com.adnanbk.ecommerceang.dto.JwtResponse;
-import com.adnanbk.ecommerceang.dto.LoginUserDto;
 import com.adnanbk.ecommerceang.dto.UserDto;
-import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
@@ -19,8 +17,6 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class FacebookService implements SocialService {
 
-    private final UserRepo userRepo;
-    private final AuthService authService;
     private final RestTemplate restTemplate;
 
     @Value("${facebook.clientId}")
@@ -32,7 +28,7 @@ public class FacebookService implements SocialService {
 
 
 
-    public JwtResponse verify(JwtResponse jwtResponse)  {
+    public UserDto verify(JwtResponse jwtResponse)  {
         String token=jwtResponse.getToken();
         UserDto user=jwtResponse.getAppUser();
         if(token==null)
@@ -42,15 +38,7 @@ public class FacebookService implements SocialService {
                         ,String.class,token,accessToken);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                AppUser appUser=userRepo.findByUserName(user.getUserName());
-                if(appUser==null){
-                     appUser=new AppUser(user.getUserName(),user.getEmail(),user.getFirstName(),user.getLastName(),generateRandomPassword(6));
-                     appUser.setEnabled(true);
-                    appUser=userRepo.save(appUser);
-                }
-                var resp= authService.generateTokens(appUser);
-                resp.getAppUser().setIsSocial(true);
-                return resp;
+              return user;
 
             } else {
                 System.out.println("Invalid ID token.");

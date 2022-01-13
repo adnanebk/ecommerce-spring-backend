@@ -47,26 +47,26 @@ public class JwtTokenUtil{
 	}
 	private String doGenerateToken(String username,long expiration,HashMap<String,Object> claims) {
 		return  JWT.create().withSubject(username)
-				           .withExpiresAt(new Date(System.currentTimeMillis() +expiration))
-				           .withIssuedAt(new Date(System.currentTimeMillis()))
-		                   .withClaim("claims",claims).sign(algorithm);
+				.withExpiresAt(new Date(System.currentTimeMillis() +expiration))
+				.withIssuedAt(new Date(System.currentTimeMillis()))
+				.withClaim("claims",claims).sign(algorithm);
 	}
 
 
 	public String validateTokenAndReturnSubject(String token) throws JWTVerificationException {
 		var verifier= JWT.require(algorithm).build();
-			var decodedJwt = verifier.verify(token);
-			return decodedJwt.getSubject();
+		var decodedJwt = verifier.verify(token);
+		return decodedJwt.getSubject();
 
 	}
 
-    public void setAuthenticationToken(String userName, String password, HttpServletRequest request) {
+	public void setAuthenticationToken(String userName, String password, HttpServletRequest request) {
 		UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 				userName, password, Collections.singletonList(new SimpleGrantedAuthority("ROLE-USER")));
 		// Stores additional details about the authentication request (IP address, certificate serial number etc.).
 		if(request!=null)
-		usernamePasswordAuthenticationToken
-				.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+			usernamePasswordAuthenticationToken
+					.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		// After setting the Authentication in the context, we specify
 		// that the current user is authenticated. So it passes the
 		// Spring Security Configurations successfully.
