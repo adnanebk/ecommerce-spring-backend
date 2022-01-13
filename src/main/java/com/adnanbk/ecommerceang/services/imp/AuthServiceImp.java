@@ -44,14 +44,14 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtResponse handleLoginWithGoogle(JwtResponse jwtResponse){
-        var user = googleService.verify(jwtResponse);
-        return doLoginSocialUser(user);
+         googleService.verify(jwtResponse);
+        return doLoginSocialUser(jwtResponse.getAppUser());
     }
 
     @Override
     public JwtResponse handleLoginWithFacebook(JwtResponse jwtResponse){
-        var user = facebookService.verify(jwtResponse);
-        return doLoginSocialUser(user);
+         facebookService.verify(jwtResponse);
+        return doLoginSocialUser(jwtResponse.getAppUser());
     }
 
 

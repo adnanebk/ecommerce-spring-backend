@@ -1,9 +1,6 @@
 package com.adnanbk.ecommerceang.services.imp;
 
 import com.adnanbk.ecommerceang.dto.JwtResponse;
-import com.adnanbk.ecommerceang.dto.UserDto;
-import com.adnanbk.ecommerceang.models.AppUser;
-import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.SocialService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -25,21 +22,17 @@ public class GoogleService implements SocialService {
 
 
    @Override
-   public UserDto verify(JwtResponse jwtResponse)  {
+   public void verify(JwtResponse jwtResponse)  {
       String token=jwtResponse.getToken();
-      UserDto user=jwtResponse.getAppUser();
       if(token==null)
          throw new BadCredentialsException("Invalid credentials");
       GoogleIdToken idToken;
       try {
          idToken = googleverifier.verify(token);
-      if (idToken != null) {
-       //  GoogleIdToken.Payload payload = idToken.getPayload();
+         //  GoogleIdToken.Payload payload = idToken.getPayload();
 
-         return user;
+         if (idToken == null) {
 
-
-      } else {
          System.out.println("Invalid ID token.");
          throw new BadCredentialsException("Invalid credentials");
       }

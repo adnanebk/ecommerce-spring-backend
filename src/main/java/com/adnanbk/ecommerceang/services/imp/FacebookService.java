@@ -2,9 +2,6 @@ package com.adnanbk.ecommerceang.services.imp;
 
 
 import com.adnanbk.ecommerceang.dto.JwtResponse;
-import com.adnanbk.ecommerceang.dto.UserDto;
-import com.adnanbk.ecommerceang.reposetories.UserRepo;
-import com.adnanbk.ecommerceang.services.AuthService;
 import com.adnanbk.ecommerceang.services.SocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,19 +25,15 @@ public class FacebookService implements SocialService {
 
 
 
-    public UserDto verify(JwtResponse jwtResponse)  {
+    public void verify(JwtResponse jwtResponse)  {
         String token=jwtResponse.getToken();
-        UserDto user=jwtResponse.getAppUser();
         if(token==null)
             throw new BadCredentialsException("Invalid credentials");
         String accessToken=clientId+'|'+clientSecret;
         ResponseEntity<String> response=  restTemplate.getForEntity(apiInspector +"?input_token={token}&access_token={app-token}"
                         ,String.class,token,accessToken);
 
-            if (response.getStatusCode().is2xxSuccessful()) {
-              return user;
-
-            } else {
+            if (!response.getStatusCode().is2xxSuccessful()) {
                 System.out.println("Invalid ID token.");
                 throw new BadCredentialsException("Invalid credentials");
             }
