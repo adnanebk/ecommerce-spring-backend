@@ -32,7 +32,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public Iterable<CreditCard> activatedCreditCard(CreditCard creditCard) {
+    public Iterable<CreditCard> activeCreditCard(CreditCard creditCard) {
       var cards=  creditCardRepo.findAll();
       cards.forEach(card->{
           if(card.getId().equals(creditCard.getId())) {

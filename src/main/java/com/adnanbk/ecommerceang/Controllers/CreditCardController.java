@@ -3,10 +3,8 @@ package com.adnanbk.ecommerceang.Controllers;
 import com.adnanbk.ecommerceang.models.CreditCard;
 import com.adnanbk.ecommerceang.services.CreditCardService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
@@ -31,7 +29,7 @@ public class CreditCardController {
     }
     @PatchMapping("/active")
     public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard){
-        var cards =creditCardService.activatedCreditCard(creditCard);
+        var cards =creditCardService.activeCreditCard(creditCard);
         return ResponseEntity.ok().body(cards);
     }
 }
