@@ -17,10 +17,6 @@ public interface AuthService {
 
     JwtResponse handleRegister(AppUser user);
 
-    boolean verify(String token);
-
-    void sendEmailConfirmation(String user);
-
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName);
 
     JwtResponse refreshNewToken(String refreshToken);

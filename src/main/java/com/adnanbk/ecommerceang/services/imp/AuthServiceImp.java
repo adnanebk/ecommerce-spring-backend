@@ -8,17 +8,12 @@ import com.adnanbk.ecommerceang.dto.UserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.reposetories.UserRepo;
 import com.adnanbk.ecommerceang.services.AuthService;
+import com.adnanbk.ecommerceang.services.EmailSenderService;
 import com.adnanbk.ecommerceang.services.SocialService;
-import com.sun.mail.imap.protocol.IMAPSaslAuthenticator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +29,6 @@ public class AuthServiceImp implements AuthService {
     private final   UserRepo userRepo;
     private final   JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncode;
-    private final EmailSenderService emailSenderService;
     private final SocialService googleService;
     private final SocialService facebookService;
 
@@ -79,28 +73,12 @@ public class AuthServiceImp implements AuthService {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user= userRepo.save(user);
 
-        if(!user.isEnabled())
-            emailSenderService.sendEmailConfirmation(user);
 
         return  generateTokens(user,null);
     }
 
-    @Override
-    public boolean verify(String token) {
-        AppUser user = emailSenderService.verifyToken(token);
-        if(user!=null)
-        {
-            user.setEnabled(true);
-            userRepo.save(user);
-            return true;
-        }
-        return false;
-    }
-    @Override
-    public void sendEmailConfirmation(String email){
-        AppUser user=userRepo.findByEmail(email).orElseThrow(()-> new BadCredentialsException("could not found this email"));
-        emailSenderService.sendEmailConfirmation(user);
-    }
+
+
 
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName) {

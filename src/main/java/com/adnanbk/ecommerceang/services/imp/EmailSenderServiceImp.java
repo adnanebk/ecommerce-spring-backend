@@ -4,11 +4,15 @@ import com.adnanbk.ecommerceang.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.models.ConfirmationToken;
 import com.adnanbk.ecommerceang.reposetories.ConfirmationTokenRepository;
+import com.adnanbk.ecommerceang.reposetories.CreditCardRepo;
+import com.adnanbk.ecommerceang.reposetories.UserRepo;
+import com.adnanbk.ecommerceang.services.EmailSenderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -18,10 +22,11 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class EmailSenderService {
+public class EmailSenderServiceImp implements EmailSenderService {
 
     private final JavaMailSender javaMailSender;
     private final ConfirmationTokenRepository confirmationTokenRepo;
+    private final UserRepo userRepo;
     @Value("${spring.mail.name}")
     private String name;
     @Value("${spring.mail.email}")
@@ -29,8 +34,14 @@ public class EmailSenderService {
     @Value("${api.url}")
     private String url;
 
+
     @Async
-    public void sendEmailConfirmation(AppUser user) {
+    @Override
+    public void sendEmailConfirmation(String email) {
+
+        AppUser user=userRepo.findByEmail(email).orElseThrow(()-> new BadCredentialsException("could not found this email"));
+
+
         String destAddress = user.getEmail();
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
@@ -58,7 +69,8 @@ public class EmailSenderService {
         javaMailSender.send(message);
     }
 
-    public AppUser verifyToken(String _token) {
+    @Override
+    public boolean verifyToken(String _token) {
         if (_token != null && !_token.isEmpty()) {
             var token = confirmationTokenRepo.findById(_token)
                                        .orElseThrow(()->new InvalidTokenException("invalid token"));
@@ -67,7 +79,16 @@ public class EmailSenderService {
             if(token.getAppUser().isEnabled())
                 throw new InvalidTokenException("user is already verified");
 
-          return token.getAppUser();
+           AppUser user = token.getAppUser();
+
+            if(user==null)
+            return false;
+
+                user.setEnabled(true);
+                userRepo.save(user);
+                return true;
+
+
         }
         throw new InvalidTokenException("invalid token");    }
 }

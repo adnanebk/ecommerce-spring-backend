@@ -6,17 +6,13 @@ import com.adnanbk.ecommerceang.dto.JwtResponse;
 import com.adnanbk.ecommerceang.dto.LoginUserDto;
 import com.adnanbk.ecommerceang.models.AppUser;
 import com.adnanbk.ecommerceang.services.AuthService;
-import com.adnanbk.ecommerceang.services.SocialService;
-import com.adnanbk.ecommerceang.services.imp.GoogleService;
-import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.adnanbk.ecommerceang.services.EmailSenderService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -29,6 +25,8 @@ public class AuthController {
 
 
     private final AuthService authService;
+    private final EmailSenderService emailSenderService;
+
 
     @Value("${front.url}")
     private String frontUrl;
@@ -40,7 +38,9 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public JwtResponse create( @RequestBody @Valid AppUser user)   {
         user.setEnabled(false);
-        return  authService.handleRegister(user);
+        JwtResponse jwtResponse=  authService.handleRegister(user);
+            emailSenderService.sendEmailConfirmation(user.getEmail());
+           return  jwtResponse;
 
     }
     @PostMapping("/login")
@@ -60,7 +60,7 @@ public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
 
     @GetMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestParam String token) {
-     boolean isVerified= authService.verify(token);
+     boolean isVerified= emailSenderService.verifyToken(token);
      if(isVerified)
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl+"?verified=true")).build();
 
@@ -69,7 +69,7 @@ public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
     }
     @PostMapping("/confirm")
     public ResponseEntity<?> sendEmailConfirmation(@RequestBody String email) {
-        authService.sendEmailConfirmation(email);
+        emailSenderService.sendEmailConfirmation(email);
         return ResponseEntity.ok().build();
      }
     @PostMapping("/appUsers/change-password")
