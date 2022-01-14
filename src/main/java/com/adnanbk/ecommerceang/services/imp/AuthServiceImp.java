@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -129,7 +130,7 @@ public class AuthServiceImp implements AuthService {
     private JwtResponse doLoginSocialUser(UserDto user) {
         AppUser appUser=userRepo.findByUserName(user.getUserName());
         if(appUser==null){
-            appUser=new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(),generateRandomPassword(6));
+            appUser=new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(),generateRandomPassword());
             appUser.setEnabled(true);
             appUser=userRepo.save(appUser);
         }
@@ -145,6 +146,27 @@ public class AuthServiceImp implements AuthService {
         var claims =new HashMap<String,Object>();
         claims.put("email",appUser.getEmail());
         return claims;
+    }
+
+    // Method to generate a random alphanumeric password of a specific length
+    private String generateRandomPassword()
+    {
+        // ASCII range – alphanumeric (0-9, a-z, A-Z)
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+
+        // each iteration of the loop randomly chooses a character from the given
+        // ASCII range and appends it to the `StringBuilder` instance
+
+        for (int i = 0; i < 6; i++)
+        {
+            int randomIndex = random.nextInt(chars.length());
+            sb.append(chars.charAt(randomIndex));
+        }
+
+        return sb.toString();
     }
 
 }
