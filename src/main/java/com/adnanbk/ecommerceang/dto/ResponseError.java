@@ -27,8 +27,7 @@ public class ResponseError {
         StringBuilder name= new StringBuilder();
         for (char c : fieldName.toCharArray()) {
             if(Character.isUpperCase(c))
-                name.append(" ").append(c);
-            else
+                name.append(" ");
             name.append(c);
         }
         return name.toString().toLowerCase();

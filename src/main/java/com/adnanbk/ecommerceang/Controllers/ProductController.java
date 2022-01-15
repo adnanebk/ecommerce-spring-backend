@@ -32,10 +32,7 @@ public class ProductController {
     private final ImageService imageService;
     private final ProductService productService;
 
-  /*  @InitBinder("product") // add this parameter to apply this binder only to request parameters with this name
-    protected void bidValidator(WebDataBinder binder) {
-        binder.addValidators(productValidator);
-    }*/
+
 
 
     @PostMapping(value = "/products/images",consumes ="multipart/form-data")
@@ -67,7 +64,7 @@ public class ProductController {
     @PutMapping("/products/v2")
     @ApiOperation(value = "update product",notes = "This endpoint updates a product and bind its category based on category name"
             ,response = Product.class)
-    public ResponseEntity<?> updateProduct(@Valid @RequestBody Product product){
+    public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product product){
         Product updatedProduct =productService.updateProduct(product);
         if(updatedProduct==null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Products not found");
@@ -77,7 +74,7 @@ public class ProductController {
 
     @PutMapping("/products/list")
     @ApiOperation(value = "update products",notes = "This endpoint updates  products and bind their categories by using bulk update ")
-    public ResponseEntity<?> updateProducts(@Valid @RequestBody List<Product> products){
+    public ResponseEntity<List<Product>> updateProducts(@Valid @RequestBody List<Product> products){
         List<Product> updatedProducts =productService.updateProducts(products);
         if(updatedProducts.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Products not found");
@@ -86,7 +83,7 @@ public class ProductController {
     }
     @DeleteMapping("/products/v2")
     @ApiOperation(value = "remove list of products")
-    public ResponseEntity<?> removeProducts(@RequestParam List<Long> Ids)
+    public ResponseEntity<String> removeProducts(@RequestParam List<Long> Ids)
     {
         if  (!Ids.isEmpty())
             productService.removeProducts(Ids);
@@ -97,12 +94,13 @@ public class ProductController {
     public Callable<ResponseEntity<List<Product>>> addProductsFromExcel(MultipartFile file)
     {
             List<Product> products = productService.saveAllFromExcel(file);
-            return ()-> new ResponseEntity(products,HttpStatus.CREATED);
+            return ()-> new ResponseEntity<>(products,HttpStatus.CREATED);
     }
 
     @GetMapping("/products/excel")
     @ApiOperation(value = "download excel file of products")
-    public Callable<ResponseEntity<?>> loadProducts(@RequestParam(required = false) List<Long> Ids)
+    public Callable<ResponseEntity<InputStreamResource>>
+                   loadProducts(@RequestParam(required = false) List<Long> Ids)
     {
         return   ()->{
             String filename = "products-"+ LocalDate.now()+".xlsx";

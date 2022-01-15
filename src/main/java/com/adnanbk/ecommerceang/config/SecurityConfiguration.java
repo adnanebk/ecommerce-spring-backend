@@ -37,7 +37,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     protected @Override void configure(HttpSecurity http) throws Exception {
         http.cors().and()
-                .csrf().disable()
+                //.csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/userOrders/**","/api/appUsers/**","/api/creditCards/**").authenticated()
                 //.antMatchers("/api/google").authenticated()

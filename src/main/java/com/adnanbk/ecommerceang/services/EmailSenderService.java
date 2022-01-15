@@ -6,5 +6,5 @@ public interface EmailSenderService {
 
     void sendEmailConfirmation(String email);
 
-    boolean verifyToken(String token);
+    void verifyToken(String token);
 }

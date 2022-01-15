@@ -60,14 +60,13 @@ public class ProductServiceImp implements ProductService {
         try {
             List<Product> products = excelHelper.excelToList(multipartFile.getInputStream())
                                     .stream().map(productMapper::mapProductImage).toList();
-                 if(products.size()>0)
+                 if(!products.isEmpty())
                 return productRepo.saveAll(products);
-            throw new CustomFileException("We can't process the file,please try again");
 
         } catch (IOException e) {
             throw new CustomFileException("We can't process the file,please try again");
-
         }
+        throw new CustomFileException("there are no product to process");
 
     }
 

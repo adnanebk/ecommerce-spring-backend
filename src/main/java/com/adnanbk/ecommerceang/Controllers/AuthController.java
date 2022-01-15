@@ -59,28 +59,27 @@ public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyUser(@RequestParam String token) {
-     boolean isVerified= emailSenderService.verifyToken(token);
-     if(isVerified)
+    public ResponseEntity<String> verifyUser(@RequestParam String token) {
+          emailSenderService.verifyToken(token);
+
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl+"?verified=true")).build();
 
-        return ResponseEntity.badRequest().body("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
 
     }
     @PostMapping("/confirm")
-    public ResponseEntity<?> sendEmailConfirmation(@RequestBody String email) {
+    public ResponseEntity<String> sendEmailConfirmation(@RequestBody String email) {
         emailSenderService.sendEmailConfirmation(email);
         return ResponseEntity.ok().build();
      }
     @PostMapping("/appUsers/change-password")
-    public ResponseEntity<?> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto,Principal principal) {
+    public ResponseEntity<String> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto,Principal principal) {
       this.authService.changePassword(changeUserPasswordDto,principal.getName());
         return ResponseEntity.ok().build();
     }
 
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshNewToken(@RequestBody  String refreshToken) {
+    public ResponseEntity<JwtResponse> refreshNewToken(@RequestBody  String refreshToken) {
       var jwtResponse=  this.authService.refreshNewToken(refreshToken);
         return ResponseEntity.ok().body(jwtResponse);
     }

@@ -45,7 +45,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtResponse handleLoginWithFacebook(JwtResponse jwtResponse){
-         facebookService.verify(jwtResponse);
+        boolean isTokenValid =facebookService.verify(jwtResponse);
+        if(!isTokenValid)
+            throw new BadCredentialsException("Invalid credentials");
         return doLoginSocialUser(jwtResponse.getAppUser());
     }
 

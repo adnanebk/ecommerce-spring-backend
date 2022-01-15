@@ -70,7 +70,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
     }
 
     @Override
-    public boolean verifyToken(String _token) {
+    public void verifyToken(String _token) {
         if (_token != null && !_token.isEmpty()) {
             var token = confirmationTokenRepo.findById(_token)
                                        .orElseThrow(()->new InvalidTokenException("invalid token"));
@@ -82,11 +82,10 @@ public class EmailSenderServiceImp implements EmailSenderService {
            AppUser user = token.getAppUser();
 
             if(user==null)
-            return false;
+            throw new InvalidTokenException("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
 
                 user.setEnabled(true);
                 userRepo.save(user);
-                return true;
 
 
         }
