@@ -35,7 +35,7 @@ public class ImageServiceImp implements ImageService {
     private void createUploadingDirectory() {
         try {
             root=Paths.get(uploadDir);
-           // if(!Files.isDirectory(Paths.get(uploadDir)))
+            if(!Files.isDirectory(Paths.get(uploadDir)))
             Files.createDirectory(Paths.get(uploadDir));
         } catch (IOException e) {
             throw new CustomFileException("Could not initialize folder for upload!");
