@@ -2,6 +2,7 @@ package com.adnanbk.ecommerceang.services.imp;
 
 import com.adnanbk.ecommerceang.Utils.ExcelHelperI;
 import com.adnanbk.ecommerceang.exceptions.CustomFileException;
+import com.adnanbk.ecommerceang.mappers.ProductMapper;
 import com.adnanbk.ecommerceang.models.Product;
 import com.adnanbk.ecommerceang.reposetories.ProductRepository;
 import com.adnanbk.ecommerceang.services.ProductService;
@@ -13,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,26 +25,28 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperI<Product> excelHelper;
+    private final ProductMapper productMapper;
 
-    @Value("${api.url}")
-    private String baseUrl;
+
 
     @Override
     public Product addProduct(Product product) {
-           mapProductImage(product);
+        productMapper.mapProductImage(product);
         return productRepo.save(product);
     }
 
     @Override
     public  Product updateProduct(Product product) {
         Product prod= productRepo.getOne(product.getId());
-        mapProduct(product, prod);
+        productMapper.mapProduct(product, prod);
         return   productRepo.save(prod);
     }
 
     @Override
     public List<Product> updateProducts(List<Product> products) {
-        var updatedProducts = mapProducts(products);
+        var productsInDb= productRepo.findAllById(products.stream()
+                .map(Product::getId).collect(Collectors.toList()));
+        var updatedProducts = productMapper.mapProducts(products,productsInDb);
         return productRepo.saveAll(updatedProducts);
     }
 
@@ -54,7 +59,7 @@ public class ProductServiceImp implements ProductService {
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {
         try {
             List<Product> products = excelHelper.excelToList(multipartFile.getInputStream())
-                                    .stream().map(this::mapProductImage).toList();
+                                    .stream().map(productMapper::mapProductImage).toList();
                  if(products.size()>0)
                 return productRepo.saveAll(products);
             throw new CustomFileException("We can't process the file,please try again");
@@ -66,8 +71,6 @@ public class ProductServiceImp implements ProductService {
 
     }
 
-
-
     public ByteArrayInputStream loadToExcel(List<Long> Ids) {
         if (Ids != null && !Ids.isEmpty())
             return excelHelper.listToExcel(productRepo.findAllById(Ids));
@@ -75,30 +78,15 @@ public class ProductServiceImp implements ProductService {
     }
 
 
-    private Product mapProductImage(Product productSrc) {
-        if (!productSrc.getImage().startsWith("http") && !productSrc.getImage().startsWith("assets"))
-            productSrc.setImage(baseUrl + "/products/images/" + productSrc.getImage());
-        return  productSrc;
-    }
-    private List<Product> mapProducts(List<Product> products) {
+/*    private List<Product> mapProducts(List<Product> products) {
         var productsInDb= productRepo.findAllById(products.stream()
                 .map(Product::getId).collect(Collectors.toList()));
         for (Product prod : productsInDb) {
             var product = products.stream().filter(p -> p.getId().equals(prod.getId())).findFirst();
             product.ifPresent(value -> mapProduct(value, prod));
         }
-         return productsInDb;
-    }
+        return productsInDb;
+    }*/
 
-    private void mapProduct(Product productSrc, Product productDest) {
-        productDest.setCategory(productSrc.getCategory());
-        productDest.setImage(productSrc.getImage());
-        productDest.setSku(productSrc.getSku());
-        productDest.setName(productSrc.getName());
-        productDest.setDescription(productSrc.getDescription());
-        productDest.setUnitPrice(productSrc.getUnitPrice());
-        productDest.setActive(productSrc.isActive());
-        productDest.setUnitsInStock(productSrc.getUnitsInStock());
-        mapProductImage(productDest);
-    }
+
 }
