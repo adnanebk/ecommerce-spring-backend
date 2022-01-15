@@ -84,24 +84,19 @@ public class ControllerAdvice {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
         @ExceptionHandler(JWTVerificationException.class)
-    public ResponseEntity<Object> JWTVerificationException(JWTVerificationException ex) {
-        return ResponseEntity.badRequest().body(ex);
+    public ResponseEntity<Exception> JWTVerificationException(JWTVerificationException ex) {
+
+        return ResponseEntity.badRequest().body(new RuntimeException("error while verifying jwt token"));
     }
 
-    @ExceptionHandler(CustomFileException.class)
-    public ResponseEntity<Object> CustomFilException(CustomFileException ex) {
-        return ResponseEntity.badRequest().body(ex);
-    }
+
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseBody
     public String InvalidTokenException(InvalidTokenException ex) {
         return "<h2>"+ex.getMessage()+"</h2>";
     }
 
-    @ExceptionHandler(UserNotEnabledException.class)
-    public ResponseEntity<Object> UserNotEnabledException(UserNotEnabledException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex);
-    }
+
     private Set<ResponseError> generateErrors(ConstraintViolationException cause) {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
