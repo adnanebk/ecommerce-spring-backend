@@ -20,7 +20,9 @@
         <java.version>16</java.version>
                <sonar.organization>adnanebk</sonar.organization>
   <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    </properties>
+    <maven.compiler.source>16</maven.compiler.source>
+ <maven.compiler.target>16</maven.compiler.target>
+</properties>
     <repositories>
         <repository>
             <id>jcenter-snapshots</id>
