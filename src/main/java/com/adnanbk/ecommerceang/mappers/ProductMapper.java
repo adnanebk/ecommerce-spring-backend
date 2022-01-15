@@ -7,15 +7,12 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class ProductMapper {
 
     @Value("${api.url}")
     private String baseUrl;
-
-
 
 
     public void mapProduct(Product productSrc, Product productDest) {
@@ -30,7 +27,7 @@ public class ProductMapper {
         mapProductImage(productDest);
     }
 
-    public List<Product> mapProducts(List<Product> productsSrc,List<Product> productsDest) {
+    public void mapProducts(List<Product> productsSrc,List<Product> productsDest) {
         Collections.sort(productsSrc, Comparator.comparing(Product::getId));
         Collections.sort(productsDest, Comparator.comparing(Product::getId));
 
@@ -41,8 +38,6 @@ public class ProductMapper {
               mapProduct(productSrc,productInDb);
 
         }
-        return productsDest;
-
     }
 
     public  Product mapProductImage(Product productSrc) {

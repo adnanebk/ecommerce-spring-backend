@@ -46,8 +46,8 @@ public class ProductServiceImp implements ProductService {
     public List<Product> updateProducts(List<Product> products) {
         var productsInDb= productRepo.findAllById(products.stream()
                 .map(Product::getId).collect(Collectors.toList()));
-        var updatedProducts = productMapper.mapProducts(products,productsInDb);
-        return productRepo.saveAll(updatedProducts);
+        productMapper.mapProducts(products,productsInDb);
+        return productRepo.saveAll(productsInDb);
     }
 
 
