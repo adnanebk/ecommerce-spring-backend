@@ -29,8 +29,6 @@ public class ConfirmPasswordValidator implements ConstraintValidator<ConfirmPass
         if (appUser == null)
             return false;
 
-        boolean isValid = appUser.getConfirmPassword().equals(appUser.getPassword());
-
-        return isValid;
+        return appUser.getConfirmPassword().equals(appUser.getPassword());
     }
 }

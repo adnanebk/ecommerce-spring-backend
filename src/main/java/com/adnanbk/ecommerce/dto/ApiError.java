@@ -9,9 +9,9 @@ import java.util.Set;
 public class ApiError {
     private Integer status;
     private String message;
-    private Set errors;
+    private Set<?> errors;
 
-    public ApiError(Integer status, String message, Set errors) {
+    public ApiError(Integer status, String message, Set<?> errors) {
         super();
         this.status = status;
         this.message = message;
@@ -23,10 +23,4 @@ public class ApiError {
 
     }
 
-/*    public ApiError(HttpStatus status, String message, String error) {
-        super();
-        this.status = status;
-        this.message = message;
-        errors = Arrays.asList(error);
-    }*/
 }
