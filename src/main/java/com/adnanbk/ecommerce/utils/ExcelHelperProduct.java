@@ -30,7 +30,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             "Category", "Active", "Image url"};
 
     static final String SHEET = "Products";
-    private  List<Product> products;
+
     private ProductCategoryRepository categoryRepo;
 
     public ExcelHelperProduct(ProductCategoryRepository categoryRepo) {
@@ -44,7 +44,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
 
     @Override
     public List<Product> excelToList(InputStream is) {
-           products  = new ArrayList<>();
+        List<Product>  products  = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
@@ -100,7 +100,8 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                     }
                     case 6 -> product.setActive(currentCell.getBooleanCellValue());
                     case 7 -> product.setImage(currentCell.getStringCellValue());
-                    default -> System.err.println("cell not expected");
+                    default -> {
+                    }
                 }
                 return 1;
             } catch (IllegalStateException ex) {
