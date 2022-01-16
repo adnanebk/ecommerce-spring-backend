@@ -32,27 +32,28 @@ public class AuthController {
     private String frontUrl;
 
 
-
     @PostMapping(value = "/register")
-    @ApiOperation(value = "register new user",response =JwtResponse.class )
+    @ApiOperation(value = "register new user", response = JwtResponse.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtResponse create( @RequestBody @Valid AppUser user)   {
+    public JwtResponse create(@RequestBody @Valid AppUser user) {
         user.setEnabled(false);
-        JwtResponse jwtResponse=  authService.handleRegister(user);
-            emailSenderService.sendEmailConfirmation(user.getEmail());
-           return  jwtResponse;
+        JwtResponse jwtResponse = authService.handleRegister(user);
+        emailSenderService.sendEmailConfirmation(user.getEmail());
+        return jwtResponse;
 
     }
+
     @PostMapping("/login")
     public JwtResponse authenticateUser(@RequestBody @Valid LoginUserDto appUser) {
-    return authService.handleLogin(appUser);
-}
+        return authService.handleLogin(appUser);
+    }
 
-@PostMapping("/google")
-public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
-            return authService.handleLoginWithGoogle(jwtResponse);
+    @PostMapping("/google")
+    public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse) {
+        return authService.handleLoginWithGoogle(jwtResponse);
 
-}
+    }
+
     @PostMapping("/facebook")
     public JwtResponse facebookLogin(@RequestBody @Valid JwtResponse jwtResponse) {
         return authService.handleLoginWithFacebook(jwtResponse);
@@ -60,27 +61,29 @@ public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse){
 
     @GetMapping("/verify")
     public ResponseEntity<String> verifyUser(@RequestParam String token) {
-          emailSenderService.verifyToken(token);
+        emailSenderService.verifyToken(token);
 
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl+"?verified=true")).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl + "?verified=true")).build();
 
 
     }
+
     @PostMapping("/confirm")
     public ResponseEntity<String> sendEmailConfirmation(@RequestBody String email) {
         emailSenderService.sendEmailConfirmation(email);
         return ResponseEntity.ok().build();
-     }
+    }
+
     @PostMapping("/appUsers/change-password")
-    public ResponseEntity<String> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto,Principal principal) {
-      this.authService.changePassword(changeUserPasswordDto,principal.getName());
+    public ResponseEntity<String> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
+        this.authService.changePassword(changeUserPasswordDto, principal.getName());
         return ResponseEntity.ok().build();
     }
 
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<JwtResponse> refreshNewToken(@RequestBody  String refreshToken) {
-      var jwtResponse=  this.authService.refreshNewToken(refreshToken);
+    public ResponseEntity<JwtResponse> refreshNewToken(@RequestBody String refreshToken) {
+        var jwtResponse = this.authService.refreshNewToken(refreshToken);
         return ResponseEntity.ok().body(jwtResponse);
     }
 }

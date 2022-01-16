@@ -19,36 +19,34 @@ import java.util.Comparator;
 public class CreditCardServiceImpl implements CreditCardService {
 
     private CreditCardRepo creditCardRepo;
-    private UserRepo  userRepo;
+    private UserRepo userRepo;
 
 
     @Override
     public CreditCard saveCard(CreditCard creditCard, String userName) {
-        AppUser user=userRepo.findByUserName(userName);
+        AppUser user = userRepo.findByUserName(userName);
         activeCrediCardIfNew(creditCard, userName);
         creditCard.setAppUser(user);
-       return creditCardRepo.save(creditCard);
+        return creditCardRepo.save(creditCard);
     }
 
     private void activeCrediCardIfNew(CreditCard creditCard, String userName) {
-        if(!creditCardRepo.existsByAppUser_UserName(userName))
-        creditCard.setActive(true);
+        if (!creditCardRepo.existsByAppUser_UserName(userName))
+            creditCard.setActive(true);
     }
 
     @Override
     public Iterable<CreditCard> activeCreditCard(CreditCard creditCard) {
-      var cards=  creditCardRepo.findAll();
-      cards.forEach(card->{
-          if(card.getId().equals(creditCard.getId())) {
-              card.setActive(creditCard.getActive());
-              creditCardRepo.save(card);
-          }
-          else if(creditCard.getActive() && card.getActive())
-                {
-                    card.setActive(false);
-                    creditCardRepo.save(card);
-                }
-      });
+        var cards = creditCardRepo.findAll();
+        cards.forEach(card -> {
+            if (card.getId().equals(creditCard.getId())) {
+                card.setActive(creditCard.getActive());
+                creditCardRepo.save(card);
+            } else if (creditCard.getActive() && card.getActive()) {
+                card.setActive(false);
+                creditCardRepo.save(card);
+            }
+        });
         return IterableUtils.toList(cards).stream().sorted(Comparator.comparing(CreditCard::getActive).reversed()).toList();
     }
 }

@@ -19,7 +19,7 @@ public class ApiError {
     }
 
     public ApiError(String message) {
-     this(HttpStatus.BAD_REQUEST.value(),message,null);
+        this(HttpStatus.BAD_REQUEST.value(), message, null);
 
     }
 

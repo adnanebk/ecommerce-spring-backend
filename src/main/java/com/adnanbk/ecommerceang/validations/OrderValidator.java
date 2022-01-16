@@ -1,4 +1,5 @@
 package com.adnanbk.ecommerceang.validations;
+
 import com.adnanbk.ecommerceang.models.CreditCard;
 import com.adnanbk.ecommerceang.models.UserOrder;
 import org.springframework.stereotype.Component;
@@ -13,7 +14,8 @@ public class OrderValidator implements Validator {
 
 
     private javax.validation.Validator validator;
-    public OrderValidator( javax.validation.Validator validator) {
+
+    public OrderValidator(javax.validation.Validator validator) {
         this.validator = validator;
     }
 
@@ -25,16 +27,16 @@ public class OrderValidator implements Validator {
 
     @Override
     public void validate(Object o, Errors errors) {
-       UserOrder userOrder = (UserOrder) o;
-        CreditCard creditCard=userOrder.getCreditCard();
-        var cardErrors= validator.validate(creditCard);
-        if(!cardErrors.isEmpty())
+        UserOrder userOrder = (UserOrder) o;
+        CreditCard creditCard = userOrder.getCreditCard();
+        var cardErrors = validator.validate(creditCard);
+        if (!cardErrors.isEmpty())
             throw new ConstraintViolationException(cardErrors);
-            int year=2000+Integer.parseInt(creditCard.getExpirationDate().split("/")[1]);
-            int month=Integer.parseInt(creditCard.getExpirationDate().split("/")[0]);
-            LocalDate expirationDate= LocalDate.of(year,month,1);
-            if(expirationDate.isBefore(LocalDate.now()))
-                errors.reject("expirationDate","has passed");
+        int year = 2000 + Integer.parseInt(creditCard.getExpirationDate().split("/")[1]);
+        int month = Integer.parseInt(creditCard.getExpirationDate().split("/")[0]);
+        LocalDate expirationDate = LocalDate.of(year, month, 1);
+        if (expirationDate.isBefore(LocalDate.now()))
+            errors.reject("expirationDate", "has passed");
     }
 
 }

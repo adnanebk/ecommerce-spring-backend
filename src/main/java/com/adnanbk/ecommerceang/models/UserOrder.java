@@ -25,16 +25,15 @@ public class UserOrder {
     private int id;
 
     @NotEmpty
-    @Length(min = 4,message = "{error.min}")
+    @Length(min = 4, message = "{error.min}")
     private String fullName;
-
 
 
     @NotEmpty
     private String country;
 
     @NotEmpty
-    @Length(min = 4,message = "{error.min}")
+    @Length(min = 4, message = "{error.min}")
     private String street;
 
     @NotEmpty
@@ -49,9 +48,8 @@ public class UserOrder {
     private LocalDate dateCreated;
 
 
-
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true
-           ,mappedBy = "userOrder"
+            , mappedBy = "userOrder"
     )
     private List<OrderItem> orderItems;
 
@@ -80,7 +78,6 @@ public class UserOrder {
 
  /*   @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<Product> products;*/
-
 
 
 }

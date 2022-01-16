@@ -12,12 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 public class ConfirmationToken {
 
-    @Column(name="confirmation_token")
+    @Column(name = "confirmation_token")
     @Id
-    private  String confirmationToken;
+    private String confirmationToken;
 
-   /* @CreationTimestamp
-    private Date createdDate;*/
+    /* @CreationTimestamp
+     private Date createdDate;*/
     private LocalDateTime expirationDate;
 
     @OneToOne(targetEntity = AppUser.class)
@@ -27,6 +27,6 @@ public class ConfirmationToken {
     public ConfirmationToken(AppUser user) {
         this.appUser = user;
         confirmationToken = UUID.randomUUID().toString();
-        expirationDate=LocalDateTime.now().plusDays(1);
+        expirationDate = LocalDateTime.now().plusDays(1);
     }
 }

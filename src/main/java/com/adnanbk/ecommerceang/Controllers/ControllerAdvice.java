@@ -2,11 +2,8 @@ package com.adnanbk.ecommerceang.Controllers;
 
 import com.adnanbk.ecommerceang.dto.ApiError;
 import com.adnanbk.ecommerceang.dto.ResponseError;
-import com.adnanbk.ecommerceang.exceptions.CustomFileException;
 import com.adnanbk.ecommerceang.exceptions.InvalidTokenException;
-import com.adnanbk.ecommerceang.exceptions.UserNotEnabledException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -31,20 +28,19 @@ import java.util.Set;
 public class ControllerAdvice {
 
 
-    @ExceptionHandler({ PersistenceException.class,ConstraintViolationException.class})
+    @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleConstraintViolation(RuntimeException ex) {
-        System.err.println("******persistence exception******"+ex.getMessage());
+        System.err.println("******persistence exception******" + ex.getMessage());
 
-        if(NestedExceptionUtils.getMostSpecificCause(ex)  instanceof ConstraintViolationException cause) {
+        if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof ConstraintViolationException cause) {
             ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", generateErrors(cause));
             return ResponseEntity.badRequest().body(apiError);
         }
-        if(NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause)
-        {
+        if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause) {
             return returnUniqueErrorMessage(cause);
         }
-        if(ex  instanceof DataIntegrityViolationException cause) {
+        if (ex instanceof DataIntegrityViolationException cause) {
 
             return returnUniqueErrorMessage(cause);
         }
@@ -52,39 +48,38 @@ public class ControllerAdvice {
     }
 
 
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Set<Object> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                        er->
-                        errors.add(new ResponseError(er.getField(),er.getDefaultMessage()))
+                er ->
+                        errors.add(new ResponseError(er.getField(), er.getDefaultMessage()))
         );
 
-       ex.getBindingResult().getGlobalErrors()
+        ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
-                    if(x.getDefaultMessage()!=null)
-                        errors.add(new ResponseError(Objects.requireNonNull(x.getCode()),x.getDefaultMessage()));
-                          else
-                           errors.add(x.getCode());
+                    if (x.getDefaultMessage() != null)
+                        errors.add(new ResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
+                    else
+                        errors.add(x.getCode());
                 });
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", errors);
-        return   ResponseEntity.badRequest().body(apiError);
+        return ResponseEntity.badRequest().body(apiError);
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiError> handleValidationException(ValidationException ex) {
-        return   ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiError> BadCredentialsException(BadCredentialsException ex) {
+    public ResponseEntity<ApiError> badCredentialsException(BadCredentialsException ex) {
         return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
     }
-        @ExceptionHandler(JWTVerificationException.class)
-    public ResponseEntity<Exception> JWTVerificationException(JWTVerificationException ex) {
+
+    @ExceptionHandler(JWTVerificationException.class)
+    public ResponseEntity<Exception> jWTVerificationException(JWTVerificationException ex) {
 
         return ResponseEntity.badRequest().body(new RuntimeException("error while verifying jwt token"));
     }
@@ -92,37 +87,37 @@ public class ControllerAdvice {
 
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseBody
-    public String InvalidTokenException(InvalidTokenException ex) {
-        return "<h2>"+ex.getMessage()+"</h2>";
+    public String invalidTokenException(InvalidTokenException ex) {
+        return "<h2>" + ex.getMessage() + "</h2>";
     }
 
 
     private Set<ResponseError> generateErrors(ConstraintViolationException cause) {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
-            if(violation.getPropertyPath()!=null)
-                errors.add(new ResponseError(violation.getPropertyPath().toString(),violation.getMessage()));
+            if (violation.getPropertyPath() != null)
+                errors.add(new ResponseError(violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
 
     private ResponseEntity<Object> returnUniqueErrorMessage(Exception cause) {
-        String message= cause.getMessage().toLowerCase();
+        String message = cause.getMessage().toLowerCase();
 
-        if(message.contains("product(name)"))
-            message="product name already exists";
-        else if(message.contains("product(sku)"))
-            message="product sku already exists";
-        else if(message.contains("product_category(name)"))
-            message="category name already exists";
-        else if(message.contains("credit_card(card_name)"))
-            message="Card name already exists";
-        else if(message.contains("user(user_name)"))
-            message="User name already exists";
-        else if(message.contains("user(email)"))
-            message="Email already exists";
+        if (message.contains("product(name)"))
+            message = "product name already exists";
+        else if (message.contains("product(sku)"))
+            message = "product sku already exists";
+        else if (message.contains("product_category(name)"))
+            message = "category name already exists";
+        else if (message.contains("credit_card(card_name)"))
+            message = "Card name already exists";
+        else if (message.contains("user(user_name)"))
+            message = "User name already exists";
+        else if (message.contains("user(email)"))
+            message = "Email already exists";
         else
-            message="An error has been thrown during database modification";
+            message = "An error has been thrown during database modification";
 
         return ResponseEntity.badRequest().body(new ApiError(message));
     }

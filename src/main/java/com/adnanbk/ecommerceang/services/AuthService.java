@@ -22,5 +22,4 @@ public interface AuthService {
     JwtResponse refreshNewToken(String refreshToken);
 
 
-
 }

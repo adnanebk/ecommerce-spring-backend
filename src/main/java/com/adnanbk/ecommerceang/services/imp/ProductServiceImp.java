@@ -28,7 +28,6 @@ public class ProductServiceImp implements ProductService {
     private final ProductMapper productMapper;
 
 
-
     @Override
     public Product addProduct(Product product) {
         productMapper.mapProductImage(product);
@@ -36,17 +35,17 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public  Product updateProduct(Product product) {
-        Product prod= productRepo.getOne(product.getId());
+    public Product updateProduct(Product product) {
+        Product prod = productRepo.getOne(product.getId());
         productMapper.mapProduct(product, prod);
-        return   productRepo.save(prod);
+        return productRepo.save(prod);
     }
 
     @Override
     public List<Product> updateProducts(List<Product> products) {
-        var productsInDb= productRepo.findAllById(products.stream()
+        var productsInDb = productRepo.findAllById(products.stream()
                 .map(Product::getId).collect(Collectors.toList()));
-        productMapper.mapProducts(products,productsInDb);
+        productMapper.mapProducts(products, productsInDb);
         return productRepo.saveAll(productsInDb);
     }
 
@@ -59,8 +58,8 @@ public class ProductServiceImp implements ProductService {
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {
         try {
             List<Product> products = excelHelper.excelToList(multipartFile.getInputStream())
-                                    .stream().map(productMapper::mapProductImage).toList();
-                 if(!products.isEmpty())
+                    .stream().map(productMapper::mapProductImage).toList();
+            if (!products.isEmpty())
                 return productRepo.saveAll(products);
 
         } catch (IOException e) {
@@ -70,9 +69,9 @@ public class ProductServiceImp implements ProductService {
 
     }
 
-    public ByteArrayInputStream loadToExcel(List<Long> Ids) {
-        if (Ids != null && !Ids.isEmpty())
-            return excelHelper.listToExcel(productRepo.findAllById(Ids));
+    public ByteArrayInputStream loadToExcel(List<Long> listOfIds) {
+        if (listOfIds != null && !listOfIds.isEmpty())
+            return excelHelper.listToExcel(productRepo.findAllById(listOfIds));
         return excelHelper.listToExcel(productRepo.findAll());
     }
 

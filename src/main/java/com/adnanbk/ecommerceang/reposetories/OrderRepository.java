@@ -19,7 +19,7 @@ import java.util.Optional;
 
 @RepositoryRestResource(excerptProjection = OrderProjection.class)
 @ApiImplicitParams(@ApiImplicitParam(name = "authorization",
-        value = "Bearer jwt-token",paramType = "header"))
+        value = "Bearer jwt-token", paramType = "header"))
 public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
 
     @Override
@@ -27,11 +27,11 @@ public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
     Iterable<UserOrder> findAll();
 
 
-    @RestResource(path="byUserName")
-    @Cacheable(value="orderCache",key="#userName")
+    @RestResource(path = "byUserName")
+    @Cacheable(value = "orderCache", key = "#userName")
     List<UserOrder> findByAppUser_UserName(String userName);
 
     @Override
-    @CacheEvict(value = "orderCache",key="#s.appUser.userName")
+    @CacheEvict(value = "orderCache", key = "#s.appUser.userName")
     <S extends UserOrder> S save(S s);
 }

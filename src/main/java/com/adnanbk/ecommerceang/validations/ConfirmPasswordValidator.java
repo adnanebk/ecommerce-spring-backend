@@ -23,11 +23,11 @@ public class ConfirmPasswordValidator implements ConstraintValidator<ConfirmPass
     @Override
     public boolean isValid(AppUser appUser, ConstraintValidatorContext constraintValidatorContext) {
 
-        if(userRepo==null)
+        if (userRepo == null)
             return true;
 
-      if(appUser==null)
-        return false;
+        if (appUser == null)
+            return false;
 
         boolean isValid = appUser.getConfirmPassword().equals(appUser.getPassword());
 

@@ -21,7 +21,7 @@ import java.security.Principal;
 public class OrderController {
 
 
-       @InitBinder("userOrder") // add this parameter to apply this binder only to request parameters with this name
+    @InitBinder("userOrder") // add this parameter to apply this binder only to request parameters with this name
     protected void bidValidator(WebDataBinder binder) {
         binder.addValidators(orderValidator);
     }
@@ -30,10 +30,9 @@ public class OrderController {
     private final OrderValidator orderValidator;
 
 
-
     @PostMapping("/userOrders")
-    public ResponseEntity<UserOrder> saveOrder( @RequestBody @Valid  UserOrder userOrder, Principal principal){
-         UserOrder SavedUserOrder =userOderService.saveOrder(userOrder,principal.getName());
+    public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder userOrder, Principal principal) {
+        UserOrder SavedUserOrder = userOderService.saveOrder(userOrder, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(SavedUserOrder.getId()).toUri();
         return ResponseEntity.created(location).body(SavedUserOrder);

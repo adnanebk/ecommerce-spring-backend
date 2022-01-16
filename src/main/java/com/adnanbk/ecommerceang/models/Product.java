@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name="product")
+@Table(name = "product")
 @Data
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Product {
@@ -29,16 +29,16 @@ public class Product {
     @NotNull(message = "{error.choose}")
     private ProductCategory category;
 
-    @Column(name = "sku",unique = true)
+    @Column(name = "sku", unique = true)
     @NotEmpty(message = "{error.empty}")
     private String sku;
 
-    @Column(name = "name",unique = true)
+    @Column(name = "name", unique = true)
     @NotEmpty
     private String name;
 
-    @Column(name = "description",length = 500)
-    @Length(min = 10,message = "{error.min}")
+    @Column(name = "description", length = 500)
+    @Length(min = 10, message = "{error.min}")
     @NotEmpty
     private String description;
 

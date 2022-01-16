@@ -10,27 +10,27 @@ import javax.validation.ConstraintValidatorContext;
 public class UniqueUserValidator implements ConstraintValidator<UniqueEmail, String> {
 
 
-   private  UserRepo userRepo;
+    private UserRepo userRepo;
 
 
+    @Autowired
+    public UniqueUserValidator(UserRepo userRepo) {
+        this.userRepo = userRepo;
+    }
 
-   @Autowired
-   public UniqueUserValidator(UserRepo userRepo) {
-      this.userRepo = userRepo;
-   }
+    public UniqueUserValidator() {
 
-   public UniqueUserValidator() {
+    }
 
-   }
-   @Override
-   public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-      if (s == null ) {
-         return false;
-      }
-      if(userRepo==null)
-         return true;
+    @Override
+    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+        if (s == null) {
+            return false;
+        }
+        if (userRepo == null)
+            return true;
 
-      boolean isValid = !userRepo.existsByEmail(s);
-      return isValid;
-   }
+        boolean isValid = !userRepo.existsByEmail(s);
+        return isValid;
+    }
 }

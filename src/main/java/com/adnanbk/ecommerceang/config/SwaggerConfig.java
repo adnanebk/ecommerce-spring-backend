@@ -23,11 +23,12 @@ public class SwaggerConfig {
                 .build() // build the object
                 .apiInfo(apiInfo());
     }
+
     @Bean
-    public ApiInfo apiInfo(){
-         return new ApiInfo("ecommerce app api",
-                 "sample Api for testing the application functionalities",
-                 "1.0","fee",new Contact("Adnane Benkouider","http://adnanbk.herokuapp.com",
-                 "benkouider.adnane@gmail.com"),"Api license","", Collections.emptyList());
+    public ApiInfo apiInfo() {
+        return new ApiInfo("ecommerce app api",
+                "sample Api for testing the application functionalities",
+                "1.0", "fee", new Contact("Adnane Benkouider", "http://adnanbk.herokuapp.com",
+                "benkouider.adnane@gmail.com"), "Api license", "", Collections.emptyList());
     }
 }

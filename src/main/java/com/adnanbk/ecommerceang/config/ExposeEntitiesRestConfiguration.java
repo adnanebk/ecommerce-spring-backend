@@ -21,7 +21,7 @@ public class ExposeEntitiesRestConfiguration implements RepositoryRestConfigurer
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         RepositoryRestConfigurer.super.configureRepositoryRestConfiguration(config, cors);
         cors.addMapping("/api/**").allowedOrigins(origin);
-        config.exposeIdsFor(ProductCategory.class,Product.class, AppUser.class);
+        config.exposeIdsFor(ProductCategory.class, Product.class, AppUser.class);
     }
 
     @Override

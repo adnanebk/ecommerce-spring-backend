@@ -19,12 +19,12 @@ import java.util.Collections;
 @Service
 public class UserDetailsServiceImp implements UserDetailsService {
 
-    private  UserRepo userRepo;
+    private UserRepo userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, UserNotEnabledException {
         var user = userRepo.findByUserName(username);
-        if(user==null)
+        if (user == null)
             return null;
         return new User(user.getUserName(), user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE-USER")));

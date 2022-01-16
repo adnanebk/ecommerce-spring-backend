@@ -18,28 +18,27 @@ import java.util.Date;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
-
-    @RestResource(path="byCategory")
+    @RestResource(path = "byCategory")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    Page<Product>  findByCategoryId(Long id , Pageable pageable);
+    Page<Product> findByCategoryId(Long id, Pageable pageable);
 
-    @RestResource(path="byCategoryAndName")
+    @RestResource(path = "byCategoryAndName")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    //@Query("select prod from Product as prod where prod.category.Id = ?1 and lower(prod.name) like lower(concat('%', ?2,'%')) ")
-    Page<Product>  findByCategoryIdAndNameIgnoreCase(Long id,String name, Pageable pageable);
+        //@Query("select prod from Product as prod where prod.category.Id = ?1 and lower(prod.name) like lower(concat('%', ?2,'%')) ")
+    Page<Product> findByCategoryIdAndNameIgnoreCase(Long id, String name, Pageable pageable);
 
-    @RestResource(path="byNameOrDescription")
+    @RestResource(path = "byNameOrDescription")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    Page<Product> findByNameIgnoreCaseContainsOrDescriptionIgnoreCaseContains(String name,String description, Pageable pageable);
+    Page<Product> findByNameIgnoreCaseContainsOrDescriptionIgnoreCaseContains(String name, String description, Pageable pageable);
 
-    @RestResource(path="byName")
+    @RestResource(path = "byName")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Page<Product> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Page<Product> findAll(Pageable pageable);
 
-    @RestResource(path="byDate")
+    @RestResource(path = "byDate")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Page<Product> findAllByDateCreated(Date date, Pageable pageable);
 
@@ -47,7 +46,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Override
     @RestResource(exported = false)
     <S extends Product> S save(S s);
-
 
 
     @Override

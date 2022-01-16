@@ -27,23 +27,23 @@ public class ProductMapper {
         mapProductImage(productDest);
     }
 
-    public void mapProducts(List<Product> productsSrc,List<Product> productsDest) {
+    public void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
         Collections.sort(productsSrc, Comparator.comparing(Product::getId));
         Collections.sort(productsDest, Comparator.comparing(Product::getId));
 
         for (int i = 0; i < productsDest.size(); i++) {
-            Product productInDb=productsDest.get(i);
-            Product productSrc=productsSrc.get(i);
-            if(productInDb.getId().equals(productSrc.getId()))
-              mapProduct(productSrc,productInDb);
+            Product productInDb = productsDest.get(i);
+            Product productSrc = productsSrc.get(i);
+            if (productInDb.getId().equals(productSrc.getId()))
+                mapProduct(productSrc, productInDb);
 
         }
     }
 
-    public  Product mapProductImage(Product productSrc) {
+    public Product mapProductImage(Product productSrc) {
         if (!productSrc.getImage().startsWith("http") && !productSrc.getImage().startsWith("assets"))
             productSrc.setImage(baseUrl + "/products/images/" + productSrc.getImage());
-        return  productSrc;
+        return productSrc;
     }
 
 }

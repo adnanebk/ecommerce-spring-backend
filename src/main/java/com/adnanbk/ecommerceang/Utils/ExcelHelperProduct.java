@@ -26,11 +26,11 @@ import java.util.List;
 @Component
 public class ExcelHelperProduct implements ExcelHelperI<Product> {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERS ={ "Name", "Description", "Sku","Price","Quantity",
-                               "Category","Active","Image url"};
+    static String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
+            "Category", "Active", "Image url"};
 
     static String SHEET = "Products";
-    private final List<Product> products=new ArrayList<>();
+    private final List<Product> products = new ArrayList<>();
     private ProductCategoryRepository categoryRepo;
 
     public ExcelHelperProduct(ProductCategoryRepository categoryRepo) {
@@ -38,15 +38,15 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
     }
 
     @Override
-    public  boolean hasExcelFormat(MultipartFile file) {
+    public boolean hasExcelFormat(MultipartFile file) {
         return TYPE.equals(file.getContentType());
     }
 
     @Override
-    public  List<Product> excelToList(InputStream is) {
+    public List<Product> excelToList(InputStream is) {
 
         List<Product> products = new ArrayList<>();
-        try ( Workbook workbook = new XSSFWorkbook(is)) {
+        try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
 
@@ -60,36 +60,36 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                 }
 
                 currentRow.getFirstCellNum();
-                if(currentRow.getPhysicalNumberOfCells()<=0)
+                if (currentRow.getPhysicalNumberOfCells() <= 0)
                     continue;
-                Product product =new Product();
-                boolean isRowExist=false;
-                for(int i=0; i<currentRow.getLastCellNum(); i++) {
+                Product product = new Product();
+                boolean isRowExist = false;
+                for (int i = 0; i < currentRow.getLastCellNum(); i++) {
                     var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                    if(currentCell==null)
+                    if (currentCell == null)
                         continue;
-                    isRowExist=true;
+                    isRowExist = true;
                     try {
-                    switch (i) {
+                        switch (i) {
 
 
-                        case 0 -> product.setName(currentCell.getStringCellValue());
-                        case 1 -> product.setDescription(currentCell.getStringCellValue());
-                        case 2 -> product.setSku(currentCell.getStringCellValue());
-                        case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
+                            case 0 -> product.setName(currentCell.getStringCellValue());
+                            case 1 -> product.setDescription(currentCell.getStringCellValue());
+                            case 2 -> product.setSku(currentCell.getStringCellValue());
+                            case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
 
-                        case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
-                        case 5 -> {
-                            var category =categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
-                           if(category==null)
-                               throw new ValidationException("you must choose correct category");
+                            case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
+                            case 5 -> {
+                                var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
+                                if (category == null)
+                                    throw new ValidationException("you must choose correct category");
 
-                            product.setCategory(category);
+                                product.setCategory(category);
+                            }
+                            case 6 -> product.setActive(currentCell.getBooleanCellValue());
+                            case 7 -> product.setImage(currentCell.getStringCellValue());
                         }
-                        case 6 -> product.setActive(currentCell.getBooleanCellValue());
-                        case 7 -> product.setImage(currentCell.getStringCellValue());
-                    }
-                } catch (IllegalStateException ex){
+                    } catch (IllegalStateException ex) {
                         throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
 
                     }
@@ -97,11 +97,11 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                 }
 
 
-                if(isRowExist)
-                products.add(product);
+                if (isRowExist)
+                    products.add(product);
             }
 
-           // workbook.close();
+            // workbook.close();
             this.products.addAll(products);
             return products;
         } catch (IOException e) {
@@ -110,7 +110,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
     }
 
 
-    public  ByteArrayInputStream listToExcel(List<Product> products) {
+    public ByteArrayInputStream listToExcel(List<Product> products) {
 
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {

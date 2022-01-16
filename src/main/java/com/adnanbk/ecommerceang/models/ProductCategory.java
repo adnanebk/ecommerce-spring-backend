@@ -8,7 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-@Table(name="product_category")
+@Table(name = "product_category")
 @Data
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProductCategory {
@@ -19,17 +19,14 @@ public class ProductCategory {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name",unique = true)
-    @Length(min = 2,message = "{error.min}")
+    @Column(name = "name", unique = true)
+    @Length(min = 2, message = "{error.min}")
     @NotEmpty
     private String name;
 
 /*    @OneToMany( mappedBy = "category",orphanRemoval = true,cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<Product> products;*/
-
-
-
 
 
 }

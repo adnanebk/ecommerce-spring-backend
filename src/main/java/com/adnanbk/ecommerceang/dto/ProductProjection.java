@@ -7,7 +7,7 @@ import org.springframework.data.rest.core.config.Projection;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Projection(name = "customProduct", types =  Product.class)
+@Projection(name = "customProduct", types = Product.class)
 public interface ProductProjection {
 
     public Long getId();

@@ -7,7 +7,7 @@ import org.springframework.data.rest.core.config.Projection;
 import java.time.LocalDate;
 import java.util.List;
 
-@Projection(name = "userOrder", types =  UserOrder.class)
+@Projection(name = "userOrder", types = UserOrder.class)
 public interface OrderProjection {
 
     public String getFullName();
@@ -20,7 +20,7 @@ public interface OrderProjection {
 
     public int getQuantity();
 
-    public double getTotalPrice() ;
+    public double getTotalPrice();
 
     public LocalDate getDateCreated();
 

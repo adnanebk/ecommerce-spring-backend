@@ -11,6 +11,7 @@ import javax.persistence.QueryHint;
 public interface ProductCategoryRepository extends CrudRepository<ProductCategory, Long> {
 
     ProductCategory findByNameIgnoreCase(String categoryName);
+
     boolean existsByName(String name);
 
     @Override

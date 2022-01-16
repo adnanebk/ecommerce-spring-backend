@@ -16,8 +16,8 @@ import javax.persistence.QueryHint;
 import java.util.Optional;
 
 @ApiImplicitParams(@ApiImplicitParam(name = "authorization",
-        value = "Bearer jwt-token",paramType = "header"))
-public interface UserRepo extends CrudRepository<AppUser,Long> {
+        value = "Bearer jwt-token", paramType = "header"))
+public interface UserRepo extends CrudRepository<AppUser, Long> {
 
     @Override
     @RolesAllowed("ROLE_ADMIN")
@@ -33,10 +33,10 @@ public interface UserRepo extends CrudRepository<AppUser,Long> {
 
     boolean existsByUserName(String userName);
 
-     boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
 
-    @RestResource(path="byUserName")
+    @RestResource(path = "byUserName")
     //@Cacheable(value = "findByUserNameCache",key ="#userName")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     AppUser findByUserName(String userName);

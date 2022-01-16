@@ -29,21 +29,21 @@ public class CreditCard {
 
     @NotNull(message = "{error.empty}")
     @Pattern(regexp = "^(?:(?<visa>[0-9]{12}(?:[0-9]{3})?)|(?<mastercard>[0-9]{14}))$"
-              ,message = "{error.regExp}")
-    @Column(name = "card_name",unique = true)
+            , message = "{error.regExp}")
+    @Column(name = "card_name", unique = true)
     private String cardNumber;
 
     @NotEmpty
-    @Pattern(regexp = "^\\d{2}\\/\\d{2}$",message = "{error.regExp}")
+    @Pattern(regexp = "^\\d{2}\\/\\d{2}$", message = "{error.regExp}")
     private String expirationDate;
 
     @OneToMany(cascade = CascadeType.ALL
-            ,mappedBy = "creditCard"
+            , mappedBy = "creditCard"
     )
     @JsonIgnore
     private List<UserOrder> userOrders;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private AppUser appUser;

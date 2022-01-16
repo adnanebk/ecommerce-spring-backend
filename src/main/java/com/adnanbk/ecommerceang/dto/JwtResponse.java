@@ -17,8 +17,8 @@ public class JwtResponse {
 
     public JwtResponse(String token, String refreshToken, UserDto appUser) {
         this.token = token;
-        this.refreshToken=refreshToken;
-        this.appUser=appUser;
+        this.refreshToken = refreshToken;
+        this.appUser = appUser;
     }
 
 }

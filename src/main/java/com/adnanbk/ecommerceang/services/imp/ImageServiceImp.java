@@ -25,7 +25,7 @@ public class ImageServiceImp implements ImageService {
     @Value("${app.upload.dir:${user.home}}")
     public String uploadDir;
 
-    private  Path root;
+    private Path root;
 
     @PostConstruct
     public void init() {
@@ -34,21 +34,21 @@ public class ImageServiceImp implements ImageService {
 
     private void createUploadingDirectory() {
         try {
-            root=Paths.get(uploadDir);
-            if(!Files.isDirectory(Paths.get(uploadDir)))
-            Files.createDirectory(Paths.get(uploadDir));
+            root = Paths.get(uploadDir);
+            if (!Files.isDirectory(Paths.get(uploadDir)))
+                Files.createDirectory(Paths.get(uploadDir));
         } catch (IOException e) {
             throw new CustomFileException("Could not initialize folder for upload!");
         }
     }
 
     @Async
-    public CompletableFuture<String> CreateImage(MultipartFile image)  {
+    public CompletableFuture<String> CreateImage(MultipartFile image) {
 
-        if(image==null || !StringUtils.hasLength(image.getOriginalFilename()))
+        if (image == null || !StringUtils.hasLength(image.getOriginalFilename()))
             throw new CustomFileException("you must upload  a valid image ");
-        String fileName=image.getOriginalFilename().trim();
-        if(!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))
+        String fileName = image.getOriginalFilename().trim();
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))
             throw new CustomFileException("Image type not supported , we accept only jpg or png files");
         Path filePath = this.root.resolve(fileName);
         try {
@@ -56,7 +56,7 @@ public class ImageServiceImp implements ImageService {
         } catch (IOException e) {
             throw new CustomFileException("we Could not write the file, please try again");
         }
-        return  CompletableFuture.completedFuture(fileName);
+        return CompletableFuture.completedFuture(fileName);
     }
 
     @Override

@@ -1,8 +1,13 @@
 package com.adnanbk.ecommerceang.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(value = HttpStatus.BAD_REQUEST)
 public class InvalidTokenException extends RuntimeException {
     public InvalidTokenException() {
-        super();
+        super("There was an error in the token");
+
     }
 
     public InvalidTokenException(String message, Throwable cause) {

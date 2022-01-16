@@ -21,31 +21,34 @@ import java.util.Locale;
 @SpringBootApplication
 @EnableCaching
 @EnableAsync
-public class EcommerceAngApplication   {
+public class EcommerceAngApplication {
 
     @Bean
-public GoogleIdTokenVerifier googleverifier() {
+    public GoogleIdTokenVerifier googleverifier() {
 
-    return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-            // Specify the CLIENT_ID of the app that accesses the backend:
-            .setAudience(Collections.singletonList("517151847301-i200k7o5tivqaitri8ri8j1obrjp0bd6.apps.googleusercontent.com"))
-            // Or, if multiple clients access the backend:
-            //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
-            .build();
-}
+        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                // Specify the CLIENT_ID of the app that accesses the backend:
+                .setAudience(Collections.singletonList("517151847301-i200k7o5tivqaitri8ri8j1obrjp0bd6.apps.googleusercontent.com"))
+                // Or, if multiple clients access the backend:
+                //.setAudience(Arrays.asList(CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3))
+                .build();
+    }
+
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
+
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver localeResolver = new SessionLocaleResolver();
         localeResolver.setDefaultLocale(Locale.US);
         return localeResolver;
     }
+
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("findByUserNameCache","creditCardCache","orderCache");
+        return new ConcurrentMapCacheManager("findByUserNameCache", "creditCardCache", "orderCache");
     }
 /*
     @Bean

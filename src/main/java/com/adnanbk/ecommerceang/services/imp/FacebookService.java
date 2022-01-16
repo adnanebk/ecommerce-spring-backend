@@ -19,15 +19,13 @@ public class FacebookService implements SocialService {
     private String clientId;
     @Value("${facebook.clientSecret}")
     private String clientSecret;
-    private  String apiInspector ="https://graph.facebook.com/debug_token";
+    private String apiInspector = "https://graph.facebook.com/debug_token";
 
 
+    public boolean verify(JwtResponse jwtResponse) {
+        String token = jwtResponse.getToken();
 
-
-    public boolean verify(JwtResponse jwtResponse)  {
-        String token=jwtResponse.getToken();
-
-        if(token!=null) {
+        if (token != null) {
 
             String accessToken = clientId + '|' + clientSecret;
             ResponseEntity<String> response = restTemplate.getForEntity(apiInspector + "?input_token={token}&access_token={app-token}"

@@ -20,68 +20,62 @@ import java.util.Set;
 @Data
 @ConfirmPassword
 @NoArgsConstructor
-@JsonIgnoreProperties(value = "password",allowSetters = true)
+@JsonIgnoreProperties(value = "password", allowSetters = true)
 public class AppUser {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@NotEmpty
-	@Column(name = "user_name")
-	private String userName;
+    @NotEmpty
+    @Column(name = "user_name")
+    private String userName;
 
-	@Column(unique = true)
-	@UniqueEmail
-	@Email
-	@NotEmpty
-	private String email;
+    @Column(unique = true)
+    @UniqueEmail
+    @Email
+    @NotEmpty
+    private String email;
 
-    @OneToMany( mappedBy = "appUser",orphanRemoval = true,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "appUser", orphanRemoval = true, cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<CreditCard> creditCards=new HashSet<>();
+    private Set<CreditCard> creditCards = new HashSet<>();
 
-	@OneToMany( mappedBy = "appUser",orphanRemoval = true,cascade = CascadeType.ALL)
-	@JsonIgnore
-	private Set<UserOrder> userOrders=new HashSet<>();
+    @OneToMany(mappedBy = "appUser", orphanRemoval = true, cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<UserOrder> userOrders = new HashSet<>();
 
-	@Column
-	@NotEmpty
-	private String firstName;
+    @Column
+    @NotEmpty
+    private String firstName;
 
-	@Column
-	@NotEmpty
-	private String lastName;
+    @Column
+    @NotEmpty
+    private String lastName;
 
-	@Column
-	private String street;
+    @Column
+    private String street;
 
-	private String city;
-	private String country;
-	private boolean enabled;
+    private String city;
+    private String country;
+    private boolean enabled;
 
-	@Column
-	@NotEmpty
-	@Length(min = 4,message = "{error.min}")
-	private String password;
+    @Column
+    @NotEmpty
+    @Length(min = 4, message = "{error.min}")
+    private String password;
 
-	@Length(min = 4,message = "{error.min}")
-	@Transient
-	private String confirmPassword;
+    @Length(min = 4, message = "{error.min}")
+    @Transient
+    private String confirmPassword;
 
-	public AppUser(String userName, String email, String firstName, String lastName, String password) {
-		this.userName = userName;
-		this.email = email;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.password = password;
-		this.confirmPassword = password;
-	}
-
-
-
-
-
-
+    public AppUser(String userName, String email, String firstName, String lastName, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.password = password;
+        this.confirmPassword = password;
+    }
 
 
 }

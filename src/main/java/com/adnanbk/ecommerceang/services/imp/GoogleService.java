@@ -16,25 +16,31 @@ import java.security.GeneralSecurityException;
 public class GoogleService implements SocialService {
 
 
-   private final GoogleIdTokenVerifier googleverifier;
+    private final GoogleIdTokenVerifier googleverifier;
 
 
+    @Override
+    public boolean verify(JwtResponse jwtResponse) {
+        String token = jwtResponse.getToken();
+        if (token == null) {
+            return false;
+        }
 
-   @Override
-   public boolean verify(JwtResponse jwtResponse)  {
-      String token=jwtResponse.getToken();
-      if(token!=null)
-      try {
-         GoogleIdToken  idToken = googleverifier.verify(token);
-         //  GoogleIdToken.Payload payload = idToken.getPayload();
+        return doVerify(token);
 
-         return (idToken != null);
+    }
+
+    private boolean doVerify(String token) {
+        try {
+            GoogleIdToken idToken = googleverifier.verify(token);
+            //  GoogleIdToken.Payload payload = idToken.getPayload();
+
+            return (idToken != null);
 
 
-      } catch (GeneralSecurityException | IOException e) {
-        return false;
-      }
-      return false;
-   }
+        } catch (GeneralSecurityException | IOException e) {
+            return false;
+        }
+    }
 
 }

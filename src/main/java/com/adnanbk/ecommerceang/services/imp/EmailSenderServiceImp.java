@@ -39,7 +39,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
     @Override
     public void sendEmailConfirmation(String email) {
 
-        AppUser user=userRepo.findByEmail(email).orElseThrow(()-> new BadCredentialsException("could not found this email"));
+        AppUser user = userRepo.findByEmail(email).orElseThrow(() -> new BadCredentialsException("could not found this email"));
 
 
         String destAddress = user.getEmail();
@@ -59,12 +59,12 @@ public class EmailSenderServiceImp implements EmailSenderService {
         try {
             helper.setFrom(email, name);
 
-        helper.setTo(destAddress);
-        helper.setSubject(subject);
+            helper.setTo(destAddress);
+            helper.setSubject(subject);
 
-        helper.setText(content, true);
+            helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
-          throw new InvalidTokenException("We could not verify the email");
+            throw new InvalidTokenException("We could not verify the email");
         }
         javaMailSender.send(message);
     }
@@ -73,21 +73,22 @@ public class EmailSenderServiceImp implements EmailSenderService {
     public void verifyToken(String _token) {
         if (_token != null && !_token.isEmpty()) {
             var token = confirmationTokenRepo.findById(_token)
-                                       .orElseThrow(()->new InvalidTokenException("invalid token"));
-            if(token.getExpirationDate().isBefore(LocalDateTime.now()))
+                    .orElseThrow(() -> new InvalidTokenException("invalid token"));
+            if (token.getExpirationDate().isBefore(LocalDateTime.now()))
                 throw new InvalidTokenException("token is expired");
-            if(token.getAppUser().isEnabled())
+            if (token.getAppUser().isEnabled())
                 throw new InvalidTokenException("user is already verified");
 
-           AppUser user = token.getAppUser();
+            AppUser user = token.getAppUser();
 
-            if(user==null)
-            throw new InvalidTokenException("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
+            if (user == null)
+                throw new InvalidTokenException("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
 
-                user.setEnabled(true);
-                userRepo.save(user);
+            user.setEnabled(true);
+            userRepo.save(user);
 
 
         }
-        throw new InvalidTokenException("invalid token");    }
+        throw new InvalidTokenException("invalid token");
+    }
 }

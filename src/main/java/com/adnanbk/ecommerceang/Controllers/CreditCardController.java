@@ -21,15 +21,16 @@ public class CreditCardController {
 
 
     @PostMapping
-    public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal){
-        CreditCard savedCreditCard =creditCardService.saveCard(creditCard,principal.getName());
+    public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal) {
+        CreditCard savedCreditCard = creditCardService.saveCard(creditCard, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedCreditCard.getId()).toUri();
         return ResponseEntity.created(location).body(savedCreditCard);
     }
+
     @PatchMapping("/active")
-    public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard){
-        var cards =creditCardService.activeCreditCard(creditCard);
+    public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard) {
+        var cards = creditCardService.activeCreditCard(creditCard);
         return ResponseEntity.ok().body(cards);
     }
 }

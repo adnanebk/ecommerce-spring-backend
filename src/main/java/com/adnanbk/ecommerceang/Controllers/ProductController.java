@@ -33,15 +33,14 @@ public class ProductController {
     private final ProductService productService;
 
 
+    @PostMapping(value = "/products/images", consumes = "multipart/form-data")
+    @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image", response = String.class, consumes = "multipart/form-data")
+    public CompletableFuture<ResponseEntity<String>> uploadProductImage(@RequestParam("image") MultipartFile file) {
+        return this.imageService.CreateImage(file)
+                .thenApplyAsync((fileName -> ResponseEntity.created(URI.create(fileName)).body(fileName)));
 
+    }
 
-    @PostMapping(value = "/products/images",consumes ="multipart/form-data")
-    @ApiOperation(value = "Create product image",notes = "this endpoint uploads an image",response = String.class,consumes ="multipart/form-data")
-    public CompletableFuture<ResponseEntity<String>> UploadProductImage(@RequestParam("image") MultipartFile file){
-              return  this.imageService.CreateImage(file)
-                      .thenApplyAsync((fileName-> ResponseEntity.created(URI.create(fileName)).body(fileName)));
-
-        }
     @GetMapping("/products/images/{filename:.+}")
     @ApiOperation(value = "get product image")
     @ResponseBody
@@ -52,63 +51,64 @@ public class ProductController {
     }
 
     @PostMapping("/products/v2")
-    @ApiOperation(value = "Add new product",notes = "This endpoint creates a product and bind its category based on category name ",
+    @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = Product.class)
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product){
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product) {
         Product prod = productService.addProduct(product);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(prod.getId()).toUri();
 
         return ResponseEntity.created(location).body(prod);
     }
+
     @PutMapping("/products/v2")
-    @ApiOperation(value = "update product",notes = "This endpoint updates a product and bind its category based on category name"
-            ,response = Product.class)
-    public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product product){
-        Product updatedProduct =productService.updateProduct(product);
-        if(updatedProduct==null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Products not found");
+    @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
+            , response = Product.class)
+    public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product product) {
+        Product updatedProduct = productService.updateProduct(product);
+        if (updatedProduct == null)
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
         return ResponseEntity.ok(updatedProduct);
     }
 
 
     @PutMapping("/products/list")
-    @ApiOperation(value = "update products",notes = "This endpoint updates  products and bind their categories by using bulk update ")
-    public ResponseEntity<List<Product>> updateProducts(@Valid @RequestBody List<Product> products){
-        List<Product> updatedProducts =productService.updateProducts(products);
-        if(updatedProducts.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Products not found");
+    @ApiOperation(value = "update products", notes = "This endpoint updates  products and bind their categories by using bulk update ")
+    public ResponseEntity<List<Product>> updateProducts(@Valid @RequestBody List<Product> products) {
+        List<Product> updatedProducts = productService.updateProducts(products);
+        if (updatedProducts.isEmpty())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
 
         return ResponseEntity.ok(updatedProducts);
     }
+
     @DeleteMapping("/products/v2")
     @ApiOperation(value = "remove list of products")
-    public ResponseEntity<String> removeProducts(@RequestParam List<Long> Ids)
-    {
-        if  (!Ids.isEmpty())
-            productService.removeProducts(Ids);
+    public ResponseEntity<String> removeProducts(@RequestParam List<Long> listOfIds) {
+        if (!listOfIds.isEmpty())
+            productService.removeProducts(listOfIds);
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/products/excel")
-    @ApiOperation(value = "add products from excel file",notes = "you have to download an excel file and fill it")
-    public Callable<ResponseEntity<List<Product>>> addProductsFromExcel(MultipartFile file)
-    {
-            List<Product> products = productService.saveAllFromExcel(file);
-            return ()-> new ResponseEntity<>(products,HttpStatus.CREATED);
+    @ApiOperation(value = "add products from excel file", notes = "you have to download an excel file and fill it")
+    public Callable<ResponseEntity<List<Product>>> addProductsFromExcel(MultipartFile file) {
+        List<Product> products = productService.saveAllFromExcel(file);
+        return () -> new ResponseEntity<>(products, HttpStatus.CREATED);
     }
 
     @GetMapping("/products/excel")
     @ApiOperation(value = "download excel file of products")
     public Callable<ResponseEntity<InputStreamResource>>
-                   loadProducts(@RequestParam(required = false) List<Long> Ids)
-    {
-        return   ()->{
-            String filename = "products-"+ LocalDate.now()+".xlsx";
+    loadProducts(@RequestParam(required = false) List<Long> Ids) {
+        return () -> {
+            String filename = "products-" + LocalDate.now() + ".xlsx";
             InputStreamResource file = new InputStreamResource(productService.loadToExcel(Ids));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                    .body(file);   };
+                    .body(file);
+        };
     }
 
 }

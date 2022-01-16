@@ -21,22 +21,20 @@ public class UserOrderServiceImp implements UserOderService {
     private CreditCardRepo creditCardRepo;
 
 
-
-
     @Override
     @Transactional
     public UserOrder saveOrder(UserOrder userOrder, String userName) {
-        AppUser appUser =userRepo.findByUserName(userName);
-        CreditCard creditCard=userOrder.getCreditCard();
+        AppUser appUser = userRepo.findByUserName(userName);
+        CreditCard creditCard = userOrder.getCreditCard();
 
-            var userCardOptional=creditCardRepo.findByCardNumber(creditCard.getCardNumber());
-            creditCard.setAppUser(appUser);
-            creditCard=userCardOptional.orElse(creditCardRepo.save(creditCard));
+        var userCardOptional = creditCardRepo.findByCardNumber(creditCard.getCardNumber());
+        creditCard.setAppUser(appUser);
+        creditCard = userCardOptional.orElse(creditCardRepo.save(creditCard));
 
         userOrder.setAppUser(appUser);
         userOrder.setCreditCard(creditCard);
         userOrder.setUserOrderItems(orderItemRepo.saveAll(userOrder.getOrderItems()));
-      return  orderRepository.save(userOrder);
+        return orderRepository.save(userOrder);
     }
 
 }

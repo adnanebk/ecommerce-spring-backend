@@ -10,7 +10,9 @@ public interface ExcelHelperI<T> {
     boolean hasExcelFormat(MultipartFile file);
 
     List<T> excelToList(InputStream is);
+
     ByteArrayInputStream listToExcel(List<T> list);
+
     List<T> getList();
 
 }

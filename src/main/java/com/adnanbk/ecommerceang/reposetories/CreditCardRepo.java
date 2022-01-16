@@ -1,4 +1,5 @@
 package com.adnanbk.ecommerceang.reposetories;
+
 import com.adnanbk.ecommerceang.models.CreditCard;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -29,17 +30,18 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
     Optional<CreditCard> findByCardNumber(String cardNumber);
 
-    @RestResource(path="byUserName")
+    @RestResource(path = "byUserName")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     @PreAuthorize("#userName == authentication.name")
     List<CreditCard> findByAppUser_UserNameOrderByActiveDesc(String userName);
 
 
     boolean existsByAppUser_UserName(String userName);
+
     @Override
     <S extends CreditCard> S save(S s);
-    
-        @Override
+
+    @Override
     void deleteById(Long aLong);
 
     @Override
