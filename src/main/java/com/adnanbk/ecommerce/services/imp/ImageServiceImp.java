@@ -44,7 +44,7 @@ public class ImageServiceImp implements ImageService {
     @Async
     public CompletableFuture<String> CreateImage(MultipartFile image) {
 
-        if (image == null || image.getOriginalFilename()==null)
+        if (image == null || image.getOriginalFilename() == null)
             throw new CustomFileException("you must upload  a valid image ");
         String fileName = image.getOriginalFilename().trim();
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))

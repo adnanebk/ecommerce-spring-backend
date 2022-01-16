@@ -55,16 +55,15 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
                 currentRow.getFirstCellNum();
-                if (currentRow.getPhysicalNumberOfCells() > 0)
-                {
+                if (currentRow.getPhysicalNumberOfCells() > 0) {
                     Product product = new Product();
 
-                  boolean  isRowExist = extractRowData(currentRow, product);
+                    boolean isRowExist = extractRowData(currentRow, product);
 
 
                     if (isRowExist)
-                    products.add(product);
-            }
+                        products.add(product);
+                }
             }
 
             // workbook.close();
@@ -76,16 +75,16 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
     }
 
     private boolean extractRowData(Row currentRow, Product product) {
-        int extractedCellsNum=0;
+        int extractedCellsNum = 0;
         for (int i = 0; i < currentRow.getLastCellNum(); i++) {
-            extractedCellsNum+= extractCellData(currentRow,i ,product);
+            extractedCellsNum += extractCellData(currentRow, i, product);
         }
-        return extractedCellsNum>0;
+        return extractedCellsNum > 0;
     }
 
     private int extractCellData(Row currentRow, int cellIndex, Product product) {
         var currentCell = currentRow.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-        if (currentCell != null){
+        if (currentCell != null) {
             try {
                 switch (cellIndex) {
 
@@ -113,7 +112,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             }
 
         }
-    return 0;
+        return 0;
     }
 
 
@@ -157,9 +156,10 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
     }
 
     private void skipHeader(Iterator<Row> rows) {
-        if(rows.hasNext())
+        if (rows.hasNext())
             rows.next();
     }
+
     @Override
     public List<Product> getList() {
         return products;
