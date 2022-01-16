@@ -2,9 +2,12 @@
 
 This is the back end side of the application.
 
-it has been developed using java 16 and spring boot with spring data rest 
-I have used jwt token with refresh token for optimal security with the ability to connect with gmail and facebook 
-For performance i have implemented hibernate caching and spring caching and used asyc responses for methods thad takes time to operate
+it has been developed using java 16 and spring boot with spring data rest , 
+
+I have used jwt token with refresh token for optimal security with the ability to connect with gmail and facebook , 
+
+For performance i have implemented hibernate caching and spring caching and used asyc responses for methods thad takes time to operate , 
+
 I have used swagger for ducumentation
 
 I have used continuous deployment for automatic deployment after push request to github.
