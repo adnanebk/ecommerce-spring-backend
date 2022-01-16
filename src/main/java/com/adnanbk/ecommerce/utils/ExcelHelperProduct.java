@@ -50,55 +50,21 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
 
-            int rowNumber = 0;
+            // skip header
+            skipHeader(rows);
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
-                // skip header
-                if (rowNumber == 0) {
-                    rowNumber++;
-                    continue;
-                }
-
                 currentRow.getFirstCellNum();
-                if (currentRow.getPhysicalNumberOfCells() <= 0)
-                    continue;
-                Product product = new Product();
-                boolean isRowExist = false;
-                for (int i = 0; i < currentRow.getLastCellNum(); i++) {
-                    var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-                    if (currentCell == null)
-                        continue;
-                    isRowExist = true;
-                    try {
-                        switch (i) {
+                if (currentRow.getPhysicalNumberOfCells() > 0)
+                {
+                    Product product = new Product();
+
+                  boolean  isRowExist = extractRowData(currentRow, product);
 
 
-                            case 0 -> product.setName(currentCell.getStringCellValue());
-                            case 1 -> product.setDescription(currentCell.getStringCellValue());
-                            case 2 -> product.setSku(currentCell.getStringCellValue());
-                            case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
-
-                            case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
-                            case 5 -> {
-                                var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
-                                if (category == null)
-                                    throw new ValidationException("you must choose correct category");
-
-                                product.setCategory(category);
-                            }
-                            case 6 -> product.setActive(currentCell.getBooleanCellValue());
-                            case 7 -> product.setImage(currentCell.getStringCellValue());
-                        }
-                    } catch (IllegalStateException ex) {
-                        throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
-
-                    }
-
-                }
-
-
-                if (isRowExist)
+                    if (isRowExist)
                     products.add(product);
+            }
             }
 
             // workbook.close();
@@ -107,6 +73,47 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
         } catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
         }
+    }
+
+    private boolean extractRowData(Row currentRow, Product product) {
+        int extractedCellsNum=0;
+        for (int i = 0; i < currentRow.getLastCellNum(); i++) {
+            extractedCellsNum+= extractCellData(currentRow,i ,product);
+        }
+        return extractedCellsNum>0;
+    }
+
+    private int extractCellData(Row currentRow, int cellIndex, Product product) {
+        var currentCell = currentRow.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+        if (currentCell != null){
+            try {
+                switch (cellIndex) {
+
+                    case 0 -> product.setName(currentCell.getStringCellValue());
+                    case 1 -> product.setDescription(currentCell.getStringCellValue());
+                    case 2 -> product.setSku(currentCell.getStringCellValue());
+                    case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
+
+                    case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
+                    case 5 -> {
+                        var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
+                        if (category == null)
+                            throw new ValidationException("you must choose correct category");
+
+                        product.setCategory(category);
+                    }
+                    case 6 -> product.setActive(currentCell.getBooleanCellValue());
+                    case 7 -> product.setImage(currentCell.getStringCellValue());
+                    default -> System.out.println("cell not expected");
+                }
+                return 1;
+            } catch (IllegalStateException ex) {
+                throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
+
+            }
+
+        }
+    return 0;
     }
 
 
@@ -125,17 +132,8 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             }
 
             int rowIdx = 1;
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             for (Product product : products) {
-                Row row = sheet.createRow(rowIdx++);
-                row.createCell(0).setCellValue(product.getName());
-                row.createCell(1).setCellValue(product.getDescription());
-                row.createCell(2).setCellValue(product.getSku());
-                row.createCell(3).setCellValue(product.getUnitPrice().doubleValue());
-                row.createCell(4).setCellValue(product.getUnitsInStock());
-                row.createCell(5).setCellValue(product.getCategory().getName());
-                row.createCell(6).setCellValue(product.isActive());
-                row.createCell(7).setCellValue(product.getImage());
+                rowIdx = fillRowWithProduct(sheet, rowIdx, product);
             }
 
             workbook.write(out);
@@ -145,7 +143,23 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
         }
     }
 
+    private int fillRowWithProduct(Sheet sheet, int rowIdx, Product product) {
+        Row row = sheet.createRow(rowIdx++);
+        row.createCell(0).setCellValue(product.getName());
+        row.createCell(1).setCellValue(product.getDescription());
+        row.createCell(2).setCellValue(product.getSku());
+        row.createCell(3).setCellValue(product.getUnitPrice().doubleValue());
+        row.createCell(4).setCellValue(product.getUnitsInStock());
+        row.createCell(5).setCellValue(product.getCategory().getName());
+        row.createCell(6).setCellValue(product.isActive());
+        row.createCell(7).setCellValue(product.getImage());
+        return rowIdx;
+    }
 
+    private void skipHeader(Iterator<Row> rows) {
+        if(rows.hasNext())
+            rows.next();
+    }
     @Override
     public List<Product> getList() {
         return products;
