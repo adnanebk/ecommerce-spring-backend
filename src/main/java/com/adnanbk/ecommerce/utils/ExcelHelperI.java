@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.Utils;
+package com.adnanbk.ecommerce.utils;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.Controllers;
+package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.models.UserOrder;
 import com.adnanbk.ecommerce.services.UserOderService;

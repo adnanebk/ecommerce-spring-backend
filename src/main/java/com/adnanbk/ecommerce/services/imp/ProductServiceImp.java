@@ -1,6 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.Utils.ExcelHelperI;
+import com.adnanbk.ecommerce.utils.ExcelHelperI;
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.models.Product;

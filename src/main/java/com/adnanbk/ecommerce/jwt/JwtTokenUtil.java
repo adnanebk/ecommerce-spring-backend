@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.Jwt;
+package com.adnanbk.ecommerce.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;

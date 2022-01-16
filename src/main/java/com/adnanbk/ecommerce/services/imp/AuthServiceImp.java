@@ -1,6 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.Jwt.JwtTokenUtil;
+import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.JwtResponse;
 import com.adnanbk.ecommerce.dto.LoginUserDto;

@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.Utils;
+package com.adnanbk.ecommerce.utils;
 
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.models.Product;

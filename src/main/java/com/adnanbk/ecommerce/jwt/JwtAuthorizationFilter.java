@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.Jwt;
+package com.adnanbk.ecommerce.jwt;
 
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
