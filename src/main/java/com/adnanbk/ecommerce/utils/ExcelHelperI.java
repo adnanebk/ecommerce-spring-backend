@@ -13,6 +13,4 @@ public interface ExcelHelperI<T> {
 
     ByteArrayInputStream listToExcel(List<T> list);
 
-    List<T> getList();
-
 }

@@ -25,12 +25,12 @@ import java.util.List;
 
 @Component
 public class ExcelHelperProduct implements ExcelHelperI<Product> {
-    public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
+    static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    static final String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
             "Category", "Active", "Image url"};
 
-    static String SHEET = "Products";
-    private final List<Product> products = new ArrayList<>();
+    static final String SHEET = "Products";
+    private  List<Product> products;
     private ProductCategoryRepository categoryRepo;
 
     public ExcelHelperProduct(ProductCategoryRepository categoryRepo) {
@@ -44,8 +44,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
 
     @Override
     public List<Product> excelToList(InputStream is) {
-
-        List<Product> products = new ArrayList<>();
+           products  = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
@@ -66,8 +65,6 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                 }
             }
 
-            // workbook.close();
-            this.products.addAll(products);
             return products;
         } catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
@@ -103,7 +100,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                     }
                     case 6 -> product.setActive(currentCell.getBooleanCellValue());
                     case 7 -> product.setImage(currentCell.getStringCellValue());
-                    default -> System.out.println("cell not expected");
+                    default -> System.err.println("cell not expected");
                 }
                 return 1;
             } catch (IllegalStateException ex) {
@@ -160,9 +157,5 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
             rows.next();
     }
 
-    @Override
-    public List<Product> getList() {
-        return products;
-    }
 
 }
