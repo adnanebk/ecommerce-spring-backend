@@ -34,7 +34,7 @@ public class JwtTokenUtil {
     }
 
     //generate token for user
-    public String generateToken(String username, HashMap<String, Object> claims) {
+    public String generateToken(String username, Map<String, Object> claims) {
         return doGenerateToken(username, expirationTime * 60 * 1000, claims);
     }
 
