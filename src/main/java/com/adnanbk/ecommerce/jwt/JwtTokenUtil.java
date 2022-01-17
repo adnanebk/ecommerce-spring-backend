@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtTokenUtil {
@@ -38,11 +38,11 @@ public class JwtTokenUtil {
         return doGenerateToken(username, expirationTime * 60 * 1000, claims);
     }
 
-    public String generateRefreshToken(String username, HashMap<String, Object> claims) {
+    public String generateRefreshToken(String username, Map<String, Object> claims) {
         return doGenerateToken(username, (expirationTime + 43200) * 60 * 1000, claims);
     }
 
-    private String doGenerateToken(String username, long expiration, HashMap<String, Object> claims) {
+    private String doGenerateToken(String username, long expiration, Map<String, Object> claims) {
         return JWT.create().withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
                 .withIssuedAt(new Date(System.currentTimeMillis()))
