@@ -31,11 +31,10 @@ public class ControllerAdvice {
     @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleConstraintViolation(RuntimeException ex) {
-        System.err.println("******persistence exception******" + ex.getMessage());
 
         if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof ConstraintViolationException cause) {
-            ApiErrorDto apiErrorDto = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", generateErrors(cause));
-            return ResponseEntity.badRequest().body(apiErrorDto);
+
+            return ResponseEntity.badRequest().body(generateApiErrors(generateErrors(cause)));
         }
         if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause) {
             return returnUniqueErrorMessage(cause);
@@ -50,7 +49,7 @@ public class ControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorDto> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        Set<Object> errors = new HashSet<>();
+        Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
                 er ->
@@ -61,11 +60,9 @@ public class ControllerAdvice {
                 .forEach(x -> {
                     if (x.getDefaultMessage() != null)
                         errors.add(new ResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
-                    else
-                        errors.add(x.getCode());
+
                 });
-        ApiErrorDto apiErrorDto = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", errors);
-        return ResponseEntity.badRequest().body(apiErrorDto);
+        return ResponseEntity.badRequest().body(generateApiErrors(errors));
     }
 
     @ExceptionHandler(ValidationException.class)
@@ -103,22 +100,33 @@ public class ControllerAdvice {
 
     private ResponseEntity<Object> returnUniqueErrorMessage(Exception cause) {
         String message = cause.getMessage().toLowerCase();
-
+        ResponseError responseError;
         if (message.contains("product(name)"))
-            message = "product name already exists";
+            responseError = new ResponseError("name", "already exists");
         else if (message.contains("product(sku)"))
-            message = "product sku already exists";
-        else if (message.contains("product_category(name)"))
-            message = "category name already exists";
-        else if (message.contains("credit_card(card_name)"))
-            message = "Card name already exists";
-        else if (message.contains("user(user_name)"))
-            message = "User name already exists";
-        else if (message.contains("user(email)"))
-            message = "Email already exists";
-        else
-            message = "An error has been thrown during database modification";
+            responseError = new ResponseError("sku", "already exists");
 
-        return ResponseEntity.badRequest().body(new ApiErrorDto(message));
+        else if (message.contains("product_category(name)"))
+            responseError = new ResponseError("name", "already exists");
+
+        else if (message.contains("credit_card(card_number)"))
+            responseError = new ResponseError("cardNumber", "already exists");
+
+        else if (message.contains("user(user_name)"))
+            responseError = new ResponseError("userName", "already exists");
+
+        else if (message.contains("user(email)"))
+            responseError = new ResponseError("email", "already exists");
+
+        else
+            return ResponseEntity.badRequest().body(new ApiErrorDto("An error has been thrown during database modification"));
+
+
+        return ResponseEntity.badRequest().body(generateApiErrors(Set.of(responseError)));
+
+    }
+
+    private ApiErrorDto generateApiErrors(Set<ResponseError> responseErrors) {
+        return new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", responseErrors);
     }
 }

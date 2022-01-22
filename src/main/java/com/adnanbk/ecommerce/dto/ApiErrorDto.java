@@ -13,7 +13,7 @@ public class ApiErrorDto {
     private String message;
     private Set<?> errors;
 
-    public ApiErrorDto(Integer status, String message, Set<?> errors) {
+    public ApiErrorDto(Integer status, String message, Set<ResponseError> errors) {
         super();
         this.status = status;
         this.message = message;

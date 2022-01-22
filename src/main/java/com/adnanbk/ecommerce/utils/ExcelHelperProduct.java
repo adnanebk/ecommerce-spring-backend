@@ -43,7 +43,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
 
     @Override
     public List<Product> excelToList(InputStream is) {
-        List<Product>  products  = new ArrayList<>();
+        List<Product> products = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();

@@ -69,6 +69,5 @@ public class UserOrder {
     private CreditCard creditCard;
 
 
-
 }
 

@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.dto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
+
 @Getter
 @Setter
 public class ResponseError {
@@ -25,6 +26,6 @@ public class ResponseError {
     }
 
     private String formatToWordsWithSpaces(String fieldName) {
-        return fieldName.replaceAll("([a-z])([A-Z]+)", "$1 $2" ).toLowerCase();
+        return fieldName.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase();
     }
 }

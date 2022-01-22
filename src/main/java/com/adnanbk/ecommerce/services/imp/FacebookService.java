@@ -20,7 +20,7 @@ public class FacebookService implements SocialService {
     @Value("${facebook.clientSecret}")
     private String clientSecret;
     @Value("${facebook.inspectorUrl}")
-    private  String apiInspector;
+    private String apiInspector;
 
 
     public boolean verify(JwtDto jwtDto) {

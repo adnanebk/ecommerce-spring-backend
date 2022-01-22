@@ -47,7 +47,7 @@ public class ImageServiceImp implements ImageService {
 
         if (image == null)
             throw new CustomFileException("you must upload  a valid image ");
-        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(),"").trim();
+        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "").trim();
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))
             throw new CustomFileException("Image type not supported , we accept only jpg or png files");
         Path filePath = this.root.resolve(fileName);
