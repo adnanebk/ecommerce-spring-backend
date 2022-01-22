@@ -1,6 +1,6 @@
 package com.adnanbk.ecommerce.controllers;
 
-import com.adnanbk.ecommerce.dto.ApiError;
+import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -34,8 +34,8 @@ public class ControllerAdvice {
         System.err.println("******persistence exception******" + ex.getMessage());
 
         if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof ConstraintViolationException cause) {
-            ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", generateErrors(cause));
-            return ResponseEntity.badRequest().body(apiError);
+            ApiErrorDto apiErrorDto = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", generateErrors(cause));
+            return ResponseEntity.badRequest().body(apiErrorDto);
         }
         if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause) {
             return returnUniqueErrorMessage(cause);
@@ -49,7 +49,7 @@ public class ControllerAdvice {
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiErrorDto> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         Set<Object> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
@@ -64,18 +64,18 @@ public class ControllerAdvice {
                     else
                         errors.add(x.getCode());
                 });
-        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", errors);
-        return ResponseEntity.badRequest().body(apiError);
+        ApiErrorDto apiErrorDto = new ApiErrorDto(HttpStatus.BAD_REQUEST.value(), "Try to fix these errors", errors);
+        return ResponseEntity.badRequest().body(apiErrorDto);
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ApiError> handleValidationException(ValidationException ex) {
-        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    public ResponseEntity<ApiErrorDto> handleValidationException(ValidationException ex) {
+        return ResponseEntity.badRequest().body(new ApiErrorDto(ex.getMessage()));
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ApiError> badCredentialsException(BadCredentialsException ex) {
-        return ResponseEntity.badRequest().body(new ApiError(ex.getMessage()));
+    public ResponseEntity<ApiErrorDto> badCredentialsException(BadCredentialsException ex) {
+        return ResponseEntity.badRequest().body(new ApiErrorDto(ex.getMessage()));
     }
 
     @ExceptionHandler(JWTVerificationException.class)
@@ -119,6 +119,6 @@ public class ControllerAdvice {
         else
             message = "An error has been thrown during database modification";
 
-        return ResponseEntity.badRequest().body(new ApiError(message));
+        return ResponseEntity.badRequest().body(new ApiErrorDto(message));
     }
 }

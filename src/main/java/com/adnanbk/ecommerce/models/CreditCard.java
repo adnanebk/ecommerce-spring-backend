@@ -1,7 +1,8 @@
 package com.adnanbk.ecommerce.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -10,7 +11,8 @@ import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "credit_card")
 public class CreditCard {
 

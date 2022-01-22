@@ -44,9 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (tokenArr.length != 2)
             throw new JWTVerificationException("Header not contains Authorization or JWT Token does not begin with Bearer");
 
-	/*		response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			response.setStatus(HttpStatus.BAD_REQUEST.value());*/
+
 
         // Once we get the token validate it.
         if (SecurityContextHolder.getContext().getAuthentication() == null) {

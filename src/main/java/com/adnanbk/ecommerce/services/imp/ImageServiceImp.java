@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -42,11 +43,11 @@ public class ImageServiceImp implements ImageService {
     }
 
     @Async
-    public CompletableFuture<String> CreateImage(MultipartFile image) {
+    public CompletableFuture<String> createImage(MultipartFile image) {
 
-        if (image == null || image.getOriginalFilename() == null)
+        if (image == null)
             throw new CustomFileException("you must upload  a valid image ");
-        String fileName = image.getOriginalFilename().trim();
+        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(),"").trim();
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))
             throw new CustomFileException("Image type not supported , we accept only jpg or png files");
         Path filePath = this.root.resolve(fileName);

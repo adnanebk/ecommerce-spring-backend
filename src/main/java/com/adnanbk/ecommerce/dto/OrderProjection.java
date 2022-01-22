@@ -10,20 +10,20 @@ import java.util.List;
 @Projection(name = "userOrder", types = UserOrder.class)
 public interface OrderProjection {
 
-    public String getFullName();
+    String getFullName();
 
-    public String getCountry();
+    String getCountry();
 
-    public String getStreet();
+    String getStreet();
 
-    public String getCity();
+    String getCity();
 
-    public int getQuantity();
+    int getQuantity();
 
-    public double getTotalPrice();
+    double getTotalPrice();
 
-    public LocalDate getDateCreated();
+    LocalDate getDateCreated();
 
-    public List<OrderItem> getOrderItems();
+    List<OrderItem> getOrderItems();
 
 }

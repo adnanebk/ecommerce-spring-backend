@@ -31,9 +31,9 @@ public class OrderController {
 
     @PostMapping("/userOrders")
     public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder userOrder, Principal principal) {
-        UserOrder SavedUserOrder = userOderService.saveOrder(userOrder, principal.getName());
+        UserOrder savedUserOrder = userOderService.saveOrder(userOrder, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(SavedUserOrder.getId()).toUri();
-        return ResponseEntity.created(location).body(SavedUserOrder);
+                .buildAndExpand(savedUserOrder.getId()).toUri();
+        return ResponseEntity.created(location).body(savedUserOrder);
     }
 }

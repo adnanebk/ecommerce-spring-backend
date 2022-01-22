@@ -2,7 +2,7 @@ package com.adnanbk.ecommerce.controllers;
 
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.JwtResponse;
+import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.services.AuthService;
@@ -33,30 +33,30 @@ public class AuthController {
 
 
     @PostMapping(value = "/register")
-    @ApiOperation(value = "register new user", response = JwtResponse.class)
+    @ApiOperation(value = "register new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtResponse create(@RequestBody @Valid AppUser user) {
+    public JwtDto create(@RequestBody @Valid AppUser user) {
         user.setEnabled(false);
-        JwtResponse jwtResponse = authService.handleRegister(user);
+        JwtDto jwtDto = authService.handleRegister(user);
         emailSenderService.sendEmailConfirmation(user.getEmail());
-        return jwtResponse;
+        return jwtDto;
 
     }
 
     @PostMapping("/login")
-    public JwtResponse authenticateUser(@RequestBody @Valid LoginUserDto appUser) {
+    public JwtDto authenticateUser(@RequestBody @Valid LoginUserDto appUser) {
         return authService.handleLogin(appUser);
     }
 
     @PostMapping("/google")
-    public JwtResponse googleLogin(@RequestBody @Valid JwtResponse jwtResponse) {
-        return authService.handleLoginWithGoogle(jwtResponse);
+    public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
+        return authService.handleLoginWithGoogle(jwtDto);
 
     }
 
     @PostMapping("/facebook")
-    public JwtResponse facebookLogin(@RequestBody @Valid JwtResponse jwtResponse) {
-        return authService.handleLoginWithFacebook(jwtResponse);
+    public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
+        return authService.handleLoginWithFacebook(jwtDto);
     }
 
     @GetMapping("/verify")
@@ -82,7 +82,7 @@ public class AuthController {
 
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<JwtResponse> refreshNewToken(@RequestBody String refreshToken) {
+    public ResponseEntity<JwtDto> refreshNewToken(@RequestBody String refreshToken) {
         var jwtResponse = this.authService.refreshNewToken(refreshToken);
         return ResponseEntity.ok().body(jwtResponse);
     }

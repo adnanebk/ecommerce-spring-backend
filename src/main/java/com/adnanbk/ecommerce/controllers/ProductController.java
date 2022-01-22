@@ -36,7 +36,7 @@ public class ProductController {
     @PostMapping(value = "/products/images", consumes = "multipart/form-data")
     @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image", response = String.class, consumes = "multipart/form-data")
     public CompletableFuture<ResponseEntity<String>> uploadProductImage(@RequestParam("image") MultipartFile file) {
-        return this.imageService.CreateImage(file)
+        return this.imageService.createImage(file)
                 .thenApplyAsync((fileName -> ResponseEntity.created(URI.create(fileName)).body(fileName)));
 
     }
@@ -100,10 +100,10 @@ public class ProductController {
     @GetMapping("/products/excel")
     @ApiOperation(value = "download excel file of products")
     public Callable<ResponseEntity<InputStreamResource>>
-    loadProducts(@RequestParam(required = false) List<Long> Ids) {
+    loadProducts(@RequestParam(required = false) List<Long> listOfIds) {
         return () -> {
             String filename = "products-" + LocalDate.now() + ".xlsx";
-            InputStreamResource file = new InputStreamResource(productService.loadToExcel(Ids));
+            InputStreamResource file = new InputStreamResource(productService.loadToExcel(listOfIds));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))

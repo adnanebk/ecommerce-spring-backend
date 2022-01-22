@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.models;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Length;
 
@@ -9,7 +10,8 @@ import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "product_category")
-@Data
+@Getter
+@Setter
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ProductCategory {
 
@@ -24,9 +26,6 @@ public class ProductCategory {
     @NotEmpty
     private String name;
 
-/*    @OneToMany( mappedBy = "category",orphanRemoval = true,cascade = CascadeType.ALL)
-    @JsonIgnore
-    private Set<Product> products;*/
 
 
 }

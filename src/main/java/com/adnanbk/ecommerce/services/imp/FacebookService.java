@@ -1,7 +1,7 @@
 package com.adnanbk.ecommerce.services.imp;
 
 
-import com.adnanbk.ecommerce.dto.JwtResponse;
+import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.services.SocialService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +19,12 @@ public class FacebookService implements SocialService {
     private String clientId;
     @Value("${facebook.clientSecret}")
     private String clientSecret;
-    private String apiInspector = "https://graph.facebook.com/debug_token";
+    @Value("${facebook.inspectorUrl}")
+    private  String apiInspector;
 
 
-    public boolean verify(JwtResponse jwtResponse) {
-        String token = jwtResponse.getToken();
+    public boolean verify(JwtDto jwtDto) {
+        String token = jwtDto.getToken();
 
         if (token != null) {
 

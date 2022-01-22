@@ -1,9 +1,9 @@
 package com.adnanbk.ecommerce.services;
 
-import com.adnanbk.ecommerce.dto.JwtResponse;
+import com.adnanbk.ecommerce.dto.JwtDto;
 
 public interface SocialService {
-    boolean verify(JwtResponse jwtResponse);
+    boolean verify(JwtDto jwtDto);
 
 
 }

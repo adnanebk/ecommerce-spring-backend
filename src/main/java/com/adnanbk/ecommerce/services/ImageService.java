@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface ImageService {
 
-    CompletableFuture<String> CreateImage(MultipartFile multipartFile);
+    CompletableFuture<String> createImage(MultipartFile multipartFile);
 
     Resource load(String filename);
 }

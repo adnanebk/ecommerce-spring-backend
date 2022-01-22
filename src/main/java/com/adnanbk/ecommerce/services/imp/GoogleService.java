@@ -1,6 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.dto.JwtResponse;
+import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.services.SocialService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -20,8 +20,8 @@ public class GoogleService implements SocialService {
 
 
     @Override
-    public boolean verify(JwtResponse jwtResponse) {
-        String token = jwtResponse.getToken();
+    public boolean verify(JwtDto jwtDto) {
+        String token = jwtDto.getToken();
         if (token == null) {
             return false;
         }
@@ -33,7 +33,6 @@ public class GoogleService implements SocialService {
     private boolean doVerify(String token) {
         try {
             GoogleIdToken idToken = googleverifier.verify(token);
-            //  GoogleIdToken.Payload payload = idToken.getPayload();
 
             return (idToken != null);
 

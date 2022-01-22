@@ -10,25 +10,25 @@ import java.util.Date;
 @Projection(name = "customProduct", types = Product.class)
 public interface ProductProjection {
 
-    public Long getId();
+    Long getId();
 
-    public ProductCategory getCategory();
+    ProductCategory getCategory();
 
-    public String getSku();
+    String getSku();
 
-    public String getName();
+    String getName();
 
-    public String getDescription();
+    String getDescription();
 
-    public BigDecimal getUnitPrice();
+    BigDecimal getUnitPrice();
 
-    public String getImage();
+    String getImage();
 
-    public boolean isActive();
+    boolean isActive();
 
-    public Integer getUnitsInStock();
+    Integer getUnitsInStock();
 
-    public Date getDateCreated();
+    Date getDateCreated();
 
-    public Date getLastUpdated();
+    Date getLastUpdated();
 }

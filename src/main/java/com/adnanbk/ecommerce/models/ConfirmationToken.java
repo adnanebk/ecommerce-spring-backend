@@ -1,23 +1,26 @@
 package com.adnanbk.ecommerce.models;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class ConfirmationToken {
 
-    @Column(name = "confirmation_token")
     @Id
-    private String confirmationToken;
+    private String token;
 
-    /* @CreationTimestamp
-     private Date createdDate;*/
+
     private LocalDateTime expirationDate;
 
     @OneToOne(targetEntity = AppUser.class)
@@ -26,7 +29,7 @@ public class ConfirmationToken {
 
     public ConfirmationToken(AppUser user) {
         this.appUser = user;
-        confirmationToken = UUID.randomUUID().toString();
+        token = UUID.randomUUID().toString();
         expirationDate = LocalDateTime.now().plusDays(1);
     }
 }

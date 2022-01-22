@@ -1,10 +1,10 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.JwtResponse;
+import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
@@ -36,22 +36,22 @@ public class AuthServiceImp implements AuthService {
     private long expirationTime;
 
     @Override
-    public JwtResponse handleLoginWithGoogle(JwtResponse jwtResponse) {
-        googleService.verify(jwtResponse);
-        return doLoginSocialUser(jwtResponse.getAppUser());
+    public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
+        googleService.verify(jwtDto);
+        return doLoginSocialUser(jwtDto.getAppUser());
     }
 
     @Override
-    public JwtResponse handleLoginWithFacebook(JwtResponse jwtResponse) {
-        boolean isTokenValid = facebookService.verify(jwtResponse);
+    public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
+        boolean isTokenValid = facebookService.verify(jwtDto);
         if (!isTokenValid)
             throw new BadCredentialsException("Invalid credentials");
-        return doLoginSocialUser(jwtResponse.getAppUser());
+        return doLoginSocialUser(jwtDto.getAppUser());
     }
 
 
     @Override
-    public JwtResponse handleLogin(LoginUserDto appUser) {
+    public JwtDto handleLogin(LoginUserDto appUser) {
         var currentUser = userRepo.findByUserName(appUser.getUserName());
       /*  try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword()));
@@ -69,7 +69,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public JwtResponse handleRegister(AppUser user) {
+    public JwtDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user = userRepo.save(user);
 
@@ -88,23 +88,23 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public JwtResponse refreshNewToken(String refreshToken) {
+    public JwtDto refreshNewToken(String refreshToken) {
         String userName = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
         var user = this.userRepo.findByUserName(userName);
         return user != null ? generateTokens(user, refreshToken) : null;
     }
 
-    private JwtResponse generateTokens(AppUser user, String refreshToken) {
+    private JwtDto generateTokens(AppUser user, String refreshToken) {
         String token = this.jwtTokenUtil.generateToken(user.getUserName(), generateClaims(user));
         refreshToken = Objects.requireNonNullElse(refreshToken,
                 this.jwtTokenUtil.generateRefreshToken(user.getUserName(), new HashMap<>()));
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
         userDto.setExpirationDate(new Date(System.currentTimeMillis() + (expirationTime * 60 * 1000)));
-        return new JwtResponse(token, refreshToken, userDto);
+        return new JwtDto(token, refreshToken, userDto);
     }
 
-    private JwtResponse doLoginSocialUser(UserDto user) {
+    private JwtDto doLoginSocialUser(UserDto user) {
         AppUser appUser = userRepo.findByUserName(user.getUserName());
         if (appUser == null) {
             appUser = new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(), generateRandomPassword());
@@ -117,7 +117,7 @@ public class AuthServiceImp implements AuthService {
         return response;
     }
 
-    private JwtResponse generateTokens(AppUser user) {
+    private JwtDto generateTokens(AppUser user) {
         return generateTokens(user, null);
     }
 

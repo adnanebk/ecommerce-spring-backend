@@ -54,7 +54,6 @@ public class UserOrder {
     private List<OrderItem> orderItems;
 
     public void setUserOrderItems(List<OrderItem> orderItems) {
-        //orderItems.forEach(e->e.setUserOrder(this));
         this.orderItems.clear();
         this.orderItems.addAll(orderItems);
     }
@@ -68,16 +67,7 @@ public class UserOrder {
     @JoinColumn(name = "card_id", nullable = false)
     @NotNull
     private CreditCard creditCard;
-/*    private String country;
 
-    private String city;
-
-
-    private String street;*/
-
-
- /*   @OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
-    private Set<Product> products;*/
 
 
 }

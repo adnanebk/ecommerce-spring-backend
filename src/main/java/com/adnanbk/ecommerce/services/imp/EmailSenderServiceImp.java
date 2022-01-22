@@ -44,7 +44,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
         String destAddress = user.getEmail();
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        String verifyURL = url + "/verify?token=" + confirmationTokenRepo.save(confirmationToken).getConfirmationToken();
+        String verifyURL = url + "/verify?token=" + confirmationTokenRepo.save(confirmationToken).getToken();
 
 
         String subject = "Please verify your registration";
@@ -69,9 +69,9 @@ public class EmailSenderServiceImp implements EmailSenderService {
     }
 
     @Override
-    public void verifyToken(String _token) {
-        if (_token != null && !_token.isEmpty()) {
-            var token = confirmationTokenRepo.findById(_token)
+    public void verifyToken(String myToken) {
+        if (myToken != null && !myToken.isEmpty()) {
+            var token = confirmationTokenRepo.findById(myToken)
                     .orElseThrow(() -> new InvalidTokenException("invalid token"));
             if (token.getExpirationDate().isBefore(LocalDateTime.now()))
                 throw new InvalidTokenException("token is expired");

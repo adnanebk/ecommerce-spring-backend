@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class OrderValidator implements Validator {
 
 
-    private javax.validation.Validator validator;
+    private final javax.validation.Validator validator;
 
     public OrderValidator(javax.validation.Validator validator) {
         this.validator = validator;

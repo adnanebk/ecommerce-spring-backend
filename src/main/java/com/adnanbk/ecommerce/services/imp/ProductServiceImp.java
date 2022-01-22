@@ -1,11 +1,11 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.utils.ExcelHelperI;
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
 import com.adnanbk.ecommerce.services.ProductService;
+import com.adnanbk.ecommerce.utils.ExcelHelperI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +39,7 @@ public class ProductServiceImp implements ProductService {
     @Override
     public List<Product> updateProducts(List<Product> products) {
         var productsInDb = productRepo.findAllById(products.stream()
-                .map(Product::getId).collect(Collectors.toList()));
+                .map(Product::getId).toList());
         productMapper.mapProducts(products, productsInDb);
         return productRepo.saveAll(productsInDb);
     }
@@ -72,15 +71,6 @@ public class ProductServiceImp implements ProductService {
     }
 
 
-/*    private List<Product> mapProducts(List<Product> products) {
-        var productsInDb= productRepo.findAllById(products.stream()
-                .map(Product::getId).collect(Collectors.toList()));
-        for (Product prod : productsInDb) {
-            var product = products.stream().filter(p -> p.getId().equals(prod.getId())).findFirst();
-            product.ifPresent(value -> mapProduct(value, prod));
-        }
-        return productsInDb;
-    }*/
 
 
 }

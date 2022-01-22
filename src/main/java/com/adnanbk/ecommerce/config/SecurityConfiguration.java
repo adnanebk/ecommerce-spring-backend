@@ -41,7 +41,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/userOrders/**", "/api/appUsers/**", "/api/creditCards/**").authenticated()
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
-        //.and().oauth2Login().permitAll(true).authorizationEndpoint()..and().permitAll();
         //http.oauth2Login();
 
         //.addFilter(new JWTAuthenticationFilter(authenticationManager(),jwtTokenUtil))

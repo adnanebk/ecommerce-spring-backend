@@ -17,7 +17,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
 
     static final String SHEET = "Products";
 
-    private ProductCategoryRepository categoryRepo;
+    private final ProductCategoryRepository categoryRepo;
 
     public ExcelHelperProduct(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
@@ -101,6 +100,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                     case 6 -> product.setActive(currentCell.getBooleanCellValue());
                     case 7 -> product.setImage(currentCell.getStringCellValue());
                     default -> {
+                        return 0;
                     }
                 }
                 return 1;

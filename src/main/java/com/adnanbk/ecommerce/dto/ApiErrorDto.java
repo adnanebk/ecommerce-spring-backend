@@ -1,24 +1,26 @@
 package com.adnanbk.ecommerce.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 import java.util.Set;
 
-@Data
-public class ApiError {
+@Getter
+@Setter
+public class ApiErrorDto {
     private Integer status;
     private String message;
     private Set<?> errors;
 
-    public ApiError(Integer status, String message, Set<?> errors) {
+    public ApiErrorDto(Integer status, String message, Set<?> errors) {
         super();
         this.status = status;
         this.message = message;
         this.errors = errors;
     }
 
-    public ApiError(String message) {
+    public ApiErrorDto(String message) {
         this(HttpStatus.BAD_REQUEST.value(), message, null);
 
     }
