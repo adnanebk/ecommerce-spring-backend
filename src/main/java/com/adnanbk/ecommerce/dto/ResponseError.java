@@ -19,12 +19,12 @@ public class ResponseError {
     public ResponseError(String fieldName, String message) {
         this.formattedName = fieldName;
         if (!fieldName.equals(fieldName.toLowerCase()))
-            this.formattedName = formatName(fieldName);
+            this.formattedName = formatToWordsWithSpaces(fieldName);
         this.fieldName = StringUtils.uncapitalize(fieldName);
         this.message = message;
     }
 
-    private String formatName(String fieldName) {
+    private String formatToWordsWithSpaces(String fieldName) {
         return fieldName.replaceAll("([a-z])([A-Z]+)", "$1 $2" ).toLowerCase();
     }
 }
