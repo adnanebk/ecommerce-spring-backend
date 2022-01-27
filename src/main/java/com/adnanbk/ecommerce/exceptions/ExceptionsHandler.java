@@ -2,8 +2,6 @@ package com.adnanbk.ecommerce.exceptions;
 
 import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
-import com.adnanbk.ecommerce.dto.ResponseErrorFactory;
-import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,6 +22,8 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+
+import static com.adnanbk.ecommerce.dto.ResponseErrorFactory.*;
 
 @RestControllerAdvice
 public class ExceptionsHandler {
@@ -54,13 +54,13 @@ public class ExceptionsHandler {
 
         ex.getBindingResult().getFieldErrors().forEach(
                 er ->
-                        errors.add(new ResponseError(er.getField(), er.getDefaultMessage()))
+                        errors.add(createResponseError(er.getField(), er.getDefaultMessage()))
         );
 
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
                     if (x.getDefaultMessage() != null)
-                        errors.add(new ResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
+                        errors.add(createResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
 
                 });
         return ResponseEntity.badRequest().body(generateApiErrors(errors));
@@ -94,14 +94,14 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(new ResponseError(violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(createResponseError(violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
 
     private ResponseEntity<Object> returnUniqueErrorMessage(Exception cause) {
         String message = cause.getMessage().toLowerCase();
-        ResponseError responseError = ResponseErrorFactory.createResponseError(message);
+        ResponseError responseError = createResponseError(message);
         if (responseError == null)
             return ResponseEntity.badRequest().body(new ApiErrorDto("An error has been thrown during database modification"));
 
