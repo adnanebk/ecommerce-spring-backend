@@ -1,7 +1,8 @@
-package com.adnanbk.ecommerce.controllers;
+package com.adnanbk.ecommerce.exceptions;
 
 import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
+import com.adnanbk.ecommerce.dto.ResponseErrorFactory;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.core.NestedExceptionUtils;
@@ -25,7 +26,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @RestControllerAdvice
-public class ControllerAdvice {
+public class ExceptionsHandler {
 
 
     @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
@@ -100,27 +101,9 @@ public class ControllerAdvice {
 
     private ResponseEntity<Object> returnUniqueErrorMessage(Exception cause) {
         String message = cause.getMessage().toLowerCase();
-        ResponseError responseError;
-        if (message.contains("product(name)"))
-            responseError = new ResponseError("name", "already exists");
-        else if (message.contains("product(sku)"))
-            responseError = new ResponseError("sku", "already exists");
-
-        else if (message.contains("product_category(name)"))
-            responseError = new ResponseError("name", "already exists");
-
-        else if (message.contains("credit_card(card_number)"))
-            responseError = new ResponseError("cardNumber", "already exists");
-
-        else if (message.contains("user(user_name)"))
-            responseError = new ResponseError("userName", "already exists");
-
-        else if (message.contains("user(email)"))
-            responseError = new ResponseError("email", "already exists");
-
-        else
+        ResponseError responseError = ResponseErrorFactory.createResponseError(message);
+        if (responseError == null)
             return ResponseEntity.badRequest().body(new ApiErrorDto("An error has been thrown during database modification"));
-
 
         return ResponseEntity.badRequest().body(generateApiErrors(Set.of(responseError)));
 
