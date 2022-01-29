@@ -45,12 +45,13 @@ public class ImageServiceImp implements ImageService {
     }
 
     @Async
-    @CacheEvict(value = "productImage",key = "#image.originalFilename")
+    @CacheEvict(value = "productImage", key = "#image.originalFilename")
     public CompletableFuture<String> createImage(MultipartFile image) {
         if (image == null)
             throw new CustomFileException("you must upload  a valid image ");
-        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "").trim();
-        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png"))
+        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "")
+                .replace(" ", "").trim();
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
             throw new CustomFileException("Image type not supported , we accept only jpg or png files");
         Path filePath = this.root.resolve(fileName);
         try {
@@ -62,7 +63,7 @@ public class ImageServiceImp implements ImageService {
     }
 
     @Override
-    @Cacheable(value = "productImage",key = "#filename")
+    @Cacheable(value = "productImage", key = "#filename")
     public Resource load(String filename) {
         try {
             Path file = root.resolve(filename);
