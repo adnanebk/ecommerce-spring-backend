@@ -3,6 +3,8 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.services.ImageService;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.scheduling.annotation.Async;
@@ -43,8 +45,8 @@ public class ImageServiceImp implements ImageService {
     }
 
     @Async
+    @CacheEvict(value = "productImage",key = "#image.originalFilename")
     public CompletableFuture<String> createImage(MultipartFile image) {
-
         if (image == null)
             throw new CustomFileException("you must upload  a valid image ");
         String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "").trim();
@@ -60,6 +62,7 @@ public class ImageServiceImp implements ImageService {
     }
 
     @Override
+    @Cacheable(value = "productImage",key = "#filename")
     public Resource load(String filename) {
         try {
             Path file = root.resolve(filename);

@@ -48,7 +48,7 @@ public class EcommerceAngApplication {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("findByUserNameCache", "creditCardCache", "orderCache");
+        return new ConcurrentMapCacheManager("findByUserNameCache", "creditCardCache", "orderCache","productImage");
     }
 
 
