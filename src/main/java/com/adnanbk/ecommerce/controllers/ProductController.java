@@ -43,7 +43,6 @@ public class ProductController {
 
     @GetMapping("/products/images/{filename:.+}")
     @ApiOperation(value = "get product image")
-    @ResponseBody
     public ResponseEntity<Resource> getImage(@PathVariable String filename) {
         Resource file = imageService.load(filename);
         return ResponseEntity.ok()
