@@ -20,27 +20,15 @@ public class ResponseErrorFactory {
     }
 
     public static ResponseError createResponseError(String errorMessage) {
+        String subKey = "uniquekey";
+        int startIndex = errorMessage.indexOf(subKey);
+        int endIndex = errorMessage.indexOf("__");
+        if (startIndex != -1 && endIndex != -1) {
+            String fieldName = errorMessage.substring(startIndex + subKey.length() + 1, endIndex);
+            return createResponseError(fieldName, "already exists");
 
-        ResponseError responseError = null;
-        String meggage = "already exists";
-        if (errorMessage.contains("product(name)"))
-            responseError = createResponseError("name", meggage);
-        else if (errorMessage.contains("product(sku)"))
-            responseError = createResponseError("sku", meggage);
-
-        else if (errorMessage.contains("product_category(name)"))
-            responseError = createResponseError("name", meggage);
-
-        else if (errorMessage.contains("credit_card(card_number)"))
-            responseError = createResponseError("cardNumber", meggage);
-
-        else if (errorMessage.contains("user(user_name)"))
-            responseError = createResponseError("userName", meggage);
-
-        else if (errorMessage.contains("user(email)"))
-            responseError = createResponseError("email", meggage);
-
-        return responseError;
+        }
+        return null;
     }
 
 

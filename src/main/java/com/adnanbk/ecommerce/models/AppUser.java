@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -22,6 +23,7 @@ import java.util.Set;
 @ConfirmPassword
 @NoArgsConstructor
 @JsonIgnoreProperties(value = "password", allowSetters = true)
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

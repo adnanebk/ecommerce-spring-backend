@@ -16,7 +16,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product",
+        uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueKey_sku__")})
 @Getter
 @Setter
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -31,11 +32,11 @@ public class Product {
     @NotNull(message = "{error.choose}")
     private ProductCategory category;
 
-    @Column(name = "sku", unique = true)
+    @Column(name = "sku")
     @NotEmpty(message = "{error.empty}")
     private String sku;
 
-    @Column(name = "name", unique = true)
+    @Column(name = "name")
     @NotEmpty
     private String name;
 

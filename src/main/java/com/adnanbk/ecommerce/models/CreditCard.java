@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -13,7 +14,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "credit_card")
+@Table(name = "credit_card", uniqueConstraints = {@UniqueConstraint(columnNames = "card_number", name = "uniqueKey_cardNumber__")})
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CreditCard {
 
     @Id
@@ -30,7 +32,7 @@ public class CreditCard {
     @NotNull(message = "{error.empty}")
     @Pattern(regexp = "^(?:(?<visa>[0-9]{12}(?:[0-9]{3})?)|(?<mastercard>[0-9]{14}))$"
             , message = "{error.regExp}")
-    @Column(name = "card_number", unique = true)
+    @Column(name = "card_number")
     private String cardNumber;
 
     @NotEmpty

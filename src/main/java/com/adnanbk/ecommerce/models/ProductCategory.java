@@ -9,7 +9,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
 @Entity
-@Table(name = "product_category")
+@Table(name = "product_category", uniqueConstraints = {@UniqueConstraint(columnNames = "name", name = "uniqueKey_name__")})
 @Getter
 @Setter
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -21,7 +21,7 @@ public class ProductCategory {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", unique = true)
+    @Column(name = "name")
     @Length(min = 2, message = "{error.min}")
     @NotEmpty
     private String name;
