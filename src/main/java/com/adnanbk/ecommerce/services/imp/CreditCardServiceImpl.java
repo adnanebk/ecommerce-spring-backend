@@ -35,7 +35,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         var card = creditCardRepo.findById(creditCard.getId()).orElseThrow(()->new CardNotFoundException("no card founded with id "+creditCard.getId()));
         var currentCard = creditCardRepo.findCurrentActivatedCard().orElseThrow(()->new CardNotFoundException("card is not activated yet"));
           card.setActive(true);
-          currentCard.setActive(true);
+          currentCard.setActive(false);
           creditCardRepo.save(card);
           creditCardRepo.save(currentCard);
         return creditCardRepo.findAllByOrderByActiveDesc() ;
