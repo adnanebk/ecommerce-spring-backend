@@ -18,7 +18,7 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     Iterable<CreditCard> findAll();
 
     @RestResource(exported = false)
-    Iterable<CreditCard> findAllOrderByActiveDesc();
+    Iterable<CreditCard> findAllByOrderByActiveDesc();
 
     @Override
     @RestResource(exported = false)

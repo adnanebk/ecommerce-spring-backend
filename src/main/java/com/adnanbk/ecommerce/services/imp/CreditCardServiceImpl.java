@@ -7,12 +7,7 @@ import com.adnanbk.ecommerce.reposetories.CreditCardRepo;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import lombok.AllArgsConstructor;
-import org.apache.commons.collections4.IterableUtils;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 
 @Service
 @AllArgsConstructor
@@ -43,6 +38,6 @@ public class CreditCardServiceImpl implements CreditCardService {
           currentCard.setActive(true);
           creditCardRepo.save(card);
           creditCardRepo.save(currentCard);
-        return creditCardRepo.findAllOrderByActiveDesc() ;
+        return creditCardRepo.findAllByOrderByActiveDesc() ;
     }
 }
