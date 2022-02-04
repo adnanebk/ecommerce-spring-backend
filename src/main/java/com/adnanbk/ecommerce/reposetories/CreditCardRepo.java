@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.reposetories;
 
 import com.adnanbk.ecommerce.models.CreditCard;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -15,6 +16,9 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     @Override
     @RestResource(exported = false)
     Iterable<CreditCard> findAll();
+
+    @RestResource(exported = false)
+    Iterable<CreditCard> findAllOrderByActiveDesc();
 
     @Override
     @RestResource(exported = false)
@@ -42,4 +46,10 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
     @Override
     void delete(CreditCard creditCard);
+
+     Optional<CreditCard> findByActive(boolean active);
+
+    default Optional<CreditCard> findCurrentActivatedCard(){
+        return findByActive(true);
+    }
 }

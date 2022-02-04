@@ -29,8 +29,8 @@ public class CreditCardController {
     }
 
     @PatchMapping("/active")
-    public ResponseEntity<Iterable<CreditCard>> activatedCreditCard(@RequestBody CreditCard creditCard) {
-        var cards = creditCardService.activeCreditCard(creditCard);
+    public ResponseEntity<Iterable<CreditCard>> activateCreditCard(@RequestBody CreditCard creditCard) {
+        var cards = creditCardService.activateCreditCard(creditCard);
         return ResponseEntity.ok().body(cards);
     }
 }

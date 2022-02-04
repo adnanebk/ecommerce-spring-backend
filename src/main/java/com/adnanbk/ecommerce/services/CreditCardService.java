@@ -5,5 +5,5 @@ import com.adnanbk.ecommerce.models.CreditCard;
 public interface CreditCardService {
     CreditCard saveCard(CreditCard creditCard, String name);
 
-    Iterable<CreditCard> activeCreditCard(CreditCard creditCard);
+    Iterable<CreditCard> activateCreditCard(CreditCard creditCard);
 }
