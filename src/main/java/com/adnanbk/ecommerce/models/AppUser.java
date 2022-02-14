@@ -62,7 +62,7 @@ public class AppUser {
     private String country;
     private boolean enabled;
     
-    private boolean isSocial;
+    private boolean isSocial=false;
 
     @Column
     @NotEmpty
