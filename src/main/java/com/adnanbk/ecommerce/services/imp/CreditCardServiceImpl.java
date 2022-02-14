@@ -33,11 +33,13 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     public Iterable<CreditCard> activateCreditCard(CreditCard creditCard) {
         var card = creditCardRepo.findById(creditCard.getId()).orElseThrow(()->new CardNotFoundException("no card founded with id "+creditCard.getId()));
-        var currentCard = creditCardRepo.findCurrentActivatedCard().orElseThrow(()->new CardNotFoundException("card is not activated yet"));
-          card.setActive(true);
-          currentCard.setActive(false);
-          creditCardRepo.save(card);
-          creditCardRepo.save(currentCard);
+        card.setActive(true);
+        creditCardRepo.save(card);
+
+        var currentCard = creditCardRepo.findCurrentActivatedCard();
+          currentCard.ifPresent(c->c.setActive(false));
+          currentCard.map(creditCardRepo::save);
+
         return creditCardRepo.findAllByOrderByActiveDesc() ;
     }
 }
