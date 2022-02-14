@@ -61,6 +61,8 @@ public class AppUser {
     private String city;
     private String country;
     private boolean enabled;
+    
+    private boolean isSocial;
 
     @Column
     @NotEmpty
