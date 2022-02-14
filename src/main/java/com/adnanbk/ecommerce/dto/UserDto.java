@@ -18,7 +18,7 @@ public class UserDto {
 
     private String lastName;
 
-    private Boolean isSocial = false;
+    private Boolean isSocial;
 
     private boolean enabled;
         
