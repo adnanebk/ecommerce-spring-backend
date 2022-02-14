@@ -109,7 +109,7 @@ public class AuthServiceImp implements AuthService {
         if (appUser == null) {
             appUser = new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(), generateRandomPassword());
             appUser.setEnabled(true);
-            appUser.setIsSocial(true);
+            appUser.setSocial(true);
             appUser = userRepo.save(appUser);
         }
 
