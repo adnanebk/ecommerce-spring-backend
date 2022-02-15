@@ -83,7 +83,7 @@ public class ProductController {
 
     @DeleteMapping("/products/v2")
     @ApiOperation(value = "remove list of products")
-    public ResponseEntity<String> removeProducts(@RequestParam List<Long> listOfIds) {
+    public ResponseEntity<String> removeProducts(@RequestParam("Ids") List<Long> listOfIds) {
         if (!listOfIds.isEmpty())
             productService.removeProducts(listOfIds);
         return ResponseEntity.noContent().build();
