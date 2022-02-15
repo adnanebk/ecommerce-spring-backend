@@ -99,7 +99,7 @@ public class ProductController {
     @GetMapping("/products/excel")
     @ApiOperation(value = "download excel file of products")
     public Callable<ResponseEntity<InputStreamResource>>
-    loadProducts(@RequestParam(required = false) List<Long> listOfIds) {
+    loadProducts(@RequestParam(value="Ids",required = false) List<Long> listOfIds) {
         return () -> {
             String filename = "products-" + LocalDate.now() + ".xlsx";
             InputStreamResource file = new InputStreamResource(productService.loadToExcel(listOfIds));
