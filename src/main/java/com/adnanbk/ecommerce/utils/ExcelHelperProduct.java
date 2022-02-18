@@ -99,9 +99,6 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
                     }
                     case 6 -> product.setActive(currentCell.getBooleanCellValue());
                     case 7 -> product.setImage(currentCell.getStringCellValue());
-                    default -> {
-                        return 0;
-                    }
                 }
                 return 1;
             } catch (IllegalStateException ex) {
