@@ -23,7 +23,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.adnanbk.ecommerce.dto.ResponseErrorFactory.*;
+import static com.adnanbk.ecommerce.dto.ResponseErrorFactory.createResponseError;
 
 @RestControllerAdvice
 @ResponseStatus(HttpStatus.BAD_REQUEST)
