@@ -24,7 +24,7 @@ public class FacebookService implements SocialService {
 
 
     public boolean verify(JwtDto jwtDto) {
-        String token = jwtDto.token();
+        String token = jwtDto.getToken();
 
         if (token != null) {
 

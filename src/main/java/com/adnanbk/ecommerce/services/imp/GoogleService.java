@@ -21,7 +21,7 @@ public class GoogleService implements SocialService {
 
     @Override
     public boolean verify(JwtDto jwtDto) {
-        String token = jwtDto.token();
+        String token = jwtDto.getToken();
         if (token == null) {
             return false;
         }
