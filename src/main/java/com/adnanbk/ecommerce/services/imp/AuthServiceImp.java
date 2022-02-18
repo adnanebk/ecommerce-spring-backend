@@ -74,7 +74,7 @@ public class AuthServiceImp implements AuthService {
         user = userRepo.save(user);
 
 
-        return generateTokens(user, null);
+        return generateTokens(user);
     }
 
 
