@@ -35,9 +35,8 @@ public class ProductController {
 
     @PostMapping(value = "/products/images", consumes = "multipart/form-data")
     @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image", response = String.class, consumes = "multipart/form-data")
-    public CompletableFuture<ResponseEntity<String>> uploadProductImage(@RequestParam("image") MultipartFile file) {
-        return this.imageService.createImage(file)
-                .thenApplyAsync((fileName -> ResponseEntity.created(URI.create(fileName)).body(fileName)));
+    public CompletableFuture<String> uploadProductImage(@RequestParam("image") MultipartFile file) {
+        return this.imageService.createImage(file);
 
     }
 
@@ -63,37 +62,36 @@ public class ProductController {
     @PutMapping("/products/v2")
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = Product.class)
-    public ResponseEntity<Product> updateProduct(@Valid @RequestBody Product product) {
+    public Product updateProduct(@Valid @RequestBody Product product) {
         Product updatedProduct = productService.updateProduct(product);
         if (updatedProduct == null)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
-        return ResponseEntity.ok(updatedProduct);
+        return updatedProduct;
     }
 
 
     @PutMapping("/products/list")
     @ApiOperation(value = "update products", notes = "This endpoint updates  products and bind their categories by using bulk update ")
-    public ResponseEntity<List<Product>> updateProducts(@Valid @RequestBody List<Product> products) {
+    public List<Product> updateProducts(@Valid @RequestBody List<Product> products) {
         List<Product> updatedProducts = productService.updateProducts(products);
         if (updatedProducts.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
 
-        return ResponseEntity.ok(updatedProducts);
+        return updatedProducts;
     }
 
     @DeleteMapping("/products/v2")
     @ApiOperation(value = "remove list of products")
-    public ResponseEntity<String> removeProducts(@RequestParam("Ids") List<Long> listOfIds) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeProducts(@RequestParam("Ids") List<Long> listOfIds) {
         if (!listOfIds.isEmpty())
             productService.removeProducts(listOfIds);
-        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/products/excel")
     @ApiOperation(value = "add products from excel file", notes = "you have to download an excel file and fill it")
-    public Callable<ResponseEntity<List<Product>>> addProductsFromExcel(MultipartFile file) {
-        List<Product> products = productService.saveAllFromExcel(file);
-        return () -> new ResponseEntity<>(products, HttpStatus.CREATED);
+    public Callable<List<Product>> addProductsFromExcel(MultipartFile file) {
+       return ()-> productService.saveAllFromExcel(file);
     }
 
     @GetMapping("/products/excel")

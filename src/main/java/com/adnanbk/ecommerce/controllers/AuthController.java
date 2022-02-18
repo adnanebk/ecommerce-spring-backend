@@ -60,30 +60,26 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String> verifyUser(@RequestParam String token) {
+    public ResponseEntity<String>verifyUser(@RequestParam String token) {
         emailSenderService.verifyToken(token);
-
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl + "?verified=true")).build();
-
-
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<String> sendEmailConfirmation(@RequestBody String email) {
+    public void sendEmailConfirmation(@RequestBody String email) {
         emailSenderService.sendEmailConfirmation(email);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/appUsers/change-password")
-    public ResponseEntity<String> changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
+    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
         this.authService.changePassword(changeUserPasswordDto, principal.getName());
-        return ResponseEntity.ok().build();
     }
 
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<JwtDto> refreshNewToken(@RequestBody String refreshToken) {
-        var jwtResponse = this.authService.refreshNewToken(refreshToken);
-        return ResponseEntity.ok().body(jwtResponse);
+    @ResponseStatus(HttpStatus.CREATED)
+    public  JwtDto refreshNewToken(@RequestBody String refreshToken) {
+        return  this.authService.refreshNewToken(refreshToken);
+
     }
 }
