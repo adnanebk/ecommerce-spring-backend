@@ -113,8 +113,7 @@ public class AuthServiceImp implements AuthService {
             appUser = userRepo.save(appUser);
         }
 
-        var response = generateTokens(appUser);
-        return response;
+        return generateTokens(appUser);
     }
 
     private JwtDto generateTokens(AppUser user) {
