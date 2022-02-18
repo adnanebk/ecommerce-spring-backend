@@ -5,12 +5,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@Getter
-@Setter
-public class ChangeUserPasswordDto {
 
-    @NotEmpty
-    private String currentPassword;
-    @NotEmpty
-    private String newPassword;
+public record ChangeUserPasswordDto(@NotEmpty String currentPassword, @NotEmpty String newPassword) {
+
 }

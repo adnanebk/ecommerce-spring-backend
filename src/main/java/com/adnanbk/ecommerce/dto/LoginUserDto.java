@@ -8,13 +8,6 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginUserDto {
-    @NotEmpty
-    private String userName;
-    @NotEmpty
-    private String password;
+
+public record LoginUserDto(@NotEmpty String userName, @NotEmpty String password) {
 }

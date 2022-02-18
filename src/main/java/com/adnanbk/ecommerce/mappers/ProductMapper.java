@@ -28,8 +28,8 @@ public class ProductMapper {
     }
 
     public void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
-        Collections.sort(productsSrc, Comparator.comparing(Product::getId));
-        Collections.sort(productsDest, Comparator.comparing(Product::getId));
+        productsSrc.sort(Comparator.comparing(Product::getId));
+        productsDest.sort(Comparator.comparing(Product::getId));
 
         for (int i = 0; i < productsDest.size(); i++) {
             Product productInDb = productsDest.get(i);
