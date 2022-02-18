@@ -52,7 +52,7 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtDto handleLogin(LoginUserDto appUser) {
-        var currentUser = userRepo.findByUserName(appUser.userName());
+        var currentUser = userRepo.findByUserName(appUser.getUserName());
       /*  try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -62,7 +62,7 @@ public class AuthServiceImp implements AuthService {
         }
         */
 
-        if (currentUser == null || !passwordEncode.matches(appUser.password(), currentUser.getPassword()))
+        if (currentUser == null || !passwordEncode.matches(appUser.getPassword(), currentUser.getPassword()))
             throw new BadCredentialsException("Invalid username or password");
 
         return generateTokens(currentUser);
@@ -81,9 +81,9 @@ public class AuthServiceImp implements AuthService {
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName) {
         var user = userRepo.findByUserName(userName);
-        if (user == null || !passwordEncode.matches(changeUserPasswordDto.currentPassword(), user.getPassword()))
+        if (user == null || !passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
             throw new BadCredentialsException("current password not exists or invalid");
-        user.setPassword(passwordEncode.encode(changeUserPasswordDto.newPassword()));
+        user.setPassword(passwordEncode.encode(changeUserPasswordDto.getNewPassword()));
         userRepo.save(user);
     }
 
