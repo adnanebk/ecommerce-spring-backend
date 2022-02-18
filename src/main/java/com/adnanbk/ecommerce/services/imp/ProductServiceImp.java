@@ -31,7 +31,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Product updateProduct(Product product) {
-        Product prod = productRepo.getOne(product.getId());
+        Product prod = productRepo.getById(product.getId());
         productMapper.mapProduct(product, prod);
         return productRepo.save(prod);
     }
@@ -47,7 +47,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public void removeProducts(List<Long> productsIds) {
-        productRepo.deleteInBatch(productRepo.findAllById(productsIds));
+        productRepo.deleteAllInBatch(productRepo.findAllById(productsIds));
     }
 
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {

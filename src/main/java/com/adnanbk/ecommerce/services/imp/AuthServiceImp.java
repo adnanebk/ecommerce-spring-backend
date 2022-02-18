@@ -38,7 +38,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
         googleService.verify(jwtDto);
-        return doLoginSocialUser(jwtDto.appUser());
+        return doLoginSocialUser(jwtDto.getAppUser());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class AuthServiceImp implements AuthService {
         boolean isTokenValid = facebookService.verify(jwtDto);
         if (!isTokenValid)
             throw new BadCredentialsException("Invalid credentials");
-        return doLoginSocialUser(jwtDto.appUser());
+        return doLoginSocialUser(jwtDto.getAppUser());
     }
 
 
