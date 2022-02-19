@@ -1,7 +1,7 @@
 package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.models.Product;
-import com.adnanbk.ecommerce.services.ImageService;
+import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 @AllArgsConstructor
 public class ProductController {
 
-    private final ImageService imageService;
+    private final FileService imageService;
     private final ProductService productService;
 
 
@@ -41,7 +41,7 @@ public class ProductController {
     @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image and return the created image url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<String> uploadProductImage(HttpServletRequest request, @RequestPart("image") MultipartFile file) {
-        return this.imageService.createImage(file)
+        return this.imageService.upload(file)
                 .thenApplyAsync(imageService::load)
                 .thenApplyAsync(path -> getRootUrl(request) + "/" + path);
     }
@@ -95,7 +95,7 @@ public class ProductController {
 
     @PostMapping("/products/excel")
     @ApiOperation(value = "add products from excel file", notes = "you have to download an excel file and fill it")
-    public Callable<List<Product>> addProductsFromExcel(MultipartFile file) {
+    public Callable<List<Product>> addProductsFromExcel(@RequestPart MultipartFile file) {
         return () -> productService.saveAllFromExcel(file);
     }
 

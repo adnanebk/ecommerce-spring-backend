@@ -1,7 +1,7 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
-import com.adnanbk.ecommerce.services.ImageService;
+import com.adnanbk.ecommerce.services.FileService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class ImageServiceImp implements ImageService {
+public class ImageServiceImp implements FileService {
 
 
     @Value("${app.upload.dir:${user.home}}")
@@ -45,7 +45,7 @@ public class ImageServiceImp implements ImageService {
 
     @Async
     @CacheEvict(value = "productImage", key = "#image.originalFilename")
-    public CompletableFuture<String> createImage(MultipartFile image) {
+    public CompletableFuture<String> upload(MultipartFile image) {
         if (image == null)
             throw new CustomFileException("you must upload  a valid image ");
         String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "")

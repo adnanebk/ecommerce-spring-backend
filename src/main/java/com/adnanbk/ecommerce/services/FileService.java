@@ -4,9 +4,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ImageService {
+public interface FileService {
 
-    CompletableFuture<String> createImage(MultipartFile multipartFile);
+    CompletableFuture<String> upload(MultipartFile multipartFile);
 
     String load(String filename);
 }
