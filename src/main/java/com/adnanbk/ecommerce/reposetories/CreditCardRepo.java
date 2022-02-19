@@ -18,15 +18,15 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     Optional<CreditCard> findByCardNumber(String cardNumber);
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    //@PreAuthorize("#userName == authentication.name")
+        //@PreAuthorize("#userName == authentication.name")
     List<CreditCard> findByAppUser_UserNameOrderByActiveDesc(String userName);
 
 
     boolean existsByAppUser_UserName(String userName);
 
-     Optional<CreditCard> findByActive(boolean active);
+    Optional<CreditCard> findByActive(boolean active);
 
-    default Optional<CreditCard> findCurrentActivatedCard(){
+    default Optional<CreditCard> findCurrentActivatedCard() {
         return findByActive(true);
     }
 }

@@ -73,7 +73,7 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
-        return  new ApiErrorDto(ex.getMessage());
+        return new ApiErrorDto(ex.getMessage());
     }
 
     @ExceptionHandler(JWTVerificationException.class)

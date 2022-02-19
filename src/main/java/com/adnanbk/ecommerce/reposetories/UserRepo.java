@@ -9,7 +9,6 @@ import javax.persistence.QueryHint;
 import java.util.Optional;
 
 
-
 @RepositoryRestResource(exported = false)
 public interface UserRepo extends CrudRepository<AppUser, Long> {
 

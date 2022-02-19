@@ -79,8 +79,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public AppUser getByUserName(String userName) {
-     return this.userRepo.findByUserName(userName);
+        return this.userRepo.findByUserName(userName);
     }
+
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName) {
         var user = userRepo.findByUserName(userName);

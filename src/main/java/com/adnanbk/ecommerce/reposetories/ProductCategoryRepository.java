@@ -12,7 +12,6 @@ public interface ProductCategoryRepository extends CrudRepository<ProductCategor
 
     ProductCategory findByNameIgnoreCase(String categoryName);
 
-    boolean existsByName(String name);
 
     @Override
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))

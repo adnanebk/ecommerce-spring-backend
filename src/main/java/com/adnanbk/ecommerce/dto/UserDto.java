@@ -21,7 +21,7 @@ public class UserDto {
     private boolean isSocial;
 
     private boolean enabled;
-        
+
 
     private Date expirationDate;
 

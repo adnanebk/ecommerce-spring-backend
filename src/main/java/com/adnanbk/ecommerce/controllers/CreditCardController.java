@@ -22,7 +22,7 @@ public class CreditCardController {
 
 
     @GetMapping("/username/{userName}")
-    public List<CreditCard> getCreditCardsByUserName(@PathVariable String userName){
+    public List<CreditCard> getCreditCardsByUserName(@PathVariable String userName) {
         return creditCardService.findByUserName(userName);
     }
 

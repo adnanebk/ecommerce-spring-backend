@@ -20,7 +20,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/appUsers")
 public class AuthController {
 
 
@@ -48,14 +48,14 @@ public class AuthController {
         return authService.handleLogin(appUser);
     }
 
-    @PostMapping("/google")
+    @PostMapping("/login/google")
     @ResponseStatus(HttpStatus.OK)
     public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithGoogle(jwtDto);
 
     }
 
-    @PostMapping("/facebook")
+    @PostMapping("/login/facebook")
     public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithFacebook(jwtDto);
     }
@@ -64,8 +64,9 @@ public class AuthController {
     public AppUser getUserByUserName(@PathVariable String userName) {
         return this.authService.getByUserName(userName);
     }
+
     @GetMapping("/verify")
-    public ResponseEntity<String>verifyUser(@RequestParam String token) {
+    public ResponseEntity<String> verifyUser(@RequestParam String token) {
         emailSenderService.verifyToken(token);
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl + "?verified=true")).build();
     }
@@ -83,8 +84,8 @@ public class AuthController {
 
     @PostMapping("/refresh-token")
     @ResponseStatus(HttpStatus.CREATED)
-    public  JwtDto refreshNewToken(@RequestBody String refreshToken) {
-        return  this.authService.refreshNewToken(refreshToken);
+    public JwtDto refreshNewToken(@RequestBody String refreshToken) {
+        return this.authService.refreshNewToken(refreshToken);
 
     }
 }

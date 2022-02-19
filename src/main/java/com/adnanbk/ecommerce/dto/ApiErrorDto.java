@@ -11,7 +11,7 @@ public class ApiErrorDto {
     private String message;
     private Set<?> errors;
 
-    public ApiErrorDto( String message, Set<ResponseError> errors) {
+    public ApiErrorDto(String message, Set<ResponseError> errors) {
         super();
         this.message = message;
         this.errors = errors;

@@ -9,9 +9,8 @@ import javax.persistence.QueryHint;
 import java.util.List;
 
 
-@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-category",exported = false)
+@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-category", exported = false)
 public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
-
 
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))

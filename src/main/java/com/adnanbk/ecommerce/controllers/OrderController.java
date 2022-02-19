@@ -16,7 +16,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/orders/")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -30,13 +30,13 @@ public class OrderController {
     private final OrderValidator orderValidator;
 
     @GetMapping("/username/{userName}")
-    public List<UserOrder> getOrdersByUserName(@PathVariable String userName){
+    public List<UserOrder> getOrdersByUserName(@PathVariable String userName) {
         return userOderService.findByUserName(userName);
     }
 
-    @PostMapping("/userOrders")
-    public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder userOrder, Principal principal) {
-        UserOrder savedUserOrder = userOderService.saveOrder(userOrder, principal.getName());
+    @PostMapping
+    public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder order, Principal principal) {
+        UserOrder savedUserOrder = userOderService.saveOrder(order, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedUserOrder.getId()).toUri();
         return ResponseEntity.created(location).body(savedUserOrder);

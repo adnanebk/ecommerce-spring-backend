@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -64,18 +63,18 @@ public class ImageServiceImp implements ImageService {
 
     @Override
     @Cacheable(value = "productImage", key = "#filename")
-    public Resource load(String filename) {
+    public String load(String filename) {
         try {
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
-                return resource;
+                return uploadDir + "/" + resource.getFilename();
             } else {
                 throw new CustomFileException("we Could not read the file, please try again");
             }
-        } catch (MalformedURLException e) {
-            throw new CustomFileException("Error: " + e.getMessage());
+        } catch (IOException e) {
+            throw new CustomFileException("we Could not read the file, please try again");
         }
     }
 
