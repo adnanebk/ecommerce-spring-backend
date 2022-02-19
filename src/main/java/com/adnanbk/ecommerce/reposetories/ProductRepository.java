@@ -15,7 +15,6 @@ import javax.persistence.QueryHint;
 import java.util.Date;
 
 @RepositoryRestResource(excerptProjection = ProductProjection.class)
-@Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
