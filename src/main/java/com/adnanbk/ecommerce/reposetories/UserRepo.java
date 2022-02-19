@@ -3,12 +3,14 @@ package com.adnanbk.ecommerce.reposetories;
 import com.adnanbk.ecommerce.models.AppUser;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
 import java.util.Optional;
 
 
 
+@RepositoryRestResource(exported = false)
 public interface UserRepo extends CrudRepository<AppUser, Long> {
 
 
@@ -17,8 +19,6 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     AppUser findByUserName(String userName);
 
-    @Override
-    <S extends AppUser> S save(S s);
 
     Optional<AppUser> findByEmail(String email);
 

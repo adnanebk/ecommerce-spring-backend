@@ -3,11 +3,13 @@ package com.adnanbk.ecommerce.reposetories;
 import com.adnanbk.ecommerce.models.CreditCard;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
 import java.util.List;
 import java.util.Optional;
 
+@RepositoryRestResource(exported = false)
 public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
 
