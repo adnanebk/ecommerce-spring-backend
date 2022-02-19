@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class UserOrderServiceImp implements UserOderService {
@@ -35,6 +37,11 @@ public class UserOrderServiceImp implements UserOderService {
         userOrder.setCreditCard(creditCard);
         userOrder.setUserOrderItems(orderItemRepo.saveAll(userOrder.getOrderItems()));
         return orderRepository.save(userOrder);
+    }
+
+    @Override
+    public List<UserOrder> findByUserName(String userName) {
+        return orderRepository.findByAppUser_UserName(userName);
     }
 
 }

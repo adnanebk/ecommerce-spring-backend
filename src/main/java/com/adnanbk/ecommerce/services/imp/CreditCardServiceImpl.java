@@ -9,6 +9,8 @@ import com.adnanbk.ecommerce.services.CreditCardService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
@@ -16,6 +18,11 @@ public class CreditCardServiceImpl implements CreditCardService {
     private CreditCardRepo creditCardRepo;
     private UserRepo userRepo;
 
+
+    @Override
+    public List<CreditCard> findByUserName(String userName) {
+        return creditCardRepo.findByAppUser_UserNameOrderByActiveDesc(userName);
+    }
 
     @Override
     public CreditCard saveCard(CreditCard creditCard, String userName) {

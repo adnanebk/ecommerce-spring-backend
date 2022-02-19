@@ -17,6 +17,7 @@
 
 
     <properties>
+        <start-class>com.adnanbk.ecommerce.EcommerceAngApplication</start-class>
         <java.version>16</java.version>
         <sonar.organization>adnanebk</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
@@ -92,7 +93,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version>
+            <version>1.18.22</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>

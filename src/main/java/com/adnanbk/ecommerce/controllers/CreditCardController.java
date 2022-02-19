@@ -10,6 +10,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/creditCards")
@@ -19,6 +20,11 @@ public class CreditCardController {
 
     private CreditCardService creditCardService;
 
+
+    @GetMapping("/username/{userName}")
+    public List<CreditCard> getCreditCardsByUserName(@PathVariable String userName){
+        return creditCardService.findByUserName(userName);
+    }
 
     @PostMapping
     public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal) {
