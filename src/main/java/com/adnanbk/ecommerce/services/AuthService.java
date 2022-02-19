@@ -15,6 +15,8 @@ public interface AuthService {
 
     JwtDto handleRegister(AppUser user);
 
+    AppUser getByUserName(String userName);
+
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName);
 
     JwtDto refreshNewToken(String refreshToken);

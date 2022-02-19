@@ -60,6 +60,10 @@ public class AuthController {
         return authService.handleLoginWithFacebook(jwtDto);
     }
 
+    @GetMapping("/username/{userName}")
+    public AppUser getUserByUserName(@PathVariable String userName) {
+        return this.authService.getByUserName(userName);
+    }
     @GetMapping("/verify")
     public ResponseEntity<String>verifyUser(@RequestParam String token) {
         emailSenderService.verifyToken(token);

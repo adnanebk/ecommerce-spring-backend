@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 
 
 @RestController
@@ -28,6 +29,10 @@ public class OrderController {
     private final UserOderService userOderService;
     private final OrderValidator orderValidator;
 
+    @GetMapping("/username/{userName}")
+    public List<UserOrder> getOrdersByUserName(@PathVariable String userName){
+        return userOderService.findByUserName(userName);
+    }
 
     @PostMapping("/userOrders")
     public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder userOrder, Principal principal) {
