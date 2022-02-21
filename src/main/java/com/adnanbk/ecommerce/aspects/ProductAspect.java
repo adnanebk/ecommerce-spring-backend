@@ -21,23 +21,19 @@ public class ProductAspect {
     public void findByAspect(Product  product) {
 
         product.setImage(imagesPathUrl+product.getImage());
-        System.out.println("findAll aspect");
     }
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.save(..))",returning = "product")
     public void saveAspect(Product  product) {
 
         product.setImage(imagesPathUrl+product.getImage());
-        System.out.println("save aspect");
     }
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findAll*(..))",returning = "products")
     public void findAllAspect(Page<Product>  products) {
 
             products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
-        System.out.println("findAll aspect");
     }
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.saveAll*(..))",returning = "products")
     public void saveAllAllAspect(List<Product> products) {
         products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
-        System.out.println("saveAll aspect");
     }
 }

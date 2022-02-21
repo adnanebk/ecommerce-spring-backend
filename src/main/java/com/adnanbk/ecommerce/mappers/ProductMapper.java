@@ -8,6 +8,8 @@ import java.util.List;
 
 public class ProductMapper {
 
+    private ProductMapper() {
+    }
 
     public static void mapProduct(Product productSrc, Product productDest) {
         BeanUtils.copyProperties(productSrc,productDest);
