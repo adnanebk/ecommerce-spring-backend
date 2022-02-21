@@ -17,7 +17,6 @@ import java.util.Date;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
 
-
     @RestResource(path = "byCategory")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Page<Product> findByCategoryId(Long id, Pageable pageable);

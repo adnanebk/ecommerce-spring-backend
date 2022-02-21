@@ -17,7 +17,7 @@ public class ProductAspect {
     @Value("${imagesPathUrl}")
     private String imagesPathUrl;
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findById(..))",returning = "product")
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..))",returning = "product")
     public void findByAspect(Optional<Product> product) {
         product.ifPresent(prod->prod.setImage(imagesPathUrl+prod.getImage()));
     }
