@@ -22,7 +22,7 @@ public class ProductAspect {
 
         product.setImage(imagesPathUrl+product.getImage());
     }
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..))",returning = "products")
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..,org.springframework.data.domain.Pageable))",returning = "products")
     public void findAllAspect(Page<Product>  products) {
 
         products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
