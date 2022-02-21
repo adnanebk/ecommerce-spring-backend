@@ -12,10 +12,12 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.QueryHint;
 import java.util.Date;
+import java.util.Optional;
 
 @RepositoryRestResource(excerptProjection = ProductProjection.class)
 public interface ProductRepository extends JpaRepository<Product, Long> {
-
+    @Override
+    Optional<Product> findById(Long aLong);
 
     @RestResource(path = "byCategory")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))

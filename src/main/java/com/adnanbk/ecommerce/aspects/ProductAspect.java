@@ -19,10 +19,7 @@ public class ProductAspect {
 
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findById(..))",returning = "product")
     public void findByAspect(Optional<Product> product) {
-        product.map(prod-> {
-            prod.setImage(imagesPathUrl + prod.getImage());
-            return prod;
-        });
+        product.ifPresent(prod->prod.setImage(imagesPathUrl + prod.getImage()));
     }
 
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..,org.springframework.data.domain.Pageable))",returning = "products")
