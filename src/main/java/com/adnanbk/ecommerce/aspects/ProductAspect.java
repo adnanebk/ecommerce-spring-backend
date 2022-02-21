@@ -17,23 +17,25 @@ public class ProductAspect {
     private String imagesPathUrl;
 
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findBy*(..))",returning = "product")
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findById(..))",returning = "product")
     public void findByAspect(Product  product) {
 
         product.setImage(imagesPathUrl+product.getImage());
+    }
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..))",returning = "products")
+    public void findAllAspect(Page<Product>  products) {
+
+        products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
+    }
+
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.saveAll*(..))",returning = "products")
+    public void saveAllAllAspect(List<Product> products) {
+        products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
     }
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.save(..))",returning = "product")
     public void saveAspect(Product  product) {
 
         product.setImage(imagesPathUrl+product.getImage());
     }
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findAll*(..))",returning = "products")
-    public void findAllAspect(Page<Product>  products) {
 
-            products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
-    }
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.saveAll*(..))",returning = "products")
-    public void saveAllAllAspect(List<Product> products) {
-        products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
-    }
 }
