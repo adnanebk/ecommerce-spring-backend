@@ -9,8 +9,6 @@ import com.adnanbk.ecommerce.services.CreditCardService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
@@ -19,20 +17,16 @@ public class CreditCardServiceImpl implements CreditCardService {
     private UserRepo userRepo;
 
 
-    @Override
-    public List<CreditCard> findByUserName(String userName) {
-        return creditCardRepo.findByAppUser_UserNameOrderByActiveDesc(userName);
-    }
 
     @Override
     public CreditCard saveCard(CreditCard creditCard, String userName) {
         AppUser user = userRepo.findByUserName(userName);
-        activeCrediCardIfNew(creditCard, userName);
+        activeCreditCardIfNew(creditCard, userName);
         creditCard.setAppUser(user);
         return creditCardRepo.save(creditCard);
     }
 
-    private void activeCrediCardIfNew(CreditCard creditCard, String userName) {
+    private void activeCreditCardIfNew(CreditCard creditCard, String userName) {
         if (!creditCardRepo.existsByAppUser_UserName(userName))
             creditCard.setActive(true);
     }

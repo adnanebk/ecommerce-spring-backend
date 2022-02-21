@@ -1,8 +1,9 @@
-package com.adnanbk.ecommerce.utils;
+package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductCategoryRepository;
+import com.adnanbk.ecommerce.services.ExcelHelperService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,7 +24,7 @@ import java.util.List;
 
 
 @Component
-public class ExcelHelperProduct implements ExcelHelperI<Product> {
+public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static final String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
             "Category", "Active", "Image url"};
@@ -32,7 +33,7 @@ public class ExcelHelperProduct implements ExcelHelperI<Product> {
 
     private final ProductCategoryRepository categoryRepo;
 
-    public ExcelHelperProduct(ProductCategoryRepository categoryRepo) {
+    public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
     }
 

@@ -36,8 +36,7 @@ public class ImageServiceImp implements FileService {
     private void createUploadingDirectory() {
         try {
             root = Paths.get(uploadDir);
-            if (!Files.isDirectory(Paths.get(uploadDir)))
-                Files.createDirectory(Paths.get(uploadDir));
+                Files.createDirectories(root);
         } catch (IOException e) {
             throw new CustomFileException("Could not initialize folder for upload!");
         }
@@ -58,20 +57,19 @@ public class ImageServiceImp implements FileService {
         } catch (IOException e) {
             throw new CustomFileException("we Could not write the file, please try again");
         }
-        return CompletableFuture.completedFuture(fileName);
+        return CompletableFuture.completedFuture(filePath.toString());
     }
 
     @Override
     @Cacheable(value = "productImage", key = "#filename")
     public String load(String filename) {
         try {
-            Path file = root.resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
-
+            Path path = root.resolve(filename);
+            Resource resource = new UrlResource(path.toUri());
             if (resource.exists() || resource.isReadable()) {
-                return uploadDir + "/" + resource.getFilename();
+                return  path.toString();
             } else {
-                throw new CustomFileException("we Could not read the file, please try again");
+                throw new CustomFileException("file either not exists or not readable");
             }
         } catch (IOException e) {
             throw new CustomFileException("we Could not read the file, please try again");

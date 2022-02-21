@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/products/v2")
 @AllArgsConstructor
 public class ProductController {
 
@@ -33,38 +33,38 @@ public class ProductController {
     private final ProductService productService;
 
 
+    private String getRootUrl() {
+        return ServletUriComponentsBuilder.fromCurrentRequest().replacePath(null).toUriString();
+    }
     private String getRootUrl(HttpServletRequest request) {
         return ServletUriComponentsBuilder.fromRequest(request).replacePath(null).toUriString();
     }
-
-    @PostMapping(value = "/products/images", consumes = "multipart/form-data")
+    @PostMapping(value = "/images", consumes = "multipart/form-data")
     @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image and return the created image url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<String> uploadProductImage(HttpServletRequest request, @RequestPart("image") MultipartFile file) {
-        return this.imageService.upload(file)
-                .thenApplyAsync(imageService::load)
-                .thenApplyAsync(path -> getRootUrl(request) + "/" + path);
+    public CompletableFuture<String> uploadProductImage(@RequestPart("image") MultipartFile file,HttpServletRequest request) {
+        return this.imageService.upload(file).thenApplyAsync(path->getRootUrl(request)+"/"+path);
     }
 
-    @GetMapping("/products/images/{filename:.+}")
-    @ApiOperation(value = "get product image")
-    public String getImage(@PathVariable String filename, HttpServletRequest request) {
-        return getRootUrl(request) + "/" + imageService.load(filename);
+    @GetMapping("/images/{imageName:.+}")
+    @ApiOperation(value = "get product image url")
+    public String getImageUrl(@PathVariable String imageName) {
+        return getRootUrl() + "/" + imageService.load(imageName);
 
     }
 
-    @PostMapping("/products/v2")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = Product.class)
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product, HttpServletRequest request) {
+    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product) {
         Product prod = productService.addProduct(product);
-        URI location = URI.create(getRootUrl(request) + "/" + prod.getId());
+        URI location = URI.create(getRootUrl() + "/products/" + prod.getId());
 
         return ResponseEntity.created(location).body(prod);
     }
 
-    @PutMapping("/products/v2")
+    @PutMapping
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = Product.class)
     public Product updateProduct(@Valid @RequestBody Product product) {
@@ -75,7 +75,7 @@ public class ProductController {
     }
 
 
-    @PutMapping("/products/list")
+    @PutMapping("/list")
     @ApiOperation(value = "update products", notes = "This endpoint updates  products and bind their categories by using bulk update ")
     public List<Product> updateProducts(@Valid @RequestBody List<Product> products) {
         List<Product> updatedProducts = productService.updateProducts(products);
@@ -85,7 +85,7 @@ public class ProductController {
         return updatedProducts;
     }
 
-    @DeleteMapping("/products/v2")
+    @DeleteMapping
     @ApiOperation(value = "remove list of products")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeProducts(@RequestParam("Ids") List<Long> listOfIds) {
@@ -93,7 +93,7 @@ public class ProductController {
             productService.removeProducts(listOfIds);
     }
 
-    @PostMapping("/products/excel")
+    @PostMapping("/excel")
     @ApiOperation(value = "add products from excel file", notes = "you have to download an excel file and fill it")
     public Callable<List<Product>> addProductsFromExcel(@RequestPart MultipartFile file) {
         return () -> productService.saveAllFromExcel(file);

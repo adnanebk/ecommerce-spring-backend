@@ -26,7 +26,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(HttpServletRequest request) {
         String reqUri = request.getRequestURI();
         return !reqUri.contains("userOrders") &&
                 !reqUri.contains("appUsers") &&
@@ -42,7 +42,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // only the Token
         var tokenArr = requestTokenHeader.split("Bearer ");
         if (tokenArr.length != 2)
-            throw new JWTVerificationException("Header not contains Authorization or JWT Token does not begin with Bearer");
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Header not contains Authorization or JWT Token does not begin with Bearer");
 
 
         // Once we get the token validate it.

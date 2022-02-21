@@ -2,6 +2,7 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.models.CreditCard;
 import com.adnanbk.ecommerce.services.CreditCardService;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/creditCards")
@@ -21,12 +21,9 @@ public class CreditCardController {
     private CreditCardService creditCardService;
 
 
-    @GetMapping("/username/{userName}")
-    public List<CreditCard> getCreditCardsByUserName(@PathVariable String userName) {
-        return creditCardService.findByUserName(userName);
-    }
 
     @PostMapping
+    @ApiOperation(value = "create a new user credit card")
     public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal) {
         CreditCard savedCreditCard = creditCardService.saveCard(creditCard, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -35,6 +32,7 @@ public class CreditCardController {
     }
 
     @PatchMapping("/active")
+    @ApiOperation(value = "make the user credit card primary")
     public Iterable<CreditCard> activateCreditCard(@RequestBody CreditCard creditCard) {
         return creditCardService.activateCreditCard(creditCard);
     }

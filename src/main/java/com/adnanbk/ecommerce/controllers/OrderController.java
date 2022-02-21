@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.models.UserOrder;
 import com.adnanbk.ecommerce.services.UserOderService;
 import com.adnanbk.ecommerce.validations.OrderValidator;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -16,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/orders/")
+@RequestMapping("/api/userOrders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -29,14 +30,16 @@ public class OrderController {
     private final UserOderService userOderService;
     private final OrderValidator orderValidator;
 
-    @GetMapping("/username/{userName}")
-    public List<UserOrder> getOrdersByUserName(@PathVariable String userName) {
-        return userOderService.findByUserName(userName);
+    @GetMapping
+    @ApiOperation(value = "get all user orders")
+    public List<UserOrder> getOrdersByUserName(Principal principal) {
+        return userOderService.findByUserName(principal.getName());
     }
 
     @PostMapping
-    public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder order, Principal principal) {
-        UserOrder savedUserOrder = userOderService.saveOrder(order, principal.getName());
+    @ApiOperation(value = "create a new order")
+    public ResponseEntity<UserOrder> saveOrder(@RequestBody @Valid UserOrder userOrder, Principal principal) {
+        UserOrder savedUserOrder = userOderService.saveOrder(userOrder, principal.getName());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedUserOrder.getId()).toUri();
         return ResponseEntity.created(location).body(savedUserOrder);

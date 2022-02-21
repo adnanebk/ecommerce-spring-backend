@@ -2,11 +2,9 @@ package com.adnanbk.ecommerce.exceptions;
 
 import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,12 +72,6 @@ public class ExceptionsHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
         return new ApiErrorDto(ex.getMessage());
-    }
-
-    @ExceptionHandler(JWTVerificationException.class)
-    public ResponseEntity<Exception> jWTVerificationException(JWTVerificationException ex) {
-
-        return ResponseEntity.badRequest().body(new RuntimeException("error while verifying jwt token"));
     }
 
 

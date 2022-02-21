@@ -16,7 +16,7 @@ import java.security.GeneralSecurityException;
 public class GoogleService implements SocialService {
 
 
-    private final GoogleIdTokenVerifier googleverifier;
+    private final GoogleIdTokenVerifier googleVerifier;
 
 
     @Override
@@ -32,7 +32,7 @@ public class GoogleService implements SocialService {
 
     private boolean doVerify(String token) {
         try {
-            GoogleIdToken idToken = googleverifier.verify(token);
+            GoogleIdToken idToken = googleVerifier.verify(token);
 
             return (idToken != null);
 

@@ -4,8 +4,8 @@ import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
+import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.services.ProductService;
-import com.adnanbk.ecommerce.utils.ExcelHelperI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,20 +19,18 @@ import java.util.List;
 public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
-    private final ExcelHelperI<Product> excelHelper;
-    private final ProductMapper productMapper;
+    private final ExcelHelperService<Product> excelHelper;
 
 
     @Override
     public Product addProduct(Product product) {
-        productMapper.mapProductImage(product);
         return productRepo.save(product);
     }
 
     @Override
     public Product updateProduct(Product product) {
         Product prod = productRepo.getOne(product.getId());
-        productMapper.mapProduct(product, prod);
+        ProductMapper.mapProduct(product, prod);
         return productRepo.save(prod);
     }
 
@@ -40,7 +38,7 @@ public class ProductServiceImp implements ProductService {
     public List<Product> updateProducts(List<Product> products) {
         var productsInDb = productRepo.findAllById(products.stream()
                 .map(Product::getId).toList());
-        productMapper.mapProducts(products, productsInDb);
+        ProductMapper.mapProducts(products, productsInDb);
         return productRepo.saveAll(productsInDb);
     }
 
@@ -52,8 +50,7 @@ public class ProductServiceImp implements ProductService {
 
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {
         try {
-            List<Product> products = excelHelper.excelToList(multipartFile.getInputStream())
-                    .stream().map(productMapper::mapProductImage).toList();
+            List<Product> products = excelHelper.excelToList(multipartFile.getInputStream());
             if (!products.isEmpty())
                 return productRepo.saveAll(products);
 

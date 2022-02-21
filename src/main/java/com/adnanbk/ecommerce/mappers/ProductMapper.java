@@ -1,32 +1,19 @@
 package com.adnanbk.ecommerce.mappers;
 
 import com.adnanbk.ecommerce.models.Product;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Comparator;
 import java.util.List;
 
-@Component
 public class ProductMapper {
 
-    @Value("${api.url}")
-    private String baseUrl;
 
-
-    public void mapProduct(Product productSrc, Product productDest) {
-        productDest.setCategory(productSrc.getCategory());
-        productDest.setImage(productSrc.getImage());
-        productDest.setSku(productSrc.getSku());
-        productDest.setName(productSrc.getName());
-        productDest.setDescription(productSrc.getDescription());
-        productDest.setUnitPrice(productSrc.getUnitPrice());
-        productDest.setActive(productSrc.isActive());
-        productDest.setUnitsInStock(productSrc.getUnitsInStock());
-        mapProductImage(productDest);
+    public static void mapProduct(Product productSrc, Product productDest) {
+        BeanUtils.copyProperties(productSrc,productDest);
     }
 
-    public void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
+    public static void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
         productsSrc.sort(Comparator.comparing(Product::getId));
         productsDest.sort(Comparator.comparing(Product::getId));
 
@@ -39,10 +26,6 @@ public class ProductMapper {
         }
     }
 
-    public Product mapProductImage(Product productSrc) {
-        if (!productSrc.getImage().startsWith("http") && !productSrc.getImage().startsWith("assets"))
-            productSrc.setImage(baseUrl + "/products/images/" + productSrc.getImage());
-        return productSrc;
-    }
+
 
 }

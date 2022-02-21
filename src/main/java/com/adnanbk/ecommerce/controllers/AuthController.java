@@ -9,10 +9,10 @@ import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.EmailSenderService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -20,7 +20,7 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/appUsers")
+@RequestMapping("/api")
 public class AuthController {
 
 
@@ -28,61 +28,64 @@ public class AuthController {
     private final EmailSenderService emailSenderService;
 
 
-    @Value("${front.url}")
-    private String frontUrl;
+
+    private String getRootUrl() {
+        return ServletUriComponentsBuilder.fromCurrentRequest().replacePath(null).toUriString();
+    }
 
 
     @PostMapping(value = "/register")
-    @ApiOperation(value = "register new user", response = JwtDto.class)
+    @ApiOperation(value = "register a new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto create(@RequestBody @Valid AppUser user) {
         user.setEnabled(false);
         JwtDto jwtDto = authService.handleRegister(user);
-        emailSenderService.sendEmailConfirmation(user.getEmail());
+        emailSenderService.sendEmailConfirmation(getRootUrl(),user.getEmail());
         return jwtDto;
 
     }
 
     @PostMapping("/login")
+    @ApiOperation(value = "authenticate a user")
     public JwtDto authenticateUser(@RequestBody @Valid LoginUserDto appUser) {
         return authService.handleLogin(appUser);
     }
 
     @PostMapping("/login/google")
     @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "authenticate a google user")
     public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithGoogle(jwtDto);
 
     }
 
     @PostMapping("/login/facebook")
+    @ApiOperation(value = "authenticate a facebook user")
     public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithFacebook(jwtDto);
     }
 
-    @GetMapping("/username/{userName}")
-    public AppUser getUserByUserName(@PathVariable String userName) {
-        return this.authService.getByUserName(userName);
-    }
-
-    @GetMapping("/verify")
+    @GetMapping("/appUsers/verify")
+    @ApiOperation(value = "verify if the user is enabled")
     public ResponseEntity<String> verifyUser(@RequestParam String token) {
-        emailSenderService.verifyToken(token);
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(frontUrl + "?verified=true")).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(emailSenderService.verifyToken(token))).build();
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("/appUsers/confirm")
+    @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation(@RequestBody String email) {
-        emailSenderService.sendEmailConfirmation(email);
+        emailSenderService.sendEmailConfirmation(getRootUrl(),email);
     }
 
     @PostMapping("/appUsers/change-password")
+    @ApiOperation(value = "change the user password")
     public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
         this.authService.changePassword(changeUserPasswordDto, principal.getName());
     }
 
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/appUsers/refresh-token")
+    @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto refreshNewToken(@RequestBody String refreshToken) {
         return this.authService.refreshNewToken(refreshToken);

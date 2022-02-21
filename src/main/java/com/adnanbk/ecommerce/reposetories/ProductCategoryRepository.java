@@ -7,7 +7,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
 
-@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-category")
+@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-categories")
 public interface ProductCategoryRepository extends CrudRepository<ProductCategory, Long> {
 
     ProductCategory findByNameIgnoreCase(String categoryName);

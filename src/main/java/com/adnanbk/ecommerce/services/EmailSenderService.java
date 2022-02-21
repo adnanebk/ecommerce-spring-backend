@@ -2,7 +2,7 @@ package com.adnanbk.ecommerce.services;
 
 public interface EmailSenderService {
 
-    void sendEmailConfirmation(String email);
+    void sendEmailConfirmation(String rooUrl,String email);
 
-    void verifyToken(String token);
+    String verifyToken(String token);
 }

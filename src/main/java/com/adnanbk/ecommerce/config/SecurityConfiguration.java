@@ -39,6 +39,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/userOrders/**", "/api/appUsers/**", "/api/creditCards/**").authenticated()
+
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
         //http.oauth2Login();

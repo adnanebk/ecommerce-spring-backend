@@ -28,15 +28,13 @@ public class EmailSenderServiceImp implements EmailSenderService {
     private final UserRepo userRepo;
     @Value("${spring.mail.name}")
     private String name;
-    @Value("${spring.mail.email}")
-    private String email;
-    @Value("${api.url}")
-    private String url;
+    @Value("${front.url}")
+    private String frontUrl;
 
 
     @Async
     @Override
-    public void sendEmailConfirmation(String email) {
+    public void sendEmailConfirmation(String rooUrl,String email) {
 
         AppUser user = userRepo.findByEmail(email).orElseThrow(() -> new BadCredentialsException("could not found this email"));
 
@@ -44,7 +42,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
         String destAddress = user.getEmail();
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        String verifyURL = url + "/verify?token=" + confirmationTokenRepo.save(confirmationToken).getToken();
+        String verifyURL = rooUrl + "/verify?token=" + confirmationTokenRepo.save(confirmationToken).getToken();
 
 
         String subject = "Please verify your registration";
@@ -69,7 +67,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
     }
 
     @Override
-    public void verifyToken(String myToken) {
+    public String verifyToken(String myToken) {
         if (myToken != null && !myToken.isEmpty()) {
             var token = confirmationTokenRepo.findById(myToken)
                     .orElseThrow(() -> new InvalidTokenException("invalid token"));
@@ -85,7 +83,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
 
             user.setEnabled(true);
             userRepo.save(user);
-
+            return frontUrl + "?verified=true";
 
         }
         throw new InvalidTokenException("invalid token");
