@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-
+@Aspect
+@Component
 public class ProductAspect {
 
     @Value("${imagesPathUrl}")
