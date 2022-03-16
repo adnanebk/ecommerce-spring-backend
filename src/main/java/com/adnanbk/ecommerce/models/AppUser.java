@@ -1,6 +1,5 @@
 package com.adnanbk.ecommerce.models;
 
-import com.adnanbk.ecommerce.validations.ConfirmPassword;
 import com.adnanbk.ecommerce.validations.UniqueEmail;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -20,7 +19,6 @@ import java.util.Set;
 @Table(name = "user")
 @Getter
 @Setter
-@ConfirmPassword
 @NoArgsConstructor
 @JsonIgnoreProperties(value = "password", allowSetters = true)
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
@@ -69,9 +67,7 @@ public class AppUser {
     @Length(min = 4, message = "{error.min}")
     private String password;
 
-    @Length(min = 4, message = "{error.min}")
-    @Transient
-    private String confirmPassword;
+
 
     public AppUser(String userName, String email, String firstName, String lastName, String password) {
         this.userName = userName;
@@ -79,7 +75,6 @@ public class AppUser {
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
-        this.confirmPassword = password;
     }
 
 
