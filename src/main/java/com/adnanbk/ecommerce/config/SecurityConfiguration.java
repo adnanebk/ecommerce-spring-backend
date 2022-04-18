@@ -21,10 +21,12 @@ import javax.servlet.Filter;
 import java.util.List;
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, jsr250Enabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private final UserDetailsService userDetailsService;
+
+    private final UserDetailsService customUserDetailsService;
+
     private final Filter jwtAuthorizationFilter;
 
 
@@ -35,11 +37,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     protected @Override
     void configure(HttpSecurity http) throws Exception {
+        //must be removed in production
+        http.headers().frameOptions().disable();
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/userOrders/**", "/api/appUsers/**", "/api/creditCards/**").authenticated()
-
+                .antMatchers("/api/orders/**", "/api/user*/**", "/api/creditCards/**").authenticated()
+                .antMatchers("/api/products/v2/**").hasRole("ADMIN")
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
         //http.oauth2Login();
@@ -51,7 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     protected @Override
     void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -74,3 +78,5 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
 }
+
+

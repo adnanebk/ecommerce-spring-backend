@@ -14,7 +14,7 @@ import javax.validation.constraints.NotEmpty;
 @AllArgsConstructor
 public class LoginUserDto {
     @NotEmpty
-    private String userName;
+    private String email;
     @NotEmpty
     private String password;
 }

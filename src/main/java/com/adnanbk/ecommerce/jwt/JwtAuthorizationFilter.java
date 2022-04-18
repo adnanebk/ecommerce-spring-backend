@@ -1,13 +1,14 @@
 package com.adnanbk.ecommerce.jwt;
 
+import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,6 +21,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    private  HandlerExceptionResolver handlerExceptionResolver;
 
     private JwtTokenUtil jwtTokenUtil;
     private UserRepo userRepo;
@@ -28,8 +30,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String reqUri = request.getRequestURI();
-        return !reqUri.contains("userOrders") &&
-                !reqUri.contains("appUsers") &&
+        return !reqUri.contains("orders") &&
+                !reqUri.contains("user") &&
+                !reqUri.contains("products/v2") &&
                 !reqUri.contains("creditCards");
     }
 
@@ -38,28 +41,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String requestTokenHeader = Objects.requireNonNullElse
                 (request.getHeader("Authorization"), "");
-        // JWT Token is in the form "Bearer token". Remove Bearer word and get
-        // only the Token
-        var tokenArr = requestTokenHeader.split("Bearer ");
-        if (tokenArr.length != 2)
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "Header not contains Authorization or JWT Token does not begin with Bearer");
+        try {
+            // JWT Token is in the form "Bearer token". Remove Bearer word and get
+            // only the Token
+            var tokenArr = requestTokenHeader.split("Bearer ");
+            if (tokenArr.length != 2)
+                throw new BadCredentialsException("Header not contains Authorization or JWT Token does not begin with Bearer");
 
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                // Once we get the token we validate it.
+                String email = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
+                AppUser appUser = userRepo.findByEmail(email);
 
-        // Once we get the token validate it.
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            try {
-                String userName = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
-                AppUser appUser = userRepo.findByUserName(userName);
-
-                boolean isUserEnabled = appUser != null && appUser.isEnabled();
-                // authentication
-                if (isUserEnabled) {
-                    jwtTokenUtil.setAuthenticationToken(appUser.getUserName(), appUser.getPassword(), request);
+                if (appUser != null) {
+                    if(!appUser.isEnabled())
+                        throw new UserNotEnabledException();
+                    // authentication
+                    jwtTokenUtil.setAuthenticationToken(appUser, request);
                 }
-            } catch (JWTVerificationException ex) {
-                response.sendError(HttpStatus.FORBIDDEN.value(), ex.getMessage());
             }
-
+        } catch (RuntimeException ex){
+           handlerExceptionResolver.resolveException(request,response,null,ex);
+            return; // return from this method so the response not enter to the chain and duplicate the exceptions
         }
         chain.doFilter(request, response);
 

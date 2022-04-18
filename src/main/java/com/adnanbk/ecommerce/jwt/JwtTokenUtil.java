@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.jwt;
 
+import com.adnanbk.ecommerce.models.AppUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
@@ -20,8 +20,6 @@ import java.util.Map;
 public class JwtTokenUtil {
 
 
-    @Value("${jwt.expiration-time}")
-    private long expirationTime;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -34,17 +32,14 @@ public class JwtTokenUtil {
     }
 
     //generate token for user
-    public String generateToken(String username, Map<String, Object> claims) {
-        return doGenerateToken(username, expirationTime * 60 * 1000, claims);
+    public String generateToken(String email, Map<String, Object> claims,Date expirationTime) {
+        return doGenerateToken(email, expirationTime, claims);
     }
 
-    public String generateRefreshToken(String username, Map<String, Object> claims) {
-        return doGenerateToken(username, (expirationTime + 43200) * 60 * 1000, claims);
-    }
 
-    private String doGenerateToken(String username, long expiration, Map<String, Object> claims) {
-        return JWT.create().withSubject(username)
-                .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
+    private String doGenerateToken(String email, Date expirationDate, Map<String, Object> claims) {
+        return JWT.create().withSubject(email)
+                .withExpiresAt(expirationDate)
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withClaim("claims", claims).sign(algorithm);
     }
@@ -57,9 +52,9 @@ public class JwtTokenUtil {
 
     }
 
-    public void setAuthenticationToken(String userName, String password, HttpServletRequest request) {
+    public void setAuthenticationToken(AppUser user, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                userName, password, Collections.singletonList(new SimpleGrantedAuthority("ROLE-USER")));
+                user.getEmail(), user.getPassword(), user.getRoles().stream().map(us->new SimpleGrantedAuthority(us.getName())).toList());
         // Stores additional details about the authentication request (IP address, certificate serial number etc.).
         if (request != null)
             usernamePasswordAuthenticationToken

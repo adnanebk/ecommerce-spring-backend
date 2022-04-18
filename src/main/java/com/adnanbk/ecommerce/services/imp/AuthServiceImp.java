@@ -1,24 +1,29 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.JwtDto;
-import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.dto.*;
+import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
+import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
+import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,14 +31,18 @@ import java.util.Objects;
 public class AuthServiceImp implements AuthService {
 
     private final UserRepo userRepo;
+    private final RoleRepository roleRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncode;
     private final SocialService googleService;
     private final SocialService facebookService;
+    private  final ErrorMessagesUtil messagesUtil;
+    private final AuthenticationManager authenticationManager;
 
-
-    @Value("${jwt.expiration-time}")
-    private long expirationTime;
+    @Value("#{${jwt.expiration-time-minutes}*60*1000}")
+    private long jwtExpirationTime;
+    @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
+    private long jwtRefreshExpirationTime;
 
     @Override
     public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
@@ -45,25 +54,23 @@ public class AuthServiceImp implements AuthService {
     public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
         boolean isTokenValid = facebookService.verify(jwtDto);
         if (!isTokenValid)
-            throw new BadCredentialsException("Invalid credentials");
+            throw new BadCredentialsException(messagesUtil.getMessage("error.invalid-credential"));
         return doLoginSocialUser(jwtDto.getAppUser());
     }
 
 
     @Override
     public JwtDto handleLogin(LoginUserDto appUser) {
-        var currentUser = userRepo.findByUserName(appUser.getUserName());
-      /*  try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getUserName(), appUser.getPassword()));
+        var currentUser = userRepo.findByEmail(appUser.getEmail());
+
+        try {
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new BadCredentialsException(messagesUtil.getMessage("error.invalid-email-or-password"));
         }
-        */
 
-        if (currentUser == null || !passwordEncode.matches(appUser.getPassword(), currentUser.getPassword()))
-            throw new BadCredentialsException("Invalid username or password");
 
         return generateTokens(currentUser);
     }
@@ -71,46 +78,52 @@ public class AuthServiceImp implements AuthService {
     @Override
     public JwtDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
-        user = userRepo.save(user);
-
+        user = saveUser(user);
 
         return generateTokens(user);
     }
 
 
+
+
     @Override
-    public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName) {
-        var user = userRepo.findByUserName(userName);
+    public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email) {
+        var user = userRepo.findByEmail(email);
         if (user == null || !passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-            throw new BadCredentialsException("current password not exists or invalid");
-        user.setPassword(passwordEncode.encode(changeUserPasswordDto.getNewPassword()));
-        userRepo.save(user);
+            throw new InvalidPasswordException(messagesUtil.getMessage("error.invalid-password"),"currentPassword");
+        var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
+        userRepo.updatePassword(user.getId(),newPassword);
     }
 
     @Override
     public JwtDto refreshNewToken(String refreshToken) {
-        String userName = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
-        var user = this.userRepo.findByUserName(userName);
+        String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
+        var user = this.userRepo.findByEmail(email);
         return user != null ? generateTokens(user, refreshToken) : null;
     }
 
+    @Override
+    public ImageDto changeUserImage(String fileName, String email) {
+        userRepo.updateImage(email,fileName);
+        return  new ImageDto(userRepo.findByEmail(email).getImageUrl());
+    }
+
     private JwtDto generateTokens(AppUser user, String refreshToken) {
-        String token = this.jwtTokenUtil.generateToken(user.getUserName(), generateClaims(user));
+        var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
+        var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
+        String token = this.jwtTokenUtil.generateToken(user.getEmail(), generateClaims(user),tokenExpirationDate);
         refreshToken = Objects.requireNonNullElse(refreshToken,
-                this.jwtTokenUtil.generateRefreshToken(user.getUserName(), new HashMap<>()));
+                this.jwtTokenUtil.generateToken(user.getEmail(), new HashMap<>(),refreshTokenExpirationDate));
         UserDto userDto = new UserDto();
         BeanUtils.copyProperties(user, userDto);
-        userDto.setExpirationDate(new Date(System.currentTimeMillis() + (expirationTime * 60 * 1000)));
-        return new JwtDto(token, refreshToken, userDto);
+        return new JwtDto(token, refreshToken, userDto,tokenExpirationDate);
     }
 
     private JwtDto doLoginSocialUser(UserDto user) {
-        AppUser appUser = userRepo.findByUserName(user.getUserName());
+        AppUser appUser = userRepo.findByEmail(user.getEmail());
         if (appUser == null) {
-            appUser = new AppUser(user.getUserName(), user.getEmail(), user.getFirstName(), user.getLastName(), generateRandomPassword());
-            appUser.setEnabled(true);
-            appUser.setSocial(true);
-            appUser = userRepo.save(appUser);
+            appUser = new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true);
+            appUser = saveUser(appUser);
         }
 
         return generateTokens(appUser);
@@ -143,6 +156,12 @@ public class AuthServiceImp implements AuthService {
         }
 
         return sb.toString();
+    }
+
+    private AppUser saveUser(AppUser user) {
+        user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
+        user = userRepo.save(user);
+        return user;
     }
 
 }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
+    private final ProductMapper productMapper;
 
 
     @Override
@@ -28,17 +30,19 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+
     public Product updateProduct(Product product) {
-        Product prod = productRepo.getOne(product.getId());
-        ProductMapper.mapProduct(product, prod);
-        return productRepo.save(prod);
+        var fetchedProduct = productRepo.findById(product.getId()).orElseThrow();
+        productMapper.mapProduct(product, fetchedProduct);
+        return productRepo.save(product);
     }
 
     @Override
+    @Transactional
     public List<Product> updateProducts(List<Product> products) {
         var productsInDb = productRepo.findAllById(products.stream()
                 .map(Product::getId).toList());
-        ProductMapper.mapProducts(products, productsInDb);
+        productMapper.mapProducts(products, productsInDb);
         return productRepo.saveAll(productsInDb);
     }
 
@@ -61,9 +65,9 @@ public class ProductServiceImp implements ProductService {
 
     }
 
-    public ByteArrayInputStream loadToExcel(List<Long> listOfIds) {
-        if (listOfIds != null && !listOfIds.isEmpty())
-            return excelHelper.listToExcel(productRepo.findAllById(listOfIds));
+    public ByteArrayInputStream loadToExcel(List<Product> products) {
+        if (products != null && !products.isEmpty())
+            return excelHelper.listToExcel(products);
         return excelHelper.listToExcel(productRepo.findAll());
     }
 

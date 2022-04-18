@@ -1,7 +1,14 @@
-package com.adnanbk.ecommerce.exceptions;
+package com.adnanbk.ecommerce.exceptions.handler;
 
 import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
+import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
+import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
+import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
+import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,8 +32,10 @@ import static com.adnanbk.ecommerce.dto.ResponseErrorFactory.createResponseError
 
 @RestControllerAdvice
 @ResponseStatus(HttpStatus.BAD_REQUEST)
+@RequiredArgsConstructor
 public class ExceptionsHandler {
 
+    private final ErrorMessagesUtil errorMessagesUtil;
 
     @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
     public ApiErrorDto handleConstraintViolation(RuntimeException ex) {
@@ -51,15 +60,12 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                er ->
-                        errors.add(createResponseError(er.getField(), er.getDefaultMessage()))
+                er -> errors.add(createResponseError(er.getField(), er.getDefaultMessage()))
         );
-
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
                     if (x.getDefaultMessage() != null)
                         errors.add(createResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
-
                 });
         return generateApiErrors(errors);
     }
@@ -73,7 +79,25 @@ public class ExceptionsHandler {
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
         return new ApiErrorDto(ex.getMessage());
     }
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
+        return new ApiErrorDto(ex.getMessage(),Set.of(new ResponseError(ex.getFieldName(),ex.getMessage())));
+    }
 
+    @ExceptionHandler(JWTVerificationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiErrorDto jWTVerificationException(JWTVerificationException ex) {
+        if(ex instanceof TokenExpiredException)
+            return new ApiErrorDto(ex.getMessage(),"jwt.expired");
+
+        return new ApiErrorDto(ex.getMessage());
+    }
+
+    @ExceptionHandler(UserNotEnabledException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiErrorDto userNotEnabledException(UserNotEnabledException ex) {
+        return new ApiErrorDto(ex.getMessage(),"user.not.enabled");
+    }
 
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseBody
@@ -92,8 +116,7 @@ public class ExceptionsHandler {
     }
 
     private ApiErrorDto returnUniqueErrorMessage(Exception cause) {
-        String message = cause.getMessage().toLowerCase();
-        ResponseError responseError = createResponseError(message);
+        ResponseError responseError = createResponseError(cause.getMessage(),errorMessagesUtil);
         if (responseError == null)
             return new ApiErrorDto("An error has been thrown during database modification");
 

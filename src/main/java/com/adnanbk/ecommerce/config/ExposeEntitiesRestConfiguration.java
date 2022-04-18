@@ -1,8 +1,6 @@
 package com.adnanbk.ecommerce.config;
 
-import com.adnanbk.ecommerce.models.AppUser;
-import com.adnanbk.ecommerce.models.Product;
-import com.adnanbk.ecommerce.models.ProductCategory;
+import com.adnanbk.ecommerce.models.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -21,7 +19,7 @@ public class ExposeEntitiesRestConfiguration implements RepositoryRestConfigurer
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         RepositoryRestConfigurer.super.configureRepositoryRestConfiguration(config, cors);
         cors.addMapping("/api/**").allowedOrigins(origin);
-        config.exposeIdsFor(ProductCategory.class, Product.class, AppUser.class);
+        config.exposeIdsFor(ProductCategory.class, Product.class, AppUser.class, CreditCard.class, UserOrder.class);
     }
 
     @Override

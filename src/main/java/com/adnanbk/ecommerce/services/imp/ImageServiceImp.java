@@ -3,8 +3,6 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.services.FileService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.scheduling.annotation.Async;
@@ -43,10 +41,8 @@ public class ImageServiceImp implements FileService {
     }
 
     @Async
-    @CacheEvict(value = "productImage", key = "#image.originalFilename")
     public CompletableFuture<String> upload(MultipartFile image) {
-        if (image == null)
-            throw new CustomFileException("you must upload  a valid image ");
+
         String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "")
                 .replace(" ", "").trim();
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
@@ -57,11 +53,10 @@ public class ImageServiceImp implements FileService {
         } catch (IOException e) {
             throw new CustomFileException("we Could not write the file, please try again");
         }
-        return CompletableFuture.completedFuture(filePath.toString());
+        return CompletableFuture.completedFuture(fileName);
     }
 
     @Override
-    @Cacheable(value = "productImage", key = "#filename")
     public String load(String filename) {
         try {
             Path path = root.resolve(filename);

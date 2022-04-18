@@ -31,9 +31,9 @@ public class CreditCardController {
         return ResponseEntity.created(location).body(savedCreditCard);
     }
 
-    @PatchMapping("/active")
+    @PatchMapping("/active/{id}")
     @ApiOperation(value = "make the user credit card primary")
-    public Iterable<CreditCard> activateCreditCard(@RequestBody CreditCard creditCard) {
-        return creditCardService.activateCreditCard(creditCard);
+    public void activateCreditCard(@PathVariable long id) {
+         creditCardService.activateCreditCard(id);
     }
 }

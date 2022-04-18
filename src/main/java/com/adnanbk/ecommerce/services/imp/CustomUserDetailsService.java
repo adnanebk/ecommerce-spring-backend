@@ -11,21 +11,19 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-
 @Primary
 @AllArgsConstructor
 @Service
-public class UserDetailsServiceImp implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     private UserRepo userRepo;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, UserNotEnabledException {
-        var user = userRepo.findByUserName(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException, UserNotEnabledException {
+        var user = userRepo.findByEmail(email);
         if (user == null)
             return null;
-        return new User(user.getUserName(), user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE-USER")));
+        return new User(user.getEmail(), user.getPassword(),
+                 user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList());
     }
 }

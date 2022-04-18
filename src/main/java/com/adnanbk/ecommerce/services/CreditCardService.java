@@ -6,5 +6,5 @@ public interface CreditCardService {
 
     CreditCard saveCard(CreditCard creditCard, String name);
 
-    Iterable<CreditCard> activateCreditCard(CreditCard creditCard);
+    void activateCreditCard(long id);
 }

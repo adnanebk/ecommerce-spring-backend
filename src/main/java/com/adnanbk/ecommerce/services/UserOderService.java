@@ -6,7 +6,8 @@ import java.util.List;
 
 public interface UserOderService {
 
-    UserOrder saveOrder(UserOrder userOrder, String userName);
+    UserOrder saveOrder(UserOrder userOrder, String email);
 
-    List<UserOrder> findByUserName(String userName);
+    List<UserOrder> findByEmail(String email);
+
 }

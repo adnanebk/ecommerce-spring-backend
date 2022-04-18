@@ -21,15 +21,13 @@ public class OrderItem {
     @Column(name = "name")
     private String name;
 
-    private Long productId;
-
     @Column(name = "unit_price")
     private BigDecimal unitPrice;
 
     @Column(name = "image")
     private String image;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     @JsonIgnore // you have to do this to avoid circular relationship
     private UserOrder userOrder;

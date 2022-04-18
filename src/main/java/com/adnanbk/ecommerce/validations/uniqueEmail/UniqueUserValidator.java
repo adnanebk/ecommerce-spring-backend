@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.validations;
+package com.adnanbk.ecommerce.validations.uniqueEmail;
 
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
