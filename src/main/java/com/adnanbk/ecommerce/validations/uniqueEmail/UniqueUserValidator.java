@@ -31,6 +31,6 @@ public class UniqueUserValidator implements ConstraintValidator<UniqueEmail, Str
         if (userRepo == null)
             return true;
 
-        return userRepo.findByEmail(email).isPresent();
+        return userRepo.findByEmail(email).isEmpty();
     }
 }
