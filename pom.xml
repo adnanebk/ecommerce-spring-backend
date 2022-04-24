@@ -18,11 +18,11 @@
 
     <properties>
         <start-class>com.adnanbk.ecommerce.EcommerceAngApplication</start-class>
-        <java.version>16</java.version>
+        <java.version>17</java.version>
         <sonar.organization>adnanebk</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-        <maven.compiler.source>16</maven.compiler.source>
-        <maven.compiler.target>16</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <google-api-client.version>1.34.0</google-api-client.version>
         <mapstruct.version>1.4.2.Final</mapstruct.version>
         <poi-ooxml.version>5.2.2</poi-ooxml.version>

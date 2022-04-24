@@ -61,7 +61,7 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtDto handleLogin(LoginUserDto appUser) {
-        var currentUser = userRepo.findByEmail(appUser.getEmail());
+        var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
 
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
@@ -88,24 +88,26 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email) {
-        var user = userRepo.findByEmail(email);
-        if (user == null || !passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-            throw new InvalidPasswordException(messagesUtil.getMessage("error.invalid-password"),"currentPassword");
-        var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
-        userRepo.updatePassword(user.getId(),newPassword);
+      userRepo.findByEmail(email).ifPresent(user->{
+          if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
+              throw new InvalidPasswordException(messagesUtil.getMessage("error.invalid-password"),"currentPassword");
+          var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
+          userRepo.updatePassword(user.getId(),newPassword);
+      });
+
     }
 
     @Override
     public JwtDto refreshNewToken(String refreshToken) {
         String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
-        var user = this.userRepo.findByEmail(email);
-        return user != null ? generateTokens(user, refreshToken) : null;
+        return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
+
     }
 
     @Override
     public ImageDto changeUserImage(String fileName, String email) {
         userRepo.updateImage(email,fileName);
-        return  new ImageDto(userRepo.findByEmail(email).getImageUrl());
+        return userRepo.findByEmail(email).map(user ->new ImageDto(user.getImageUrl())).orElseThrow();
     }
 
     private JwtDto generateTokens(AppUser user, String refreshToken) {
@@ -120,12 +122,8 @@ public class AuthServiceImp implements AuthService {
     }
 
     private JwtDto doLoginSocialUser(UserDto user) {
-        AppUser appUser = userRepo.findByEmail(user.getEmail());
-        if (appUser == null) {
-            appUser = new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true);
-            appUser = saveUser(appUser);
-        }
-
+        var appUser = userRepo.findByEmail(user.getEmail())
+                .orElse(saveUser(new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true)));
         return generateTokens(appUser);
     }
 

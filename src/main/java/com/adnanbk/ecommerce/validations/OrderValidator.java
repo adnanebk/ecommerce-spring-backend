@@ -1,11 +1,14 @@
+/*
 package com.adnanbk.ecommerce.validations;
 
+import com.adnanbk.ecommerce.models.CreditCard;
 import com.adnanbk.ecommerce.models.UserOrder;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
-@Component
+import java.time.LocalDate;
+
 public class OrderValidator implements Validator {
 
 
@@ -23,7 +26,7 @@ public class OrderValidator implements Validator {
 
     @Override
     public void validate(Object o, Errors errors) {
-/*        UserOrder userOrder = (UserOrder) o;
+        UserOrder userOrder = (UserOrder) o;
         CreditCard creditCard = userOrder.getCreditCard();
         var cardErrors = validator.validate(creditCard);
         if (!cardErrors.isEmpty())
@@ -32,8 +35,9 @@ public class OrderValidator implements Validator {
         int month = Integer.parseInt(creditCard.getExpirationDate().split("/")[0]);
         LocalDate expirationDate = LocalDate.of(year, month, 1);
         if (expirationDate.isBefore(LocalDate.now()))
-            errors.reject("expirationDate", "has passed");*/
+            errors.reject("expirationDate", "has passed");
     }
 
 }
 
+*/

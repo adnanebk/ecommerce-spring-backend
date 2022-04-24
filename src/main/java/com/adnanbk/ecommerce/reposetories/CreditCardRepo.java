@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -13,13 +14,8 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-
+@RepositoryRestResource(exported = false)
 public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
-
-
-
-    Optional<CreditCard> findByCardNumber(String cardNumber);
-
 
 
     boolean existsByAppUser_Email(String email);

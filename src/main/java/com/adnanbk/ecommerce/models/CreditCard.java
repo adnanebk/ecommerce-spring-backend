@@ -1,17 +1,15 @@
 package com.adnanbk.ecommerce.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.adnanbk.ecommerce.validations.cardExpirationDate.FutureExpirationDate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -38,10 +36,11 @@ public class CreditCard {
     @Column(name = "card_number")
     private String cardNumber;
 
-    @Future(message = "{error.future}")
-    @NotNull(message = "{error.empty}")
-    @JsonFormat(pattern="MM/yy",shape = JsonFormat.Shape.STRING)
-    private Date expirationDate;
+    @NotEmpty(message = "{error.empty}")
+    @FutureExpirationDate
+    @Pattern(regexp = "^(0[1-9]|1[0-2])/([0-9]{2})$"
+            , message = "{error.regExp}")
+    private String expirationDate;
 
     @OneToMany(cascade = CascadeType.ALL
             , mappedBy = "creditCard"

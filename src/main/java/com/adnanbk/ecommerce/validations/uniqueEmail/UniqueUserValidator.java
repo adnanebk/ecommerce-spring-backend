@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.validations.uniqueEmail;
 
 import com.adnanbk.ecommerce.reposetories.UserRepo;
+import com.google.api.client.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -23,13 +24,13 @@ public class UniqueUserValidator implements ConstraintValidator<UniqueEmail, Str
     }
 
     @Override
-    public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if (s == null) {
+    public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
+        if (Strings.isNullOrEmpty(email)) {
             return false;
         }
         if (userRepo == null)
             return true;
 
-        return !userRepo.existsByEmail(s);
+        return userRepo.findByEmail(email).isPresent();
     }
 }

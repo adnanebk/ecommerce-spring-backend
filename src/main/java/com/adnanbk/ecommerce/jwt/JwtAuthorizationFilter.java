@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.jwt;
 
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
-import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -51,14 +50,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Once we get the token we validate it.
                 String email = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
-                AppUser appUser = userRepo.findByEmail(email);
-
-                if (appUser != null) {
-                    if(!appUser.isEnabled())
+                userRepo.findByEmail(email).ifPresent(user->{
+                    if(!user.isEnabled())
                         throw new UserNotEnabledException();
                     // authentication
-                    jwtTokenUtil.setAuthenticationToken(appUser, request);
-                }
+                    jwtTokenUtil.setAuthenticationToken(user, request);
+                });
+
             }
         } catch (RuntimeException ex){
            handlerExceptionResolver.resolveException(request,response,null,ex);

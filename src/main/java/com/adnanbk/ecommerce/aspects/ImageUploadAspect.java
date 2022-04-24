@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.aspects;
 import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.models.Product;
+import com.google.common.base.Strings;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 @Aspect
 @Component
-public class imageUploadAspect {
+public class ImageUploadAspect {
 
     @Value("${imagesPathUrl}")
     private String imagesPathUrl;
@@ -63,7 +64,7 @@ public class imageUploadAspect {
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.AuthServiceImp.handleLogin*(..))",returning = "jwtDto")
     public void loginAspect(JwtDto jwtDto) {
         var userImage = jwtDto.getAppUser().getImageUrl();
-        if(userImage!=null && !jwtDto.getAppUser().getImageUrl().contains("http"))
+        if(!Strings.isNullOrEmpty(userImage) && userImage.contains("http"))
         jwtDto.getAppUser().setImageUrl(imagesPathUrl+jwtDto.getAppUser().getImageUrl());
     }
 }

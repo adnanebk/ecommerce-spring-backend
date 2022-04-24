@@ -18,7 +18,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
     @Override
     public void sendEmailConfirmation(String rooUrl,String email) {
 
-        AppUser user = Optional.of(userRepo.findByEmail(email)).orElseThrow(() -> new BadCredentialsException("could not found this email"));
+        AppUser user = userRepo.findByEmail(email).orElseThrow(() -> new BadCredentialsException("could not found this email"));
 
         String destAddress = user.getEmail();
 

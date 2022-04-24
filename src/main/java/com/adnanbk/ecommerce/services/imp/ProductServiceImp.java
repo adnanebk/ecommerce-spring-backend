@@ -30,11 +30,12 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-
     public Product updateProduct(Product product) {
-        var fetchedProduct = productRepo.findById(product.getId()).orElseThrow();
-        productMapper.mapProduct(product, fetchedProduct);
-        return productRepo.save(product);
+        return productRepo.findById(product.getId()).map(prod->{
+             productMapper.mapProduct(product, prod);
+             return productRepo.save(product);
+         }).orElseThrow();
+
     }
 
     @Override

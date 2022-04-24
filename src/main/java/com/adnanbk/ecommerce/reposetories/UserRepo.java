@@ -10,6 +10,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.QueryHint;
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 
 @RepositoryRestResource(path = "users")
@@ -17,11 +18,11 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
 
 
 
-    boolean existsByEmail(String email);
+  //  boolean existsByEmail(String email);
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     @RestResource(path = "email")
-    AppUser findByEmail(String email);
+    Optional<AppUser> findByEmail(String email);
 
     @Transactional
     @Modifying(clearAutomatically = true)

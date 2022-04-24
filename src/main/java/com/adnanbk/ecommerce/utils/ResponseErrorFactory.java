@@ -1,6 +1,6 @@
-package com.adnanbk.ecommerce.dto;
+package com.adnanbk.ecommerce.utils;
 
-import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
+import com.adnanbk.ecommerce.dto.ResponseError;
 import org.springframework.util.StringUtils;
 
 public class ResponseErrorFactory {

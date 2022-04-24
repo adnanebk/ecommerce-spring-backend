@@ -11,6 +11,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/creditCards")
@@ -20,6 +21,11 @@ public class CreditCardController {
 
     private CreditCardService creditCardService;
 
+    @GetMapping
+    @ApiOperation(value = "get all credit cards by the email of the authenticated a user")
+    public List<CreditCard> getUserCreditCards(Principal principal) {
+        return creditCardService.getByEmail(principal.getName());
+    }
 
 
     @PostMapping
@@ -29,6 +35,11 @@ public class CreditCardController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(savedCreditCard.getId()).toUri();
         return ResponseEntity.created(location).body(savedCreditCard);
+    }
+    @PutMapping("/{id}")
+    @ApiOperation(value = "update a user credit card")
+    public CreditCard updateCreditCard(@RequestBody @Valid CreditCard creditCard,@PathVariable Long id,Principal principal) {
+        return creditCardService.update(creditCard,id,principal.getName());
     }
 
     @PatchMapping("/active/{id}")

@@ -26,10 +26,10 @@ public class UserOrderServiceImp implements UserOderService {
     @Override
     @Transactional
     public UserOrder saveOrder(UserOrder userOrder, String email) {
-        AppUser appUser = userRepo.findByEmail(email);
+        AppUser appUser = userRepo.findByEmail(email).orElseThrow();
         CreditCard creditCard = userOrder.getCreditCard();
 
-        var userCardOptional = creditCardRepo.findByCardNumber(creditCard.getCardNumber());
+        var userCardOptional = creditCardRepo.findById(creditCard.getId());
 
         creditCard.setAppUser(appUser);
         creditCard = userCardOptional.orElse(creditCardRepo.save(creditCard));
