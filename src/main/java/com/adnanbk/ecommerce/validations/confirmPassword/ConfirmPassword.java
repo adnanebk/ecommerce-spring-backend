@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.validations;
+package com.adnanbk.ecommerce.validations.confirmPassword;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

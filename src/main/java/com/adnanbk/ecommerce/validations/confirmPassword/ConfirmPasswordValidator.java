@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.validations;
+package com.adnanbk.ecommerce.validations.confirmPassword;
 
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
@@ -29,6 +29,7 @@ public class ConfirmPasswordValidator implements ConstraintValidator<ConfirmPass
         if (appUser == null)
             return false;
 
-        return appUser.getConfirmPassword().equals(appUser.getPassword());
+        return true;
+        //return appUser.getConfirmPassword().equals(appUser.getPassword());
     }
 }

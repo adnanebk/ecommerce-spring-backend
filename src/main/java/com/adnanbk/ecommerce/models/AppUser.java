@@ -1,8 +1,6 @@
 package com.adnanbk.ecommerce.models;
 
-import com.adnanbk.ecommerce.validations.UniqueEmail;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.adnanbk.ecommerce.validations.uniqueEmail.UniqueEmail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,16 +19,11 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIgnoreProperties(value = "password", allowSetters = true)
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AppUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotEmpty
-    @Column(name = "user_name")
-    private String userName;
 
     @Column(unique = true)
     @UniqueEmail
@@ -38,11 +32,9 @@ public class AppUser {
     private String email;
 
     @OneToMany(mappedBy = "appUser", orphanRemoval = true, cascade = CascadeType.ALL)
-    @JsonIgnore
     private Set<CreditCard> creditCards = new HashSet<>();
 
     @OneToMany(mappedBy = "appUser", orphanRemoval = true, cascade = CascadeType.ALL)
-    @JsonIgnore
     private Set<UserOrder> userOrders = new HashSet<>();
 
     @Column
@@ -50,15 +42,20 @@ public class AppUser {
     private String firstName;
 
     @Column
-    @NotEmpty
+    @Length(min = 1, message = "{error.min}")
     private String lastName;
 
     @Column
+    @Length(min = 4, message = "{error.min}")
     private String street;
 
+    @Length(min = 2, message = "{error.min}")
     private String city;
+    @Length(min = 2, message = "{error.min}")
     private String country;
-    private boolean enabled;
+    private boolean enabled=false;
+
+    private String imageUrl;
 
     private boolean isSocial;
 
@@ -67,14 +64,23 @@ public class AppUser {
     @Length(min = 4, message = "{error.min}")
     private String password;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"))
+    private Collection<Role> roles=new HashSet<>();
 
-
-    public AppUser(String userName, String email, String firstName, String lastName, String password) {
-        this.userName = userName;
+    public AppUser( String email, String firstName, String lastName,String imageUrl, String password,boolean enabled,boolean isSocial) {
         this.email = email;
+        this.imageUrl=imageUrl;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.enabled=enabled;
+        this.isSocial=isSocial;
     }
 
 

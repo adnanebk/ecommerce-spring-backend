@@ -1,27 +1,30 @@
 package com.adnanbk.ecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.util.Date;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "credit_card", uniqueConstraints = {@UniqueConstraint(columnNames = "card_number", name = "uniqueKey_cardNumber__")})
+@Table(name = "credit_card", uniqueConstraints = {@UniqueConstraint(columnNames = "card_number", name = "uniqueCardNumber")})
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CreditCard {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
     @NotEmpty(message = "{error.empty}")
     @Pattern(regexp = "VISA|MASTERCARD")
@@ -30,14 +33,15 @@ public class CreditCard {
     private Boolean active;
 
     @NotNull(message = "{error.empty}")
-    @Pattern(regexp = "^(?:(?<visa>[0-9]{12}(?:[0-9]{3})?)|(?<mastercard>[0-9]{14}))$"
+    @Pattern(regexp = "^(?:(?<visa>[0-9]{12}(?:[0-9]{3})?)|(?<mastercard>[0-9]{16}))$"
             , message = "{error.regExp}")
     @Column(name = "card_number")
     private String cardNumber;
 
-    @NotEmpty
-    @Pattern(regexp = "^\\d{2}\\/\\d{2}$", message = "{error.regExp}")
-    private String expirationDate;
+    @Future(message = "{error.future}")
+    @NotNull(message = "{error.empty}")
+    @JsonFormat(pattern="MM/yy",shape = JsonFormat.Shape.STRING)
+    private Date expirationDate;
 
     @OneToMany(cascade = CascadeType.ALL
             , mappedBy = "creditCard"

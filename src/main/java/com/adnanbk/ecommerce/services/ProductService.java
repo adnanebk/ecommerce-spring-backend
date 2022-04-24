@@ -16,7 +16,7 @@ public interface ProductService {
 
     void removeProducts(List<Long> productsIds);
 
-    ByteArrayInputStream loadToExcel(List<Long> productsIds);
+    ByteArrayInputStream loadToExcel(List<Product> productsIds);
 
     List<Product> saveAllFromExcel(MultipartFile multipartFile);
 

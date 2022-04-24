@@ -1,31 +1,34 @@
 package com.adnanbk.ecommerce.mappers;
 
 import com.adnanbk.ecommerce.models.Product;
+import com.adnanbk.ecommerce.reposetories.ProductCategoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Component;
 
-import java.util.Comparator;
 import java.util.List;
 
+@Component
+@RequiredArgsConstructor
 public class ProductMapper {
 
-    private ProductMapper() {
-    }
+    private final ProductCategoryRepository categoryRepository;
 
-    public static void mapProduct(Product productSrc, Product productDest) {
+
+    public  void mapProduct(Product productSrc, Product productDest) {
         BeanUtils.copyProperties(productSrc,productDest);
+       // productDest.setCategory(categoryRepository.findById(productSrc.getCategory().getId()).get());
     }
 
-    public static void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
-        productsSrc.sort(Comparator.comparing(Product::getId));
-        productsDest.sort(Comparator.comparing(Product::getId));
+    public  void mapProducts(List<Product> productsSrc, List<Product> productsDest) {
 
-        for (int i = 0; i < productsDest.size(); i++) {
-            Product productInDb = productsDest.get(i);
-            Product productSrc = productsSrc.get(i);
-            if (productInDb.getId().equals(productSrc.getId()))
-                mapProduct(productSrc, productInDb);
 
-        }
+        productsDest.forEach(productDest->
+                mapProduct(productsSrc.stream().filter(productSrc->productSrc.getId().equals(productDest.getId())).findFirst().orElseThrow(),
+                           productDest)
+        );
+
+
     }
 
 

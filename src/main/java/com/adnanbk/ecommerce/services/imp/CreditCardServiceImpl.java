@@ -8,6 +8,7 @@ import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -19,29 +20,27 @@ public class CreditCardServiceImpl implements CreditCardService {
 
 
     @Override
-    public CreditCard saveCard(CreditCard creditCard, String userName) {
-        AppUser user = userRepo.findByUserName(userName);
-        activeCreditCardIfNew(creditCard, userName);
+    @Transactional
+    public CreditCard saveCard(CreditCard creditCard, String email) {
+        AppUser user = userRepo.findByEmail(email);
+        activeCreditCardIfNoneIsActive(creditCard, email);
         creditCard.setAppUser(user);
         return creditCardRepo.save(creditCard);
     }
 
-    private void activeCreditCardIfNew(CreditCard creditCard, String userName) {
-        if (!creditCardRepo.existsByAppUser_UserName(userName))
+    private void activeCreditCardIfNoneIsActive(CreditCard creditCard, String email) {
+        if (!creditCardRepo.existsByAppUser_Email(email))
             creditCard.setActive(true);
     }
 
     @Override
-    public Iterable<CreditCard> activateCreditCard(CreditCard creditCard) {
-        var card = creditCardRepo.findById(creditCard.getId()).orElseThrow(() -> new CardNotFoundException("no card founded with id " + creditCard.getId()));
+    public void activateCreditCard(long id) {
+        creditCardRepo.findById(id).orElseThrow(() -> new CardNotFoundException("no card founded with id " + id));
         var currentCard = creditCardRepo.findCurrentActivatedCard();
+        creditCardRepo.updateActiveCard(id,true);
 
-        card.setActive(true);
-        creditCardRepo.save(card);
+        currentCard.ifPresent(_card->creditCardRepo.updateActiveCard(_card.getId(),false));
 
-        currentCard.ifPresent(c -> c.setActive(false));
-        currentCard.ifPresent(creditCardRepo::save);
 
-        return creditCardRepo.findAllByOrderByActiveDesc();
     }
 }

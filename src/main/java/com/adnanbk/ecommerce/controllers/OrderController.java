@@ -17,7 +17,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/userOrders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
@@ -33,7 +33,7 @@ public class OrderController {
     @GetMapping
     @ApiOperation(value = "get all user orders")
     public List<UserOrder> getOrdersByUserName(Principal principal) {
-        return userOderService.findByUserName(principal.getName());
+        return userOderService.findByEmail(principal.getName());
     }
 
     @PostMapping

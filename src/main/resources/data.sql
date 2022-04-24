@@ -1,13 +1,31 @@
 -- -----------------------------------------------------
+-- users
+-- -----------------------------------------------------
+INSERT INTO ROLE(id, NAME)
+VALUES (1, 'ROLE_ADMIN');
+
+INSERT INTO ROLE(id, NAME)
+VALUES (2, 'ROLE_USER');
+
+INSERT INTO USER(id,EMAIL,FIRST_NAME,ENABLED,PASSWORD,IS_SOCIAL)
+VALUES (1, 'admin@email.com','Admin',1,'$2a$04$Buxup01QZW.Ytq.1PuVJCuHPynjLA5p19gnYgPX.SKYSp5xe0pQF6',0);
+
+INSERT INTO users_ROLES(USER_ID,ROLE_ID)
+VALUES (1, 1);
+
+SET
+@id=0;
+
+-- -----------------------------------------------------
 -- Categories
 -- -----------------------------------------------------
-INSERT INTO PRODUCT_CATEGORY(id, NAME)
+INSERT INTO category(id, NAME)
 VALUES (1, 'Books');
-INSERT INTO PRODUCT_CATEGORY(id, NAME)
+INSERT INTO category(id, NAME)
 VALUES (2, 'Coffee Mugs');
-INSERT INTO PRODUCT_CATEGORY(id, NAME)
+INSERT INTO category(id, NAME)
 VALUES (3, 'Mouse Pads');
-INSERT INTO PRODUCT_CATEGORY(id, NAME)
+INSERT INTO category(id, NAME)
 VALUES (4, 'Luggage Tags');
 
 SET

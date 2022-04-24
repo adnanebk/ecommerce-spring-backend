@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.services;
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
+import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.models.AppUser;
@@ -15,9 +16,10 @@ public interface AuthService {
 
     JwtDto handleRegister(AppUser user);
 
-    void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String userName);
+    void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email);
 
     JwtDto refreshNewToken(String refreshToken);
 
 
+    ImageDto changeUserImage(String fileName, String email);
 }

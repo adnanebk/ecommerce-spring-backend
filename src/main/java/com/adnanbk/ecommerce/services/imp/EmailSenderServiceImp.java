@@ -18,6 +18,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +37,12 @@ public class EmailSenderServiceImp implements EmailSenderService {
     @Override
     public void sendEmailConfirmation(String rooUrl,String email) {
 
-        AppUser user = userRepo.findByEmail(email).orElseThrow(() -> new BadCredentialsException("could not found this email"));
-
+        AppUser user = Optional.of(userRepo.findByEmail(email)).orElseThrow(() -> new BadCredentialsException("could not found this email"));
 
         String destAddress = user.getEmail();
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        String verifyURL = rooUrl + "/verify?token=" + confirmationTokenRepo.save(confirmationToken).getToken();
+        String verifyURL = rooUrl + "/enable?token=" + confirmationTokenRepo.save(confirmationToken).getToken();
 
 
         String subject = "Please verify your registration";
@@ -58,7 +58,6 @@ public class EmailSenderServiceImp implements EmailSenderService {
 
             helper.setTo(destAddress);
             helper.setSubject(subject);
-
             helper.setText(content, true);
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new InvalidTokenException("We could not verify the email");
@@ -67,7 +66,18 @@ public class EmailSenderServiceImp implements EmailSenderService {
     }
 
     @Override
-    public String verifyToken(String myToken) {
+    public String enableUser(String myToken) {
+       var token = verifyAngGetToken(myToken);
+        AppUser user = token.getAppUser();
+            if (user == null)
+                throw new InvalidTokenException("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
+            userRepo.enableUser(user.getId(),true);
+            return frontUrl + "?verified=true";
+
+
+    }
+
+    private ConfirmationToken verifyAngGetToken(String myToken) {
         if (myToken != null && !myToken.isEmpty()) {
             var token = confirmationTokenRepo.findById(myToken)
                     .orElseThrow(() -> new InvalidTokenException("invalid token"));
@@ -75,16 +85,7 @@ public class EmailSenderServiceImp implements EmailSenderService {
                 throw new InvalidTokenException("token is expired");
             if (token.getAppUser().isEnabled())
                 throw new InvalidTokenException("user is already verified");
-
-            AppUser user = token.getAppUser();
-
-            if (user == null)
-                throw new InvalidTokenException("Sorry, we could not verify account. It maybe already verified,or verification code is incorrect.");
-
-            user.setEnabled(true);
-            userRepo.save(user);
-            return frontUrl + "?verified=true";
-
+            return token;
         }
         throw new InvalidTokenException("invalid token");
     }

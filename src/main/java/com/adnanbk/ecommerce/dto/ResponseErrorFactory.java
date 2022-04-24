@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.dto;
 
+import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import org.springframework.util.StringUtils;
 
 public class ResponseErrorFactory {
@@ -7,10 +8,22 @@ public class ResponseErrorFactory {
     private ResponseErrorFactory() {
     }
 
+
+    public static ResponseError createResponseError(String errorMessage, ErrorMessagesUtil errorMessagesUtil) {
+           String message = errorMessagesUtil.getDefaultMessage("error.already-exist");
+        if (errorMessage.toLowerCase().contains("uniqueName".toLowerCase()))
+            return createResponseError("name", message);
+        if (errorMessage.toLowerCase().contains("uniqueCardNumber".toLowerCase()))
+            return createResponseError("cardNumber", message);
+        if (errorMessage.toLowerCase().contains("uniqueSku".toLowerCase()))
+            return createResponseError("sku", message);
+        return null;
+    }
+
     public static ResponseError createResponseError(String fieldName, String errorMessage) {
         String formattedName = fieldName.equals(fieldName.toLowerCase()) ? fieldName : formatToWordsWithSpaces(fieldName);
 
-        return new ResponseError(fieldName, formattedName, errorMessage);
+        return new ResponseError(fieldName, formattedName+" " +errorMessage);
     }
 
     private static String formatToWordsWithSpaces(String fieldName) {
@@ -19,17 +32,7 @@ public class ResponseErrorFactory {
 
     }
 
-    public static ResponseError createResponseError(String errorMessage) {
-        String subKey = "uniquekey";
-        int startIndex = errorMessage.indexOf(subKey);
-        int endIndex = errorMessage.indexOf("__");
-        if (startIndex != -1 && endIndex != -1) {
-            String fieldName = errorMessage.substring(startIndex + subKey.length() + 1, endIndex);
-            return createResponseError(fieldName, "already exists");
 
-        }
-        return null;
-    }
 
 
 }

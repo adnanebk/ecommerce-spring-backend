@@ -17,7 +17,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "product",
-        uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueKey_sku__")})
+        uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueSku")})
 @Getter
 @Setter
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)

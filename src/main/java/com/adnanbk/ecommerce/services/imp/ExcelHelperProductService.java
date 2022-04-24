@@ -27,7 +27,7 @@ import java.util.List;
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static final String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
-            "Category", "Active", "Image url"};
+            "Category", "Active"};
 
     static final String SHEET = "Products";
 
@@ -99,7 +99,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                         product.setCategory(category);
                     }
                     case 6 -> product.setActive(currentCell.getBooleanCellValue());
-                    case 7 -> product.setImage(currentCell.getStringCellValue());
                 }
                 return 1;
             } catch (IllegalStateException ex) {
@@ -147,7 +146,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(4).setCellValue(product.getUnitsInStock());
         row.createCell(5).setCellValue(product.getCategory().getName());
         row.createCell(6).setCellValue(product.isActive());
-        row.createCell(7).setCellValue(product.getImage());
         return rowIdx;
     }
 

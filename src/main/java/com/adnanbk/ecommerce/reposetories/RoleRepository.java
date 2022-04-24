@@ -1,20 +1,15 @@
 package com.adnanbk.ecommerce.reposetories;
 
-import com.adnanbk.ecommerce.models.UserOrder;
+import com.adnanbk.ecommerce.models.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
-import java.util.List;
 
-
-@RepositoryRestResource(path = "orders")
-public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
-
+@RepositoryRestResource(exported = false)
+public interface RoleRepository  extends JpaRepository<Role, Long> {
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    List<UserOrder> findByAppUser_Email(String email);
-
-
+    Role findByName(String name);
 }

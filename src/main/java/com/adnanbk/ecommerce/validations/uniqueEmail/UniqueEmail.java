@@ -1,4 +1,4 @@
-package com.adnanbk.ecommerce.validations;
+package com.adnanbk.ecommerce.validations.uniqueEmail;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 public @interface UniqueEmail {
 
 
-    String message() default "Already exists";
+    String message() default "{error.already-exist}";
 
     Class<?>[] groups() default {};
 

@@ -5,23 +5,27 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
 
 import java.util.Collections;
 import java.util.Locale;
 
 
 @SpringBootApplication
-@EnableCaching
 @EnableAsync
 public class EcommerceAngApplication {
+
+
+    public static void main(String[] args) {
+
+        SpringApplication.run(EcommerceAngApplication.class, args);
+    }
+
 
     @Bean
     public GoogleIdTokenVerifier googleverifier() {
@@ -40,22 +44,18 @@ public class EcommerceAngApplication {
     }
 
     @Bean
-    public LocaleResolver localeResolver() {
-        SessionLocaleResolver localeResolver = new SessionLocaleResolver();
-        localeResolver.setDefaultLocale(Locale.US);
-        return localeResolver;
+    public AcceptHeaderLocaleResolver localeResolver() {
+        final AcceptHeaderLocaleResolver resolver = new AcceptHeaderLocaleResolver();
+        resolver.setDefaultLocale(Locale.US);
+        return resolver;
     }
-
     @Bean
-    public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("findByUserNameCache", "creditCardCache", "orderCache", "productImage");
+    public MessageSource messageSource() {
+        final ResourceBundleMessageSource source = new ResourceBundleMessageSource();
+        source.setBasename("ValidationMessages");
+        return source;
     }
 
-
-    public static void main(String[] args) {
-
-        SpringApplication.run(EcommerceAngApplication.class, args);
-    }
 
 
 }

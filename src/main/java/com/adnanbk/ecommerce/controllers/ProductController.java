@@ -13,11 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,45 +30,24 @@ public class ProductController {
     private final ProductService productService;
 
 
-    private String getRootUrl() {
-        return ServletUriComponentsBuilder.fromCurrentRequest().replacePath(null).toUriString();
-    }
-    private String getRootUrl(HttpServletRequest request) {
-        return ServletUriComponentsBuilder.fromRequest(request).replacePath(null).toUriString();
-    }
-    @PostMapping(value = "/images", consumes = "multipart/form-data")
-    @ApiOperation(value = "Create product image", notes = "this endpoint uploads an image and return the created image url", response = String.class)
-    @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<String> uploadProductImage(@RequestPart("image") MultipartFile file,HttpServletRequest request) {
-        return this.imageService.upload(file).thenApplyAsync(path->getRootUrl(request)+"/"+path);
-    }
 
-    @GetMapping("/images/{imageName:.+}")
-    @ApiOperation(value = "get product image url")
-    public String getImageUrl(@PathVariable String imageName) {
-        return getRootUrl() + "/" + imageService.load(imageName);
-
-    }
-
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = Product.class)
-    public ResponseEntity<Product> addProduct(@Valid @RequestBody Product product) {
-        Product prod = productService.addProduct(product);
-        URI location = URI.create(getRootUrl() + "/products/" + prod.getId());
-
-        return ResponseEntity.created(location).body(prod);
+    public CompletableFuture<Product> addProduct(@Valid @RequestPart Product product, @RequestPart MultipartFile file) {
+          return this.imageService.upload(file).thenApplyAsync(res->productService.addProduct(product));
     }
 
-    @PutMapping
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = Product.class)
-    public Product updateProduct(@Valid @RequestBody Product product) {
-        Product updatedProduct = productService.updateProduct(product);
-        if (updatedProduct == null)
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
-        return updatedProduct;
+    public CompletableFuture<Product> updateProduct(@Valid @RequestPart Product product, @RequestPart(required = false) MultipartFile file) {
+          if(file==null || file.isEmpty())
+              return CompletableFuture.completedFuture((productService.updateProduct(product)));
+           return this.imageService.upload(file).thenApplyAsync(res->productService.updateProduct(product));
+
+
     }
 
 
@@ -99,13 +75,13 @@ public class ProductController {
         return () -> productService.saveAllFromExcel(file);
     }
 
-    @GetMapping("/products/excel")
+    @PostMapping("/excel/download")
     @ApiOperation(value = "download excel file of products")
     public Callable<ResponseEntity<InputStreamResource>>
-    loadProducts(@RequestParam(value = "Ids", required = false) List<Long> listOfIds) {
+    downloadExcelFromProducts(@RequestBody List<Product> products) {
         return () -> {
             String filename = "products-" + LocalDate.now() + ".xlsx";
-            InputStreamResource file = new InputStreamResource(productService.loadToExcel(listOfIds));
+            InputStreamResource file = new InputStreamResource(productService.loadToExcel(products));
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
                     .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))

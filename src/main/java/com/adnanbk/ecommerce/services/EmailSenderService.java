@@ -4,5 +4,5 @@ public interface EmailSenderService {
 
     void sendEmailConfirmation(String rooUrl,String email);
 
-    String verifyToken(String token);
+    String enableUser(String token);
 }

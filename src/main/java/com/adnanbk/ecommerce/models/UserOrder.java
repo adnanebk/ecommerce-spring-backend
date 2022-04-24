@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -58,16 +59,18 @@ public class UserOrder {
     public void setUserOrderItems(List<OrderItem> orderItems) {
         this.orderItems.clear();
         this.orderItems.addAll(orderItems);
+        orderItems.forEach(orderItem -> orderItem.setUserOrder(this));
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     @JsonIgnore
     private AppUser appUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id", nullable = false)
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private CreditCard creditCard;
 
 
