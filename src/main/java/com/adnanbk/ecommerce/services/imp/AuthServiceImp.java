@@ -54,23 +54,23 @@ public class AuthServiceImp implements AuthService {
     public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
         boolean isTokenValid = facebookService.verify(jwtDto);
         if (!isTokenValid)
-            throw new BadCredentialsException(messagesUtil.getMessage("error.invalid-credential"));
+            throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-credential"));
         return doLoginSocialUser(jwtDto.getAppUser());
     }
 
 
     @Override
     public JwtDto handleLogin(LoginUserDto appUser) {
-        var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
 
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-            throw new BadCredentialsException(messagesUtil.getMessage("error.invalid-email-or-password"));
+            throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-email-or-password"));
         }
 
+        var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
 
         return generateTokens(currentUser);
     }
@@ -90,7 +90,7 @@ public class AuthServiceImp implements AuthService {
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email) {
       userRepo.findByEmail(email).ifPresent(user->{
           if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-              throw new InvalidPasswordException(messagesUtil.getMessage("error.invalid-password"),"currentPassword");
+              throw new InvalidPasswordException(messagesUtil.getDefaultMessage("error.invalid-password"),"currentPassword");
           var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
           userRepo.updatePassword(user.getId(),newPassword);
       });
