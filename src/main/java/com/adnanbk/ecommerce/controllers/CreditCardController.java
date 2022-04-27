@@ -1,17 +1,16 @@
 package com.adnanbk.ecommerce.controllers;
 
-import com.adnanbk.ecommerce.models.CreditCard;
+import com.adnanbk.ecommerce.dto.CreditCardDto;
+import com.adnanbk.ecommerce.mappers.CreditCardMapper;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/creditCards")
@@ -20,26 +19,32 @@ public class CreditCardController {
 
 
     private CreditCardService creditCardService;
+    private CreditCardMapper creditCardMapper;
 
     @GetMapping
     @ApiOperation(value = "get all credit cards by the email of the authenticated a user")
-    public List<CreditCard> getUserCreditCards(Principal principal) {
-        return creditCardService.getByEmail(principal.getName());
+    public List<CreditCardDto> getUserCreditCards(Principal principal) {
+        return creditCardService.getByEmail(principal.getName())
+                .stream().map(creditCardMapper::toDto).toList();
     }
 
 
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
-    public ResponseEntity<CreditCard> saveCreditCard(@RequestBody @Valid CreditCard creditCard, Principal principal) {
-        CreditCard savedCreditCard = creditCardService.saveCard(creditCard, principal.getName());
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(savedCreditCard.getId()).toUri();
-        return ResponseEntity.created(location).body(savedCreditCard);
+    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto, Principal principal) {
+       return Optional.of(creditCardDto)
+                .map(creditCardMapper::toEntity)
+                .map(card->creditCardService.saveCard(card,principal.getName()))
+                .map(creditCardMapper::toDto).orElseThrow();
+
     }
     @PutMapping("/{id}")
     @ApiOperation(value = "update a user credit card")
-    public CreditCard updateCreditCard(@RequestBody @Valid CreditCard creditCard,@PathVariable Long id,Principal principal) {
-        return creditCardService.update(creditCard,id,principal.getName());
+    public CreditCardDto updateCreditCard(@RequestBody @Valid CreditCardDto creditCardDto,@PathVariable Long id,Principal principal) {
+        return Optional.of(creditCardDto)
+                .map(creditCardMapper::toEntity)
+                .map(card->creditCardService.update(card,id,principal.getName()))
+                .map(creditCardMapper::toDto).orElseThrow();
     }
 
     @PatchMapping("/active/{id}")

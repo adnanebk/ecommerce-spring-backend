@@ -1,15 +1,11 @@
 package com.adnanbk.ecommerce.models;
 
-import com.adnanbk.ecommerce.validations.uniqueEmail.UniqueEmail;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,9 +22,6 @@ public class AppUser {
     private Long id;
 
     @Column(unique = true)
-    @UniqueEmail
-    @Email
-    @NotEmpty
     private String email;
 
     @OneToMany(mappedBy = "appUser", orphanRemoval = true, cascade = CascadeType.ALL)
@@ -38,20 +31,15 @@ public class AppUser {
     private Set<UserOrder> userOrders = new HashSet<>();
 
     @Column
-    @NotEmpty
     private String firstName;
 
     @Column
-    @Length(min = 1, message = "{error.min}")
     private String lastName;
 
     @Column
-    @Length(min = 4, message = "{error.min}")
     private String street;
 
-    @Length(min = 2, message = "{error.min}")
     private String city;
-    @Length(min = 2, message = "{error.min}")
     private String country;
     private boolean enabled=false;
 
@@ -60,8 +48,6 @@ public class AppUser {
     private boolean isSocial;
 
     @Column
-    @NotEmpty
-    @Length(min = 4, message = "{error.min}")
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
