@@ -42,11 +42,7 @@ public class ImageServiceImp implements FileService {
 
     @Async
     public CompletableFuture<String> upload(MultipartFile image) {
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "")
                 .replace(" ", "").trim();
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
