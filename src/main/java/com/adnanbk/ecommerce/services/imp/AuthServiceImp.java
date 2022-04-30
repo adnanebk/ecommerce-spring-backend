@@ -2,8 +2,10 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
+import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
+import com.adnanbk.ecommerce.reposetories.ConfirmationTokenRepository;
 import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
@@ -19,8 +21,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -35,7 +39,10 @@ public class AuthServiceImp implements AuthService {
     private final SocialService facebookService;
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
+    private final ConfirmationTokenRepository confirmationTokenRepo;
 
+    @Value("${front.url}")
+    private String frontUrl;
     @Value("#{${jwt.expiration-time-minutes}*60*1000}")
     private long jwtExpirationTime;
     @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
@@ -111,7 +118,12 @@ public class AuthServiceImp implements AuthService {
     public Optional<AppUser> getUserByEmail(String email) {
         return userRepo.findByEmail(email);
     }
-
+    @Override
+    public String enableUser(String token) {
+        var user = verifyAngGetTokenUser(token);
+        userRepo.enableUser(user.getId(),true);
+        return frontUrl + "?verified=true";
+    }
     private JwtDto generateTokens(AppUser user, String refreshToken) {
         var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
         var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
@@ -162,6 +174,19 @@ public class AuthServiceImp implements AuthService {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
         user = userRepo.save(user);
         return user;
+    }
+
+    private AppUser verifyAngGetTokenUser(String token) {
+
+        if (StringUtils.hasLength(token)) {
+            var confirmationToken = confirmationTokenRepo.findById(token)
+                    .orElseThrow(()->new InvalidTokenException("the token is not found"));
+            if (confirmationToken.getExpirationDate().isAfter(LocalDate.now())
+                    && !confirmationToken.getAppUser().isEnabled()){
+                return confirmationToken.getAppUser();
+            }
+        }
+        throw new InvalidTokenException("token is invalid or it has been expired");
     }
 
 }

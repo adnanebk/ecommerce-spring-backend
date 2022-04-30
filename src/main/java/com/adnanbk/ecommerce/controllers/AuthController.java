@@ -2,15 +2,15 @@ package com.adnanbk.ecommerce.controllers;
 
 
 import com.adnanbk.ecommerce.dto.*;
+import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
-import com.adnanbk.ecommerce.services.EmailSenderService;
 import com.adnanbk.ecommerce.services.FileService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Validator;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,10 +28,9 @@ public class AuthController {
 
 
     private final AuthService authService;
-    private final EmailSenderService emailSenderService;
     private final FileService imageService;
     private final UserMapper userMapper;
-    private final Validator validator;
+    private final ApplicationEventPublisher eventPublisher;
 
 
 
@@ -41,7 +40,7 @@ public class AuthController {
 
     @GetMapping("/user/email/{email}")
     @ApiOperation(value = "Get a user by its email")
-    public UserDto getUserByEmail(String email) {
+    public UserDto getUserByEmail(@PathVariable  String email) {
         return authService.getUserByEmail(email)
                 .map(userMapper::toDto).orElseThrow();
     }
@@ -53,7 +52,7 @@ public class AuthController {
                 .map(userMapper::toEntity)
                 .map(authService::handleRegister)
                 .map(user-> {
-                    emailSenderService.sendEmailConfirmation(getRootUrl(), userDto.getEmail());
+                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),userMapper.toEntity(user.getAppUser())));
                     return user;
                 })
                 .orElseThrow();
@@ -84,7 +83,7 @@ public class AuthController {
     @GetMapping("/auth/enable")
     @ApiOperation(value = "enable the user with the token sent to his email")
     public ResponseEntity<String> enableUser(@RequestParam String token) {
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(emailSenderService.enableUser(token))).build();
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(authService.enableUser(token))).build();
     }
 
     @PostMapping("/auth/refresh-token")
@@ -98,7 +97,9 @@ public class AuthController {
     @PatchMapping("/user/confirm")
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation(@RequestBody String email) {
-        emailSenderService.sendEmailConfirmation(getRootUrl(),email);
+        authService.getUserByEmail(email)
+                .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user)));
+
     }
 
     @PostMapping("/user/change-password")

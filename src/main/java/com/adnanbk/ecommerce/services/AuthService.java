@@ -26,4 +26,6 @@ public interface AuthService {
     ImageDto changeUserImage(String fileName, String email);
 
     Optional<AppUser> getUserByEmail(String email);
+
+    String enableUser(String token);
 }
