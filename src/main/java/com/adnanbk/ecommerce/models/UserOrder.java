@@ -1,17 +1,12 @@
 package com.adnanbk.ecommerce.models;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,27 +14,24 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@JsonIgnoreProperties(value = {"creditCard"}, allowSetters = true)
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UserOrder {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @NotEmpty
-    @Length(min = 4, message = "{error.min}")
+
     private String fullName;
 
 
-    @NotEmpty
+
     private String country;
 
-    @NotEmpty
-    @Length(min = 4, message = "{error.min}")
+
     private String street;
 
-    @NotEmpty
+
     private String city;
 
 
@@ -64,13 +56,11 @@ public class UserOrder {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private AppUser appUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "card_id", nullable = false)
     @NotNull
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private CreditCard creditCard;
 
 

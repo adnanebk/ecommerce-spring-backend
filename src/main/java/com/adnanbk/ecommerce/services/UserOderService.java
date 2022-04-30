@@ -10,4 +10,5 @@ public interface UserOderService {
 
     List<UserOrder> findByEmail(String email);
 
+    void remove(long id);
 }

@@ -39,8 +39,13 @@ public class AuthController {
         return ServletUriComponentsBuilder.fromCurrentRequest().replacePath("/api").toUriString();
     }
 
-
-    @PostMapping(value = "/register")
+    @GetMapping("/user/email/{email}")
+    @ApiOperation(value = "Get a user by its email")
+    public UserDto getUserByEmail(String email) {
+        return authService.getUserByEmail(email)
+                .map(userMapper::toDto).orElseThrow();
+    }
+    @PostMapping(value = "/auth/register")
     @ApiOperation(value = "register a new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto register(@RequestBody @Valid UserDto userDto) {
@@ -56,13 +61,13 @@ public class AuthController {
 
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     @ApiOperation(value = "authenticate a user")
     public JwtDto login(@RequestBody @Valid LoginUserDto appUser) {
         return authService.handleLogin(appUser);
     }
 
-    @PostMapping("/login/google")
+    @PostMapping("/auth/login/google")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
     public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
@@ -70,19 +75,19 @@ public class AuthController {
 
     }
 
-    @PostMapping("/login/facebook")
+    @PostMapping("/auth/login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
     public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithFacebook(jwtDto);
     }
 
-    @GetMapping("/enable")
+    @GetMapping("/auth/enable")
     @ApiOperation(value = "enable the user with the token sent to his email")
     public ResponseEntity<String> enableUser(@RequestParam String token) {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(emailSenderService.enableUser(token))).build();
     }
 
-    @PostMapping("/refresh-token")
+    @PostMapping("/auth/refresh-token")
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto refreshNewToken(@RequestBody String refreshToken) {

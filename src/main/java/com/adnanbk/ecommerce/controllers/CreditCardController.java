@@ -5,6 +5,7 @@ import com.adnanbk.ecommerce.mappers.CreditCardMapper;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -31,6 +32,7 @@ public class CreditCardController {
 
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
+    @ResponseStatus(HttpStatus.CREATED)
     public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto, Principal principal) {
        return Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)

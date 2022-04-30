@@ -9,8 +9,8 @@ import javax.persistence.QueryHint;
 import java.util.List;
 
 
-@RepositoryRestResource(path = "orders")
-public interface OrderRepository extends CrudRepository<UserOrder, Integer> {
+@RepositoryRestResource(path = "orders",exported = false)
+public interface OrderRepository extends CrudRepository<UserOrder, Long> {
 
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))

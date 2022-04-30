@@ -21,10 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +105,11 @@ public class AuthServiceImp implements AuthService {
     public ImageDto changeUserImage(String fileName, String email) {
         userRepo.updateImage(email,fileName);
         return userRepo.findByEmail(email).map(user ->new ImageDto(user.getImageUrl())).orElseThrow();
+    }
+
+    @Override
+    public Optional<AppUser> getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
     }
 
     private JwtDto generateTokens(AppUser user, String refreshToken) {

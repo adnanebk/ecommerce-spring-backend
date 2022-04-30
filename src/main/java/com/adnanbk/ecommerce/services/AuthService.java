@@ -6,6 +6,8 @@ import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.models.AppUser;
 
+import java.util.Optional;
+
 public interface AuthService {
 
     JwtDto handleLoginWithGoogle(JwtDto jwtDto);
@@ -22,4 +24,6 @@ public interface AuthService {
 
 
     ImageDto changeUserImage(String fileName, String email);
+
+    Optional<AppUser> getUserByEmail(String email);
 }

@@ -2,8 +2,8 @@ package com.adnanbk.ecommerce.jwt;
 
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.AllArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -45,7 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // only the Token
             var tokenArr = requestTokenHeader.split("Bearer ");
             if (tokenArr.length != 2)
-                throw new BadCredentialsException("Header not contains Authorization or JWT Token does not begin with Bearer");
+                throw new JWTVerificationException("Request header not contains a valid authorization");
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Once we get the token we validate it.

@@ -6,14 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.QueryHint;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
 
-@RepositoryRestResource(path = "users")
+@RepositoryRestResource(path = "users",exported = false)
 public interface UserRepo extends CrudRepository<AppUser, Long> {
 
 
@@ -21,7 +20,7 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
   //  boolean existsByEmail(String email);
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    @RestResource(path = "email")
+    //@RestResource(path = "email")
     Optional<AppUser> findByEmail(String email);
 
     @Transactional

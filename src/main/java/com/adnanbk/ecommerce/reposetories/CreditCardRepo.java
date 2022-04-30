@@ -20,6 +20,7 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
     boolean existsByAppUser_Email(String email);
 
+
     @PreAuthorize("#email == authentication.getName()")
     @RestResource(path = "email")
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))

@@ -16,7 +16,6 @@ import java.util.List;
 public class CreditCard {
 
     @Id
-    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -36,7 +35,7 @@ public class CreditCard {
     )
     private List<UserOrder> userOrders;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "user_id")
     private AppUser appUser;
 

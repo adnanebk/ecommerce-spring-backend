@@ -29,10 +29,12 @@ public class UserOrderServiceImp implements UserOderService {
         AppUser appUser = userRepo.findByEmail(email).orElseThrow();
         CreditCard creditCard = userOrder.getCreditCard();
 
-        var userCardOptional = creditCardRepo.findById(creditCard.getId());
-
         creditCard.setAppUser(appUser);
-        creditCard = userCardOptional.orElse(creditCardRepo.save(creditCard));
+        if(creditCard.getId()==null)
+            creditCard = creditCardRepo.save(creditCard);
+        else
+            creditCard = creditCardRepo.findById(creditCard.getId()).orElseThrow();
+
 
         userOrder.setAppUser(appUser);
         userOrder.setCreditCard(creditCard);
@@ -43,6 +45,11 @@ public class UserOrderServiceImp implements UserOderService {
     @Override
     public List<UserOrder> findByEmail(String email) {
         return orderRepository.findByAppUser_Email(email);
+    }
+
+    @Override
+    public void remove(long id) {
+     this.orderRepository.deleteById(id);
     }
 
 
