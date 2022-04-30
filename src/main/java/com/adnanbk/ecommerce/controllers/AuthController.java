@@ -2,13 +2,11 @@ package com.adnanbk.ecommerce.controllers;
 
 
 import com.adnanbk.ecommerce.dto.*;
-import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.FileService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +28,6 @@ public class AuthController {
     private final AuthService authService;
     private final FileService imageService;
     private final UserMapper userMapper;
-    private final ApplicationEventPublisher eventPublisher;
 
 
 
@@ -50,11 +47,7 @@ public class AuthController {
     public JwtDto register(@RequestBody @Valid UserDto userDto) {
         return Optional.of(userDto)
                 .map(userMapper::toEntity)
-                .map(authService::handleRegister)
-                .map(user-> {
-                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),userMapper.toEntity(user.getAppUser())));
-                    return user;
-                })
+                .map(user->authService.handleRegister(getRootUrl(),user))
                 .orElseThrow();
 
 
@@ -97,9 +90,7 @@ public class AuthController {
     @PatchMapping("/user/confirm")
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation(@RequestBody String email) {
-        authService.getUserByEmail(email)
-                .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user)));
-
+        authService.sendEmailConfirmation(getRootUrl(),email);
     }
 
     @PostMapping("/user/change-password")

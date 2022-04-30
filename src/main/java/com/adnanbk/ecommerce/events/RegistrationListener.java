@@ -1,6 +1,5 @@
-package com.adnanbk.ecommerce.services.imp;
+package com.adnanbk.ecommerce.events;
 
-import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.models.ConfirmationToken;
 import com.adnanbk.ecommerce.reposetories.ConfirmationTokenRepository;
 import lombok.RequiredArgsConstructor;

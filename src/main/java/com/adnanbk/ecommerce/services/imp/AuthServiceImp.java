@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.*;
+import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
@@ -14,6 +15,7 @@ import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +42,7 @@ public class AuthServiceImp implements AuthService {
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
     private final ConfirmationTokenRepository confirmationTokenRepo;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${front.url}")
     private String frontUrl;
@@ -80,14 +83,12 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public JwtDto handleRegister(AppUser user) {
+    public JwtDto handleRegister(String rootUrl, AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user = saveUser(user);
-
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user));
         return generateTokens(user);
     }
-
-
 
 
     @Override
@@ -120,10 +121,17 @@ public class AuthServiceImp implements AuthService {
     }
     @Override
     public String enableUser(String token) {
-        var user = verifyAngGetTokenUser(token);
+        var user = verifyConfirmationToken(token);
         userRepo.enableUser(user.getId(),true);
         return frontUrl + "?verified=true";
     }
+
+    @Override
+    public void sendEmailConfirmation(String rootUrl,String email) {
+     this.getUserByEmail(email)
+             .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user)));
+    }
+
     private JwtDto generateTokens(AppUser user, String refreshToken) {
         var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
         var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
@@ -176,7 +184,7 @@ public class AuthServiceImp implements AuthService {
         return user;
     }
 
-    private AppUser verifyAngGetTokenUser(String token) {
+    private AppUser verifyConfirmationToken(String token) {
 
         if (StringUtils.hasLength(token)) {
             var confirmationToken = confirmationTokenRepo.findById(token)
