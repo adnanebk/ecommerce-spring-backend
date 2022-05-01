@@ -56,7 +56,7 @@ public class ImageUploadAspect {
         product.setImage(imagesPathUrl+product.getImage());
     }
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.AuthServiceImp.changeUserImage(..))",returning = "imageDto")
+    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.UserServiceImpl.changeUserImage(..))",returning = "imageDto")
     public void updateUserImageAspect(ImageDto imageDto) {
         imageDto.setUrl(imagesPathUrl+imageDto.getUrl());
     }

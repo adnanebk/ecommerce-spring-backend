@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 
@@ -20,6 +21,7 @@ import java.util.Date;
         uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueSku")})
 @Getter
 @Setter
+@DynamicUpdate
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Product {
 

@@ -24,15 +24,15 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Transactional
     public CreditCard saveCard(CreditCard creditCard, String email) {
       return   userRepo.findByEmail(email).map(user->{
-            activeCreditCardIfNoneIsActive(creditCard, email);
+            activeCreditCardIfNew(creditCard, email);
             creditCard.setAppUser(user);
             return creditCardRepo.save(creditCard);
         }).orElseThrow();
 
     }
 
-    private void activeCreditCardIfNoneIsActive(CreditCard creditCard, String email) {
-        if (!creditCardRepo.existsByAppUser_Email(email))
+    private void activeCreditCardIfNew(CreditCard creditCard, String email) {
+        if (creditCardRepo.findAllByAppUser_Email(email).isEmpty())
             creditCard.setActive(true);
     }
 
@@ -55,9 +55,10 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     @Transactional
     public CreditCard update(CreditCard creditCard, Long id,String email) {
-
         return userRepo.findByEmail(email).map(user-> creditCardRepo.findById(id).map(card->{
-               BeanUtils.copyProperties(creditCard,card);
+                card.setCardType(creditCard.getCardType());
+                card.setCardNumber(creditCard.getCardNumber());
+                card.setExpirationDate(creditCard.getExpirationDate());
                card.setAppUser(user);
                return this.creditCardRepo.save(card);
            }).orElseThrow()).orElseThrow();

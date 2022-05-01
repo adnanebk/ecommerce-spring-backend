@@ -91,34 +91,19 @@ public class AuthServiceImp implements AuthService {
     }
 
 
-    @Override
-    public void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email) {
-      userRepo.findByEmail(email).ifPresent(user->{
-          if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-              throw new InvalidPasswordException(messagesUtil.getDefaultMessage("error.invalid-password"),"currentPassword");
-          var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
-          userRepo.updatePassword(user.getId(),newPassword);
-      });
-
-    }
 
     @Override
     public JwtDto refreshNewToken(String refreshToken) {
         String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
         return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
-
     }
 
     @Override
-    public ImageDto changeUserImage(String fileName, String email) {
-        userRepo.updateImage(email,fileName);
-        return userRepo.findByEmail(email).map(user ->new ImageDto(user.getImageUrl())).orElseThrow();
+    public void sendEmailConfirmation(String rootUrl, String email) {
+     this.userRepo.findByEmail(email)
+             .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user)));
     }
 
-    @Override
-    public Optional<AppUser> getUserByEmail(String email) {
-        return userRepo.findByEmail(email);
-    }
     @Override
     public String enableUser(String token) {
         var user = verifyConfirmationToken(token);
@@ -126,10 +111,17 @@ public class AuthServiceImp implements AuthService {
         return frontUrl + "?verified=true";
     }
 
-    @Override
-    public void sendEmailConfirmation(String rootUrl,String email) {
-     this.getUserByEmail(email)
-             .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user)));
+    private AppUser verifyConfirmationToken(String token) {
+
+        if (StringUtils.hasLength(token)) {
+            var confirmationToken = confirmationTokenRepo.findById(token)
+                    .orElseThrow(()->new InvalidTokenException("the token is not found"));
+            if (confirmationToken.getExpirationDate().isAfter(LocalDate.now())
+                    && !confirmationToken.getAppUser().isEnabled()){
+                return confirmationToken.getAppUser();
+            }
+        }
+        throw new InvalidTokenException("token is invalid or it has been expired");
     }
 
     private JwtDto generateTokens(AppUser user, String refreshToken) {
@@ -184,17 +176,6 @@ public class AuthServiceImp implements AuthService {
         return user;
     }
 
-    private AppUser verifyConfirmationToken(String token) {
 
-        if (StringUtils.hasLength(token)) {
-            var confirmationToken = confirmationTokenRepo.findById(token)
-                    .orElseThrow(()->new InvalidTokenException("the token is not found"));
-            if (confirmationToken.getExpirationDate().isAfter(LocalDate.now())
-                    && !confirmationToken.getAppUser().isEnabled()){
-                return confirmationToken.getAppUser();
-            }
-        }
-        throw new InvalidTokenException("token is invalid or it has been expired");
-    }
 
 }

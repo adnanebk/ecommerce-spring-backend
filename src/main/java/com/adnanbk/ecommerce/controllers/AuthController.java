@@ -1,47 +1,39 @@
 package com.adnanbk.ecommerce.controllers;
 
 
-import com.adnanbk.ecommerce.dto.*;
+import com.adnanbk.ecommerce.dto.JwtDto;
+import com.adnanbk.ecommerce.dto.LoginUserDto;
+import com.adnanbk.ecommerce.dto.UserDto;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
-import com.adnanbk.ecommerce.services.FileService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import java.security.Principal;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
+
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth/")
 public class AuthController {
 
 
     private final AuthService authService;
-    private final FileService imageService;
     private final UserMapper userMapper;
-
 
 
     private String getRootUrl() {
         return ServletUriComponentsBuilder.fromCurrentRequest().replacePath("/api").toUriString();
     }
 
-    @GetMapping("/user/email/{email}")
-    @ApiOperation(value = "Get a user by its email")
-    public UserDto getUserByEmail(@PathVariable  String email) {
-        return authService.getUserByEmail(email)
-                .map(userMapper::toDto).orElseThrow();
-    }
-    @PostMapping(value = "/auth/register")
+
+    @PostMapping(value = "register")
     @ApiOperation(value = "register a new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto register(@RequestBody @Valid UserDto userDto) {
@@ -53,13 +45,13 @@ public class AuthController {
 
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("login")
     @ApiOperation(value = "authenticate a user")
     public JwtDto login(@RequestBody @Valid LoginUserDto appUser) {
         return authService.handleLogin(appUser);
     }
 
-    @PostMapping("/auth/login/google")
+    @PostMapping("login/google")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
     public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
@@ -67,19 +59,19 @@ public class AuthController {
 
     }
 
-    @PostMapping("/auth/login/facebook")
+    @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
     public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
         return authService.handleLoginWithFacebook(jwtDto);
     }
 
-    @GetMapping("/auth/enable")
+    @GetMapping("enable")
     @ApiOperation(value = "enable the user with the token sent to his email")
     public ResponseEntity<String> enableUser(@RequestParam String token) {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(authService.enableUser(token))).build();
     }
 
-    @PostMapping("/auth/refresh-token")
+    @PostMapping("refresh-token")
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto refreshNewToken(@RequestBody String refreshToken) {
@@ -87,24 +79,13 @@ public class AuthController {
 
     }
 
-    @PatchMapping("/user/confirm")
+    @PatchMapping("confirm")
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation(@RequestBody String email) {
         authService.sendEmailConfirmation(getRootUrl(),email);
     }
 
-    @PostMapping("/user/change-password")
-    @ApiOperation(value = "change the user password")
-    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
-        this.authService.changePassword(changeUserPasswordDto, principal.getName());
-    }
 
-    @PatchMapping(value = "/user/upload-image")
-    @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
-    @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
-        return this.imageService.upload(file).thenApplyAsync(fileName-> this.authService.changeUserImage(fileName,principal.getName()));
-    }
 
 
 }

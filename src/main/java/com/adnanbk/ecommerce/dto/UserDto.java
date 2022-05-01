@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.dto;
 
 import com.adnanbk.ecommerce.models.Role;
-import com.adnanbk.ecommerce.validations.uniqueEmail.UniqueEmail;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +18,6 @@ public class UserDto {
 
     private long id;
 
-    @UniqueEmail
     @Email
     @NotEmpty
     private String email;

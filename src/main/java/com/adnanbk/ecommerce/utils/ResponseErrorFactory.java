@@ -17,6 +17,8 @@ public class ResponseErrorFactory {
             return createResponseError("cardNumber", message);
         if (errorMessage.toLowerCase().contains("uniqueSku".toLowerCase()))
             return createResponseError("sku", message);
+        if (errorMessage.toLowerCase().contains("uniqueEmail".toLowerCase()))
+            return createResponseError("email", message);
         return null;
     }
 
