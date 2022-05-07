@@ -29,7 +29,6 @@ public class ImageUploadAspect {
 
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..,org.springframework.data.domain.Pageable))",returning = "products")
     public void findAllProductsAspect(Page<Product>  products) {
-        System.out.println("aspect");
         products.forEach(product -> product.setImage(imagesPathUrl+product.getImage()));
     }
 
@@ -64,7 +63,7 @@ public class ImageUploadAspect {
     @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.AuthServiceImp.handleLogin*(..))",returning = "jwtDto")
     public void loginAspect(JwtDto jwtDto) {
         var userImage = jwtDto.getAppUser().getImageUrl();
-        if(!Strings.isNullOrEmpty(userImage) && !userImage.contains("http"))
-        jwtDto.getAppUser().setImageUrl(imagesPathUrl+jwtDto.getAppUser().getImageUrl());
+        if (!Strings.isNullOrEmpty(userImage) && !userImage.contains("http"))
+            jwtDto.getAppUser().setImageUrl(imagesPathUrl + jwtDto.getAppUser().getImageUrl());
     }
 }

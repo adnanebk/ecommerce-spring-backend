@@ -27,7 +27,7 @@ import java.util.List;
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static final String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
-            "Category", "Active"};
+            "Category"};
 
     static final String SHEET = "Products";
 
@@ -80,6 +80,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     }
 
     private int extractCellData(Row currentRow, int cellIndex, Product product) {
+        product.setImage("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0yNTEtbWluZC1pbnN0Z3JhbS0wMy5qcGc.jpg");
         var currentCell = currentRow.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
         if (currentCell != null) {
             try {
@@ -98,7 +99,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
                         product.setCategory(category);
                     }
-                    case 6 -> product.setActive(currentCell.getBooleanCellValue());
                 }
                 return 1;
             } catch (IllegalStateException ex) {
@@ -145,7 +145,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(3).setCellValue(product.getUnitPrice().doubleValue());
         row.createCell(4).setCellValue(product.getUnitsInStock());
         row.createCell(5).setCellValue(product.getCategory().getName());
-        row.createCell(6).setCellValue(product.isActive());
         return rowIdx;
     }
 

@@ -75,18 +75,18 @@ public class ProductController {
         return () -> productService.saveAllFromExcel(file);
     }
 
-    @PostMapping("/excel/download")
+    @GetMapping("/excel/download/{ids}")
     @ApiOperation(value = "download excel file of products")
-    public Callable<ResponseEntity<InputStreamResource>>
-    downloadExcelFromProducts(@RequestBody List<Product> products) {
-        return () -> {
-            String filename = "products-" + LocalDate.now() + ".xlsx";
-            InputStreamResource file = new InputStreamResource(productService.loadToExcel(products));
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-                    .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-                    .body(file);
-        };
+    public CompletableFuture<ResponseEntity<InputStreamResource>>
+    downloadExcelFromProducts(@PathVariable List<Long> ids) {
+return  CompletableFuture.supplyAsync(()->{
+    String filename = "products-" + LocalDate.now() + ".xlsx";
+    InputStreamResource file = new InputStreamResource(productService.loadToExcel(ids));
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+            .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+            .body(file);
+});
     }
 
 }

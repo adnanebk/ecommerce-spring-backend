@@ -66,9 +66,10 @@ public class ProductServiceImp implements ProductService {
 
     }
 
-    public ByteArrayInputStream loadToExcel(List<Product> products) {
-        if (products != null && !products.isEmpty())
-            return excelHelper.listToExcel(products);
+    @Override
+    public ByteArrayInputStream loadToExcel(List<Long> productIds) {
+        if (productIds != null && !productIds.isEmpty())
+            return excelHelper.listToExcel(productRepo.findAllById(productIds));
         return excelHelper.listToExcel(productRepo.findAll());
     }
 

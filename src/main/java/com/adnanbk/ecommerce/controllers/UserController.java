@@ -47,7 +47,7 @@ private final UserMapper userMapper;
         Optional.of(userDto)
                 .map(userMapper::toEntity)
                 .map(user->userService.update(user,id))
-                .map(userMapper::toDto).orElseThrow();
+                .map(userMapper::toDto);
     }
     @PatchMapping(value = "upload-image")
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)

@@ -17,10 +17,8 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
 
 
 
-  //  boolean existsByEmail(String email);
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    //@RestResource(path = "email")
     Optional<AppUser> findByEmail(String email);
 
     @Transactional
@@ -36,8 +34,5 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE AppUser us SET us.enabled = :enabled WHERE us.id= :id")
     void enableUser(Long id, boolean enabled);
-
-
-    // Optional<AppUser> findByEmail(String email);
 
 }
