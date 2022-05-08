@@ -4,6 +4,7 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.dto.UserInfoDto;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.UserService;
@@ -34,18 +35,17 @@ private final UserMapper userMapper;
                 .map(userMapper::toDto).orElseThrow();
     }
 
-    @PostMapping("change-password")
+    @PatchMapping("change-password")
     @ApiOperation(value = "change the user password")
     public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
         this.userService.changePassword(changeUserPasswordDto, principal.getName());
     }
 
     @PatchMapping("/{id}")
-    @ApiOperation(value = "change user info")
-    public void changeUserInformation(@RequestBody @Valid UserDto userDto,@PathVariable  Long id)
+    @ApiOperation(value = "change user information")
+    public void changeUserInformation(@RequestBody @Valid UserInfoDto userDto, @PathVariable  Long id)
     {
         Optional.of(userDto)
-                .map(userMapper::toEntity)
                 .ifPresent(user->userService.update(user,id));
     }
     @PatchMapping(value = "upload-image")

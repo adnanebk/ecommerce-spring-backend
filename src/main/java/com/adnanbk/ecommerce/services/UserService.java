@@ -2,6 +2,7 @@ package com.adnanbk.ecommerce.services;
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
+import com.adnanbk.ecommerce.dto.UserInfoDto;
 import com.adnanbk.ecommerce.models.AppUser;
 
 import java.util.Optional;
@@ -12,5 +13,5 @@ public interface UserService {
 
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email);
 
-    AppUser update(AppUser user,Long id);
+    AppUser update(UserInfoDto user, Long id);
 }

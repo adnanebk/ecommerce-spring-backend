@@ -3,7 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.dto.UserInfoDto;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
 import io.swagger.annotations.ApiOperation;
@@ -36,7 +36,7 @@ public class AuthController {
     @PostMapping(value = "register")
     @ApiOperation(value = "register a new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtDto register(@RequestBody @Valid UserDto userDto) {
+    public JwtDto register(@RequestBody @Valid UserInfoDto userDto) {
         return Optional.of(userDto)
                 .map(userMapper::toEntity)
                 .map(user->authService.handleRegister(getRootUrl(),user))

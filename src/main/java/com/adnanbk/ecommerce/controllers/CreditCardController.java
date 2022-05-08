@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.CreditCardDto;
+import com.adnanbk.ecommerce.dto.CreditCardEditDto;
 import com.adnanbk.ecommerce.mappers.CreditCardMapper;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ public class CreditCardController {
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
     @ResponseStatus(HttpStatus.CREATED)
-    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto, Principal principal) {
+    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, Principal principal) {
        return Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
                 .map(card->creditCardService.saveCard(card,principal.getName()))
@@ -42,15 +43,14 @@ public class CreditCardController {
     }
     @PutMapping("/{id}")
     @ApiOperation(value = "update a user credit card")
-    public CreditCardDto updateCreditCard(@RequestBody @Valid CreditCardDto creditCardDto,@PathVariable Long id,Principal principal) {
-        return Optional.of(creditCardDto)
+    public void updateCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, @PathVariable Long id, Principal principal) {
+          Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
-                .map(card->creditCardService.update(card,id,principal.getName()))
-                .map(creditCardMapper::toDto).orElseThrow();
+                .ifPresent(card->creditCardService.update(card,id,principal.getName()));
     }
 
     @PatchMapping("/active/{id}")
-    @ApiOperation(value = "make the user credit card primary")
+    @ApiOperation(value = "active the user credit card")
     public void activateCreditCard(@PathVariable long id) {
          creditCardService.activateCreditCard(id);
     }

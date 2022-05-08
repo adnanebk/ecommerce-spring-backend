@@ -31,7 +31,7 @@ public class ProductController {
 
 
 
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = Product.class)
@@ -39,7 +39,7 @@ public class ProductController {
           return this.imageService.upload(file).thenApplyAsync(res->productService.addProduct(product));
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = Product.class)
     public CompletableFuture<Product> updateProduct(@Valid @RequestPart Product product, @RequestPart(required = false) MultipartFile file) {

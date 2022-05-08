@@ -2,6 +2,7 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
+import com.adnanbk.ecommerce.dto.UserInfoDto;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
@@ -47,15 +48,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public AppUser update(AppUser user,Long id) {
+    public AppUser update(UserInfoDto user, Long id) {
         return userRepo.findById(id)
                 .map(us-> {
-                    // update only the needed fields
-                    us.setEmail(user.getEmail());
-                    us.setFirstName(user.getFirstName());
-                    us.setCity(user.getCity());
-                    us.setCountry(user.getCountry());
-                    us.setStreet(user.getStreet());
+                    BeanUtils.copyProperties(user,us);
                    return userRepo.save(us);
                 }).orElseThrow();
 

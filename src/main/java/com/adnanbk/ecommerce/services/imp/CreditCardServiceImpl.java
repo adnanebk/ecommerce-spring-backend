@@ -5,7 +5,6 @@ import com.adnanbk.ecommerce.reposetories.CreditCardRepo;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,14 +52,8 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    @Transactional
-    public CreditCard update(CreditCard creditCard, Long id,String email) {
-        return userRepo.findByEmail(email).map(user-> creditCardRepo.findById(id).map(card->{
-                card.setCardType(creditCard.getCardType());
-                card.setCardNumber(creditCard.getCardNumber());
-                card.setExpirationDate(creditCard.getExpirationDate());
-               card.setAppUser(user);
-               return this.creditCardRepo.save(card);
-           }).orElseThrow()).orElseThrow();
+    public void update(CreditCard creditCard, Long id, String email) {
+         userRepo.findByEmail(email)
+                .ifPresent(user-> this.creditCardRepo.update(creditCard.getCardType(),creditCard.getCardNumber(),creditCard.getExpirationDate(),id));
     }
 }
