@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Add Heroku remote
-        run: heroku git:remote --app $ang-shop
+        run: heroku git:remote --app ang-shop
       - uses: actions/checkout@v2
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
