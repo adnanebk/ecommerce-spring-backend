@@ -21,7 +21,7 @@ import java.util.Date;
         uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueSku")})
 @Getter
 @Setter
-@DynamicUpdate
+@DynamicUpdate // to generate an update sql statement that contains only updated fields
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Product {
 

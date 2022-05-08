@@ -4,15 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.DynamicUpdate;
-
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@DynamicUpdate
 @Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "uniqueEmail")})
 @Getter
 @Setter
