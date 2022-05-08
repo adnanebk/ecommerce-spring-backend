@@ -13,5 +13,5 @@ public interface UserService {
 
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto, String email);
 
-    AppUser update(UserInfoDto user, Long id);
+    void update(UserInfoDto user, Long id);
 }

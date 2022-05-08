@@ -9,7 +9,6 @@ import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.UserService;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,13 +47,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public AppUser update(UserInfoDto user, Long id) {
-        return userRepo.findById(id)
-                .map(us-> {
-                    BeanUtils.copyProperties(user,us);
-                   return userRepo.save(us);
-                }).orElseThrow();
-
+    public void update(UserInfoDto user, Long id) {
+       userRepo.update(user.getFirstName(),user.getLastName(),user.getEmail(),user.getCity(),user.getCountry(),user.getStreet(),id);
     }
 
 
