@@ -1,7 +1,6 @@
 name: Heroku Deploy
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
@@ -15,5 +14,5 @@ jobs:
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ang-shop
+          heroku_app_name: "ang-shop"
           heroku_email: "benkouider.adnane@gmail.com"
