@@ -118,9 +118,9 @@ public class AuthServiceImp implements AuthService {
     private AppUser verifyConfirmationToken(String token) {
           return   confirmationTokenRepo.findById(Objects.requireNonNullElse(token,""))
                     .map(confirmationToken->{
-                        if (confirmationToken.getExpirationDate().isAfter(LocalDate.now()))
+                        if (confirmationToken.getExpirationDate().isBefore(LocalDate.now()))
                            throw new InvalidTokenException("token is expired");
-                        if(!confirmationToken.getAppUser().isEnabled())
+                        if(confirmationToken.getAppUser().isEnabled())
                             throw new InvalidTokenException("token is already enabled");
                         return confirmationToken.getAppUser();
                         }
