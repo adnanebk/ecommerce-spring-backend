@@ -116,16 +116,16 @@ public class AuthServiceImp implements AuthService {
     }
 
     private AppUser verifyConfirmationToken(String token) {
+          return   confirmationTokenRepo.findById(Objects.requireNonNullElse(token,""))
+                    .map(confirmationToken->{
+                        if (confirmationToken.getExpirationDate().isAfter(LocalDate.now()))
+                           throw new InvalidTokenException("token is expired");
+                        if(!confirmationToken.getAppUser().isEnabled())
+                            throw new InvalidTokenException("token is already enabled");
+                        return confirmationToken.getAppUser();
+                        }
+                    ).orElseThrow(()->new InvalidTokenException("the token is not found"));
 
-        if (StringUtils.hasLength(token)) {
-            var confirmationToken = confirmationTokenRepo.findById(token)
-                    .orElseThrow(()->new InvalidTokenException("the token is not found"));
-            if (confirmationToken.getExpirationDate().isAfter(LocalDate.now())
-                    && !confirmationToken.getAppUser().isEnabled()){
-                return confirmationToken.getAppUser();
-            }
-        }
-        throw new InvalidTokenException("token is invalid or it has been expired");
     }
 
     private JwtDto generateTokens(AppUser user, String refreshToken) {
