@@ -6,13 +6,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
-import javax.persistence.Transient;
-
 @Getter
 @Setter
 public final class OnRegistrationCompleteEvent extends ApplicationEvent {
     private  String url;
-    @Transient
     private  AppUser user;
 
     public OnRegistrationCompleteEvent(String url, AppUser user) {
