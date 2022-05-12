@@ -30,8 +30,6 @@ public class UserDto {
     private String city;
     private String country;
 
-    private String password;
-
     private Collection<Role> roles=new HashSet<>();
 
 
