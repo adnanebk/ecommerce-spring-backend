@@ -34,11 +34,11 @@ public class OrderController {
     @PostMapping
     @ApiOperation(value = "create a new order")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserOrderDto saveOrder(@RequestBody @Valid UserOrderDto userOrderDto, Principal principal) {
+    public UserOrderDto saveOrder(@RequestBody @Valid UserOrderDto userOrderDto) {
 
         return Optional.of(userOrderDto)
                 .map(orderMapper::toEntity)
-                .map(order->userOderService.saveOrder(order,principal.getName()))
+                .map(userOderService::saveOrder)
                 .map(orderMapper::toDto).orElseThrow();
     }
 

@@ -4,9 +4,9 @@ import com.adnanbk.ecommerce.models.CreditCard;
 import com.adnanbk.ecommerce.models.UserOrder;
 import com.adnanbk.ecommerce.reposetories.OrderItemRepo;
 import com.adnanbk.ecommerce.reposetories.OrderRepository;
+import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import com.adnanbk.ecommerce.services.UserOderService;
-import com.adnanbk.ecommerce.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,27 +18,27 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserOrderServiceImp implements UserOderService {
     private OrderRepository orderRepository;
-    private UserService userService;
+    private AuthService authService;
     private OrderItemRepo orderItemRepo;
     private CreditCardService creditCardService;
 
 
     @Override
     @Transactional
-    public UserOrder saveOrder(UserOrder userOrder, String email) {
-        var appUser = userService.getUserByEmail(email);
+    public UserOrder saveOrder(UserOrder userOrder) {
+        var appUser = authService.getAuthenticatedUser();
         var creditCard = userOrder.getCreditCard();
          creditCard.setAppUser(appUser);
-         userOrder.setCreditCard(getOrCreateCreditCardIfNotExist(creditCard,email));
+         userOrder.setCreditCard(getOrCreateCreditCardIfNotExist(creditCard));
         userOrder.setAppUser(appUser);
         userOrder.setUserOrderItems(orderItemRepo.saveAll(userOrder.getOrderItems()));
         return orderRepository.save(userOrder);
     }
 
-    private CreditCard getOrCreateCreditCardIfNotExist(CreditCard creditCard, String email) {
+    private CreditCard getOrCreateCreditCardIfNotExist(CreditCard creditCard) {
         return Optional.ofNullable(creditCard.getCardNumber())
                 .map(cardNumber -> creditCardService.getByCardNumber(cardNumber)
-                        .orElseGet(()->creditCardService.saveCard(creditCard,email))).orElseThrow();
+                        .orElseGet(()->creditCardService.saveCard(creditCard))).orElseThrow();
     }
 
     @Override

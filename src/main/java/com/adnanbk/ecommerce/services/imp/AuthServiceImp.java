@@ -3,7 +3,6 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.dto.UserDto;
-import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
@@ -16,7 +15,6 @@ import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -46,7 +44,6 @@ public class AuthServiceImp implements AuthService {
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
     private final ConfirmationTokenRepository confirmationTokenRepo;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${front.url}")
     private String frontUrl;
@@ -87,10 +84,9 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public JwtDto handleRegister(String rootUrl, AppUser user) {
+    public JwtDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user = saveUser(user);
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user));
         return generateTokens(user);
     }
 
@@ -102,17 +98,18 @@ public class AuthServiceImp implements AuthService {
         return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
     }
 
-    @Override
-    public void sendEmailConfirmation(String rootUrl, String email) {
-     this.userRepo.findByEmail(email)
-             .ifPresent(user->eventPublisher.publishEvent(new OnRegistrationCompleteEvent(rootUrl,user)));
-    }
 
     @Override
     public String enableUser(String token) {
         var user = verifyConfirmationTokenAndGetUser(token);
         userRepo.enableUser(user.getId(),true);
         return frontUrl + "?verified=true";
+    }
+
+    @Override
+    public AppUser getAuthenticatedUser() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+         return  userRepo.findByEmail(authentication.getName()).get();
     }
 
     private AppUser verifyConfirmationTokenAndGetUser(String token) {

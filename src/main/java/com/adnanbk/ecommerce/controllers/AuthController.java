@@ -3,11 +3,14 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserInfoDto;
+import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.dto.UserInputDto;
+import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +29,7 @@ public class AuthController {
 
     private final AuthService authService;
     private final UserMapper userMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     private String getRootUrl() {
@@ -36,10 +40,14 @@ public class AuthController {
     @PostMapping(value = "register")
     @ApiOperation(value = "register a new user", response = JwtDto.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtDto register(@RequestBody @Valid UserInfoDto userDto) {
+    public JwtDto register(@RequestBody @Valid UserInputDto userDto) {
         return Optional.of(userDto)
                 .map(userMapper::toEntity)
-                .map(user->authService.handleRegister(getRootUrl(),user))
+                .map(user-> {
+                    JwtDto jwtDto =  authService.handleRegister(user);
+                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user));
+                    return  jwtDto;
+                })
                 .orElseThrow();
 
 
@@ -70,7 +78,11 @@ public class AuthController {
     public ResponseEntity<String> enableUser(@RequestParam String token) {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(authService.enableUser(token))).build();
     }
-
+    @GetMapping("current-user")
+    @ApiOperation(value = "get authenticated user details")
+    public UserDto getAuthUser() {
+        return userMapper.toDto(authService.getAuthenticatedUser());
+    }
     @PostMapping("refresh-token")
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,10 +91,10 @@ public class AuthController {
 
     }
 
-    @PatchMapping("confirm")
+    @PatchMapping("send-confirmation")
     @ApiOperation(value = "send a confirmation token to the user email")
-    public void sendEmailConfirmation(@RequestBody String email) {
-        authService.sendEmailConfirmation(getRootUrl(),email);
+    public void sendEmailConfirmation() {
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));
     }
 
 

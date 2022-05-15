@@ -3,8 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
-import com.adnanbk.ecommerce.dto.UserDto;
-import com.adnanbk.ecommerce.dto.UserInfoDto;
+import com.adnanbk.ecommerce.dto.UserInputDto;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.UserService;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,21 +26,16 @@ private final UserService userService;
 private final FileService imageService;
 private final UserMapper userMapper;
 
-    @GetMapping("email/{email}")
-    @ApiOperation(value = "Get a user by its email")
-    public UserDto getUserByEmail(@PathVariable String email) {
-        return userMapper.toDto(userService.getUserByEmail(email));
-    }
 
     @PatchMapping("change-password")
     @ApiOperation(value = "change the user password")
-    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto, Principal principal) {
-        this.userService.changePassword(changeUserPasswordDto, principal.getName());
+    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
+        this.userService.changePassword(changeUserPasswordDto);
     }
 
     @PatchMapping("/{id}")
     @ApiOperation(value = "change user information")
-    public void changeUserInformation(@RequestBody @Valid UserInfoDto userDto, @PathVariable  Long id)
+    public void changeUserInformation(@RequestBody @Valid UserInputDto userDto, @PathVariable  Long id)
     {
         Optional.of(userDto)
                 .ifPresent(user->userService.update(user,id));
@@ -50,8 +43,8 @@ private final UserMapper userMapper;
     @PatchMapping(value = "upload-image")
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
-        return this.imageService.upload(file).thenApplyAsync(fileName-> this.userService.changeUserImage(fileName,principal.getName()));
+    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file) {
+        return this.imageService.upload(file).thenApplyAsync(this.userService::changeUserImage);
     }
 }
 

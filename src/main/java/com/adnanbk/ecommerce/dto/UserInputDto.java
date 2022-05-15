@@ -11,7 +11,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
-public class UserInfoDto {
+public class UserInputDto {
     @Email
     @NotEmpty
     private String email;

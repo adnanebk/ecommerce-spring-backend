@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface CreditCardService {
 
-    CreditCard saveCard(CreditCard creditCard, String email);
+    CreditCard saveCard(CreditCard creditCard);
 
     void activateCreditCard(Long id);
 
-    List<CreditCard> getByEmail(String email);
+    List<CreditCard> getAuthenticatedUserCreditCards();
 
     void update(CreditCard creditCard, Long id);
 

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +24,8 @@ public class CreditCardController {
 
     @GetMapping
     @ApiOperation(value = "get all credit cards by the email of the authenticated a user")
-    public List<CreditCardDto> getUserCreditCards(Principal principal) {
-        return creditCardService.getByEmail(principal.getName())
+    public List<CreditCardDto> getUserCreditCards() {
+        return creditCardService.getAuthenticatedUserCreditCards()
                 .stream().map(creditCardMapper::toDto).toList();
     }
 
@@ -34,10 +33,10 @@ public class CreditCardController {
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
     @ResponseStatus(HttpStatus.CREATED)
-    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, Principal principal) {
+    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto) {
        return Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
-                .map(card->creditCardService.saveCard(card,principal.getName()))
+                .map(card->creditCardService.saveCard(card))
                 .map(creditCardMapper::toDto).orElseThrow();
 
     }

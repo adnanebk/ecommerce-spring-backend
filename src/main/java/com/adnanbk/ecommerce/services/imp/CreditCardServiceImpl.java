@@ -2,8 +2,8 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.models.CreditCard;
 import com.adnanbk.ecommerce.reposetories.CreditCardRepo;
+import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.CreditCardService;
-import com.adnanbk.ecommerce.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,15 +16,14 @@ import java.util.Optional;
 public class CreditCardServiceImpl implements CreditCardService {
 
     private CreditCardRepo creditCardRepo;
-    private UserService userService;
-
+    private final AuthService authService;
 
 
     @Override
     @Transactional
-    public CreditCard saveCard(CreditCard creditCard, String email) {
-       var user =   userService.getUserByEmail(email);
-            activeCreditCardIfNew(creditCard, email);
+    public CreditCard saveCard(CreditCard creditCard) {
+       var user =   authService.getAuthenticatedUser();
+            activeCreditCardIfNew(creditCard, user.getEmail());
             creditCard.setAppUser(user);
             // to make sure not updated or create a dto
             creditCard.setId(null);
@@ -46,8 +45,9 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public List<CreditCard> getByEmail(String email) {
-        return creditCardRepo.findAllByAppUser_Email(email);
+    public List<CreditCard> getAuthenticatedUserCreditCards() {
+        var user = authService.getAuthenticatedUser();
+        return creditCardRepo.findAllByAppUser_Email(user.getEmail());
     }
 
     @Override
