@@ -1,8 +1,10 @@
 package com.adnanbk.ecommerce.services.imp;
 
+import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
 import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
@@ -71,8 +73,7 @@ public class AuthServiceImp implements AuthService {
     public JwtDto handleLogin(LoginUserDto appUser) {
 
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            securityLogin(appUser);
         }
         catch (BadCredentialsException e) {
             throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-email-or-password"));
@@ -81,6 +82,11 @@ public class AuthServiceImp implements AuthService {
         var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
 
         return generateTokens(currentUser);
+    }
+
+    private void securityLogin(LoginUserDto appUser) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override
@@ -109,7 +115,16 @@ public class AuthServiceImp implements AuthService {
     @Override
     public AppUser getAuthenticatedUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-         return  userRepo.findByEmail(authentication.getName()).get();
+         return  userRepo.findByEmail(authentication.getName()).orElseThrow();
+    }
+
+    @Override
+    public void changePassword(ChangeUserPasswordDto changeUserPasswordDto) {
+        AppUser user = this.getAuthenticatedUser();
+        if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
+            throw new InvalidPasswordException(messagesUtil.getDefaultMessage("error.invalid-password"));
+        var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
+        userRepo.updatePassword(user.getId(),newPassword);
     }
 
     private AppUser verifyConfirmationTokenAndGetUser(String token) {

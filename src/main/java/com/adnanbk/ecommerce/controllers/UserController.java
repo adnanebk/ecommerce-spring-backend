@@ -4,7 +4,6 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.UserInputDto;
-import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -24,14 +23,7 @@ public class UserController {
 
 private final UserService userService;
 private final FileService imageService;
-private final UserMapper userMapper;
 
-
-    @PatchMapping("change-password")
-    @ApiOperation(value = "change the user password")
-    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
-        this.userService.changePassword(changeUserPasswordDto);
-    }
 
     @PatchMapping("/{id}")
     @ApiOperation(value = "change user information")

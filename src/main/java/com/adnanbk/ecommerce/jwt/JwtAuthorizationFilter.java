@@ -31,6 +31,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String reqUri = request.getRequestURI();
         return !reqUri.contains("orders") &&
                 !reqUri.contains("user") &&
+                !reqUri.contains("/api/auth/user/**") &&
                 !reqUri.contains("products/v2") &&
                 !reqUri.contains("creditCards");
     }

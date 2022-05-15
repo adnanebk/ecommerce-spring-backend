@@ -42,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/orders/**", "/api/user*/**", "/api/creditCards/**").authenticated()
+                .antMatchers("/api/orders/**", "/api/user*/**", "/api/creditCards/**", "/api/auth/user/**").authenticated()
                 .antMatchers("/api/products/v2/**").hasRole("ADMIN")
                 //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();

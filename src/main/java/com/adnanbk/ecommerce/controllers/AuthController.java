@@ -1,10 +1,7 @@
 package com.adnanbk.ecommerce.controllers;
 
 
-import com.adnanbk.ecommerce.dto.JwtDto;
-import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserDto;
-import com.adnanbk.ecommerce.dto.UserInputDto;
+import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
@@ -78,20 +75,25 @@ public class AuthController {
     public ResponseEntity<String> enableUser(@RequestParam String token) {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(authService.enableUser(token))).build();
     }
-    @GetMapping("current-user")
-    @ApiOperation(value = "get authenticated user details")
-    public UserDto getAuthUser() {
-        return userMapper.toDto(authService.getAuthenticatedUser());
-    }
     @PostMapping("refresh-token")
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto refreshNewToken(@RequestBody String refreshToken) {
         return this.authService.refreshNewToken(refreshToken);
-
+    }
+    @GetMapping("user")
+    @ApiOperation(value = "get authenticated user details")
+    public UserDto getAuthUser() {
+        return userMapper.toDto(authService.getAuthenticatedUser());
     }
 
-    @PatchMapping("send-confirmation")
+    @PatchMapping("user/change-password")
+    @ApiOperation(value = "change the user password")
+    public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
+        this.authService.changePassword(changeUserPasswordDto);
+    }
+
+    @PatchMapping("user/send-confirmation")
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation() {
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));
