@@ -45,8 +45,9 @@ public class ImageUploadAspect {
     @Around(value = "execution(* com.adnanbk.ecommerce.services.imp.ProductServiceImp.updateProduct(..))")
     public Product updateProductAspect(ProceedingJoinPoint joinPoint) throws Throwable {
        var productArg = (Product) joinPoint.getArgs()[0];
+       var id = (Long) joinPoint.getArgs()[1];
         productArg.setImage(productArg.getImage().replace(imagesPathUrl,""));
-         Product product = (Product) joinPoint.proceed(new Object[]{productArg});
+         Product product = (Product) joinPoint.proceed(new Object[]{productArg,id});
         product.setImage(imagesPathUrl+product.getImage());
         return product;
     }
