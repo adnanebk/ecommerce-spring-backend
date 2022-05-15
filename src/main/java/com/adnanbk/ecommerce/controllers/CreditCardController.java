@@ -43,15 +43,22 @@ public class CreditCardController {
     }
     @PutMapping("/{id}")
     @ApiOperation(value = "update a user credit card")
-    public void updateCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, @PathVariable Long id, Principal principal) {
+    public void updateCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, @PathVariable Long id) {
           Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
-                .ifPresent(card->creditCardService.update(card,id,principal.getName()));
+                .ifPresent(card->creditCardService.update(card,id));
     }
 
     @PatchMapping("/active/{id}")
     @ApiOperation(value = "active the user credit card")
-    public void activateCreditCard(@PathVariable long id) {
+    public void activateCreditCard(@PathVariable Long id) {
          creditCardService.activateCreditCard(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "remove a user credit card")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeCreditCard( @PathVariable Long id) {
+      creditCardService.removeById(id);
     }
 }

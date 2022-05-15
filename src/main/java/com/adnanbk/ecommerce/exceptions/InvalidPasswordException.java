@@ -4,11 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class InvalidPasswordException extends  RuntimeException {
-    private String fieldName;
-    public InvalidPasswordException(String message, String fieldName) {
+    private final String fieldName="currentPassword";
+    public InvalidPasswordException(String message) {
         super(message);
-        this.fieldName=fieldName;
-
     }
 
 }

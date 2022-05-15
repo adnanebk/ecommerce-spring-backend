@@ -2,31 +2,33 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.models.CreditCard;
 import com.adnanbk.ecommerce.reposetories.CreditCardRepo;
-import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.CreditCardService;
+import com.adnanbk.ecommerce.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class CreditCardServiceImpl implements CreditCardService {
 
     private CreditCardRepo creditCardRepo;
-    private UserRepo userRepo;
+    private UserService userService;
 
 
 
     @Override
     @Transactional
     public CreditCard saveCard(CreditCard creditCard, String email) {
-      return   userRepo.findByEmail(email).map(user->{
+       var user =   userService.getUserByEmail(email);
             activeCreditCardIfNew(creditCard, email);
             creditCard.setAppUser(user);
+            // to make sure not updated or create a dto
+            creditCard.setId(null);
             return creditCardRepo.save(creditCard);
-        }).orElseThrow();
 
     }
 
@@ -37,13 +39,10 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     @Transactional
-    public void activateCreditCard(long id) {
-        var currentCard = creditCardRepo.findCurrentActivatedCard();
+    public void activateCreditCard(Long id) {
+        var currentActiveCard = creditCardRepo.findCurrentActivatedCard().orElseThrow();
+        creditCardRepo.updateActiveCard(currentActiveCard.getId(),false);
         creditCardRepo.updateActiveCard(id,true);
-
-        currentCard.ifPresent(card->creditCardRepo.updateActiveCard(card.getId(),false));
-
-
     }
 
     @Override
@@ -52,8 +51,18 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public void update(CreditCard creditCard, Long id, String email) {
-         userRepo.findByEmail(email)
-                .ifPresent(user-> this.creditCardRepo.update(creditCard.getCardType(),creditCard.getCardNumber(),creditCard.getExpirationDate(),id));
+    public void update(CreditCard creditCard, Long id) {
+                this.creditCardRepo.update(creditCard.getCardType(),creditCard.getCardNumber(),creditCard.getExpirationDate(),id);
+    }
+
+
+    @Override
+    public Optional<CreditCard> getByCardNumber(String cardNumber) {
+        return creditCardRepo.findByCardNumber(cardNumber);
+    }
+
+    @Override
+    public void removeById(Long id) {
+     creditCardRepo.deleteById(id);
     }
 }

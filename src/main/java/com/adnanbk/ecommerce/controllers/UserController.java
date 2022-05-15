@@ -31,8 +31,7 @@ private final UserMapper userMapper;
     @GetMapping("email/{email}")
     @ApiOperation(value = "Get a user by its email")
     public UserDto getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email)
-                .map(userMapper::toDto).orElseThrow();
+        return userMapper.toDto(userService.getUserByEmail(email));
     }
 
     @PatchMapping("change-password")

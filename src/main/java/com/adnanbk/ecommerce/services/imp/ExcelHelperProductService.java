@@ -10,6 +10,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ValidationException;
@@ -30,6 +31,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
             "Category"};
 
     static final String SHEET = "Products";
+    public static final String DEFAULT_IMAGE = "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0yNTEtbWluZC1pbnN0Z3JhbS0wMy5qcGc.jpg";
 
     private final ProductCategoryRepository categoryRepo;
 
@@ -55,12 +57,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                 Row currentRow = rows.next();
                 currentRow.getFirstCellNum();
                 if (currentRow.getPhysicalNumberOfCells() > 0) {
-                    Product product = new Product();
-
-                    boolean isRowExist = extractRowData(currentRow, product);
-
-
-                    if (isRowExist)
+                    Product product = extractProductFromRow(currentRow);
+                    if (StringUtils.hasLength(product.getImage()))
                         products.add(product);
                 }
             }
@@ -71,43 +69,38 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         }
     }
 
-    private boolean extractRowData(Row currentRow, Product product) {
-        int extractedCellsNum = 0;
+    private Product extractProductFromRow(Row currentRow) {
+        Product product=new Product();
         for (int i = 0; i < currentRow.getLastCellNum(); i++) {
-            extractedCellsNum += extractCellData(currentRow, i, product);
+            var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            setProductPropertiesFromCell(currentCell,i, product);
         }
-        return extractedCellsNum > 0;
+        return product;
     }
 
-    private int extractCellData(Row currentRow, int cellIndex, Product product) {
-        product.setImage("https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0yNTEtbWluZC1pbnN0Z3JhbS0wMy5qcGc.jpg");
-        var currentCell = currentRow.getCell(cellIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+    private void setProductPropertiesFromCell(Cell currentCell, int cellIndex, Product product) {
+        product.setImage(DEFAULT_IMAGE);
         if (currentCell != null) {
             try {
                 switch (cellIndex) {
-
                     case 0 -> product.setName(currentCell.getStringCellValue());
                     case 1 -> product.setDescription(currentCell.getStringCellValue());
                     case 2 -> product.setSku(currentCell.getStringCellValue());
                     case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
-
                     case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
                     case 5 -> {
                         var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
                         if (category == null)
-                            throw new ValidationException("you must choose correct category");
-
+                            throw new ValidationException("category not found");
                         product.setCategory(category);
                     }
                 }
-                return 1;
             } catch (IllegalStateException ex) {
                 throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
 
             }
 
         }
-        return 0;
     }
 
 
@@ -127,7 +120,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
             int rowIdx = 1;
             for (Product product : products) {
-                rowIdx = fillRowWithProduct(sheet, rowIdx, product);
+                fillRowWithProduct(sheet, rowIdx, product);
             }
 
             workbook.write(out);

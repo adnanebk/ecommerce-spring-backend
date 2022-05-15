@@ -1,14 +1,13 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.dto.JwtDto;
 import com.adnanbk.ecommerce.services.SocialService;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
@@ -20,22 +19,15 @@ public class GoogleService implements SocialService {
 
 
     @Override
-    public boolean verify(JwtDto jwtDto) {
-        String token = jwtDto.getToken();
-        if (token == null) {
-            return false;
-        }
-
-        return doVerify(token);
-
+    public boolean verify(String authToken) {
+       return Optional.ofNullable(authToken)
+                .map(this::doVerify)
+                .orElse(false);
     }
 
     private boolean doVerify(String token) {
         try {
-            GoogleIdToken idToken = googleVerifier.verify(token);
-
-            return (idToken != null);
-
+            return Optional.ofNullable(googleVerifier.verify(token)).isPresent();
 
         } catch (GeneralSecurityException | IOException e) {
             return false;

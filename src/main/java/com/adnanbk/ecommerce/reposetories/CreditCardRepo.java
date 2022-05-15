@@ -39,4 +39,7 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE CreditCard c SET c.cardType = :cardType,c.cardNumber = :cardNumber,c.expirationDate = :expirationDate WHERE c.id= :id")
     void update(String cardType, String cardNumber, LocalDate expirationDate, Long id);
+
+    @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
+    Optional<CreditCard> findByCardNumber(String cardNumber);
 }

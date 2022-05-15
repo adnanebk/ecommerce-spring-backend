@@ -24,7 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -32,6 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -57,13 +57,13 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
-        googleService.verify(jwtDto);
+        googleService.verify(jwtDto.getToken());
         return doLoginSocialUser(jwtDto.getAppUser());
     }
 
     @Override
     public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
-        boolean isTokenValid = facebookService.verify(jwtDto);
+        boolean isTokenValid = facebookService.verify(jwtDto.getToken());
         if (!isTokenValid)
             throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-credential"));
         return doLoginSocialUser(jwtDto.getAppUser());
@@ -110,12 +110,12 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public String enableUser(String token) {
-        var user = verifyConfirmationToken(token);
+        var user = verifyConfirmationTokenAndGetUser(token);
         userRepo.enableUser(user.getId(),true);
         return frontUrl + "?verified=true";
     }
 
-    private AppUser verifyConfirmationToken(String token) {
+    private AppUser verifyConfirmationTokenAndGetUser(String token) {
           return   confirmationTokenRepo.findById(Objects.requireNonNullElse(token,""))
                     .map(confirmationToken->{
                         if (confirmationToken.getExpirationDate().isBefore(LocalDate.now()))
@@ -165,11 +165,10 @@ public class AuthServiceImp implements AuthService {
 
         // each iteration of the loop randomly chooses a character from the given
         // ASCII range and appends it to the `StringBuilder` instance
-
-        for (int i = 0; i < 6; i++) {
-            int randomIndex = random.nextInt(chars.length());
-            sb.append(chars.charAt(randomIndex));
-        }
+        IntStream.range(0,6)
+                .forEach(number->
+                        sb.append(chars.charAt(random.nextInt(chars.length())))
+                );
 
         return sb.toString();
     }

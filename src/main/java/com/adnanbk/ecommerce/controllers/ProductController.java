@@ -39,13 +39,13 @@ public class ProductController {
           return this.imageService.upload(file).thenApplyAsync(res->productService.addProduct(product));
     }
 
-    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = Product.class)
-    public CompletableFuture<Product> updateProduct(@Valid @RequestPart Product product, @RequestPart(required = false) MultipartFile file) {
+    public CompletableFuture<Product> updateProduct(@Valid @RequestPart Product product, @RequestPart(required = false) MultipartFile file,@PathVariable Long id) {
           if(file==null || file.isEmpty())
-              return CompletableFuture.completedFuture((productService.updateProduct(product)));
-           return this.imageService.upload(file).thenApplyAsync(res->productService.updateProduct(product));
+              return CompletableFuture.completedFuture((productService.updateProduct(product,id)));
+           return this.imageService.upload(file).thenApplyAsync(res->productService.updateProduct(product,id));
 
 
     }
@@ -57,7 +57,6 @@ public class ProductController {
         List<Product> updatedProducts = productService.updateProducts(products);
         if (updatedProducts.isEmpty())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Products not found");
-
         return updatedProducts;
     }
 

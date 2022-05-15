@@ -43,10 +43,8 @@ public class ImageServiceImp implements FileService {
     @Async
     public CompletableFuture<String> upload(MultipartFile image) {
 
-        String fileName = Objects.requireNonNullElse(image.getOriginalFilename(), "")
-                .replace(" ", "").trim();
-        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
-            throw new CustomFileException("Image type not supported , we accept only jpg or png files");
+        String fileName = trimImageName(image.getOriginalFilename());
+        validateImageExtension(fileName);
         Path filePath = this.root.resolve(fileName);
         try {
             image.transferTo(filePath);
@@ -69,6 +67,16 @@ public class ImageServiceImp implements FileService {
         } catch (IOException e) {
             throw new CustomFileException("we Could not read the file, please try again");
         }
+    }
+
+    private void validateImageExtension(String fileName) {
+        if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
+            throw new CustomFileException("Image type not supported , we accept only jpg or png files");
+    }
+
+    private String trimImageName(String imageName) {
+        return Objects.requireNonNullElse(imageName, "")
+                .replace(" ", "").trim();
     }
 
 }

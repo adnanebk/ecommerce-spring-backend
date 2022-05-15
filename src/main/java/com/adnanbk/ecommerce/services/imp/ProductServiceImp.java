@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,10 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Product updateProduct(Product product) {
-        return productRepo.findById(product.getId()).map(prod->{
-             productMapper.mapProduct(product, prod);
-             return productRepo.save(product);
+    public Product updateProduct(Product product,Long id) {
+        return productRepo.findById(id).map(prod->{
+               productMapper.mapProductProperties(product, prod);
+               return productRepo.save(product);
          }).orElseThrow();
 
     }
@@ -50,27 +51,27 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public void removeProducts(List<Long> productsIds) {
-        productRepo.deleteInBatch(productRepo.findAllById(productsIds));
+        productRepo.deleteAllInBatch(productRepo.findAllById(productsIds));
     }
 
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {
         try {
             List<Product> products = excelHelper.excelToList(multipartFile.getInputStream());
-            if (!products.isEmpty())
-                return productRepo.saveAll(products);
-
+            return Optional.ofNullable(products)
+                    .map(productRepo::saveAll)
+                    .orElseThrow();
         } catch (IOException e) {
             throw new CustomFileException("We can't process the file,please try again");
         }
-        throw new CustomFileException("there are no product to process");
 
     }
 
     @Override
     public ByteArrayInputStream loadToExcel(List<Long> productIds) {
-        if (productIds != null && !productIds.isEmpty())
-            return excelHelper.listToExcel(productRepo.findAllById(productIds));
-        return excelHelper.listToExcel(productRepo.findAll());
+         return   Optional.ofNullable(productIds)
+                   .map(productRepo::findAllById)
+                   .map(excelHelper::listToExcel)
+                   .orElseThrow();
     }
 
 
