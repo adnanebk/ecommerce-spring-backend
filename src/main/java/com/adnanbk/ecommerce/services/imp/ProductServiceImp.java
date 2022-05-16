@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
-import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
@@ -22,7 +21,6 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
-    private final ProductMapper productMapper;
 
 
     @Override
@@ -32,20 +30,15 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Product updateProduct(Product product,Long id) {
-        return productRepo.findById(id).map(prod->{
-               productMapper.mapProductProperties(product, prod);
+               product.setId(id);
                return productRepo.save(product);
-         }).orElseThrow();
 
     }
 
     @Override
     @Transactional
     public List<Product> updateProducts(List<Product> products) {
-        var productsInDb = productRepo.findAllById(products.stream()
-                .map(Product::getId).toList());
-        productMapper.mapProducts(products, productsInDb);
-        return productRepo.saveAll(productsInDb);
+        return productRepo.saveAll(products);
     }
 
 
@@ -67,7 +60,7 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public ByteArrayInputStream loadToExcel(List<Long> productIds) {
+    public ByteArrayInputStream convertToExcel(List<Long> productIds) {
          return   Optional.ofNullable(productIds)
                    .map(productRepo::findAllById)
                    .map(excelHelper::listToExcel)

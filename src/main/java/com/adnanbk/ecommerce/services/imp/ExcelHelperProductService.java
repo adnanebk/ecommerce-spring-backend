@@ -10,7 +10,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ValidationException;
@@ -34,6 +33,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     public static final String DEFAULT_IMAGE = "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0yNTEtbWluZC1pbnN0Z3JhbS0wMy5qcGc.jpg";
 
     private final ProductCategoryRepository categoryRepo;
+    private  boolean hasRowAnyValue=false;
 
     public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
@@ -57,8 +57,9 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                 Row currentRow = rows.next();
                 currentRow.getFirstCellNum();
                 if (currentRow.getPhysicalNumberOfCells() > 0) {
+                    hasRowAnyValue=false;
                     Product product = extractProductFromRow(currentRow);
-                    if (StringUtils.hasLength(product.getImage()))
+                    if (hasRowAnyValue)
                         products.add(product);
                 }
             }
@@ -71,6 +72,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private Product extractProductFromRow(Row currentRow) {
         Product product=new Product();
+        product.setImage(DEFAULT_IMAGE);
         for (int i = 0; i < currentRow.getLastCellNum(); i++) {
             var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
             setProductPropertiesFromCell(currentCell,i, product);
@@ -79,8 +81,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     }
 
     private void setProductPropertiesFromCell(Cell currentCell, int cellIndex, Product product) {
-        product.setImage(DEFAULT_IMAGE);
         if (currentCell != null) {
+            hasRowAnyValue=true;
             try {
                 switch (cellIndex) {
                     case 0 -> product.setName(currentCell.getStringCellValue());
@@ -97,9 +99,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                 }
             } catch (IllegalStateException ex) {
                 throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
-
             }
-
         }
     }
 

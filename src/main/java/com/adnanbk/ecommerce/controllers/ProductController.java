@@ -80,7 +80,7 @@ public class ProductController {
     downloadExcelFromProducts(@PathVariable List<Long> ids) {
 return  CompletableFuture.supplyAsync(()->{
     String filename = "products-" + LocalDate.now() + ".xlsx";
-    InputStreamResource file = new InputStreamResource(productService.loadToExcel(ids));
+    InputStreamResource file = new InputStreamResource(productService.convertToExcel(ids));
     return ResponseEntity.ok()
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
