@@ -56,12 +56,12 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
                 currentRow.getFirstCellNum();
-                if (currentRow.getPhysicalNumberOfCells() > 0) {
-                    hasRowAnyValue=false;
-                    Product product = extractProductFromRow(currentRow);
-                    if (hasRowAnyValue)
-                        products.add(product);
-                }
+                if (currentRow.getPhysicalNumberOfCells() <= 0)
+                    continue;
+                hasRowAnyValue = false;
+                Product product = extractProductFromRow(currentRow);
+                if (hasRowAnyValue)
+                    products.add(product);
             }
 
             return products;

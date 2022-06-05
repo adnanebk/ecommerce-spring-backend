@@ -79,7 +79,7 @@ public class AuthController {
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public JwtDto refreshNewToken(@RequestBody String refreshToken) {
-        return this.authService.refreshNewToken(refreshToken);
+        return this.authService.refreshJwtToken(refreshToken);
     }
     @GetMapping("user")
     @ApiOperation(value = "get authenticated user details")

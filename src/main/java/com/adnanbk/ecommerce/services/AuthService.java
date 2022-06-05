@@ -11,7 +11,7 @@ public interface AuthService {
     JwtDto handleLoginWithFacebook(JwtDto jwtDto);
     JwtDto handleLogin(LoginUserDto appUser);
     JwtDto handleRegister(AppUser user);
-    JwtDto refreshNewToken(String refreshToken);
+    JwtDto refreshJwtToken(String refreshToken);
     String enableUser(String token);
 
     AppUser getAuthenticatedUser();

@@ -44,7 +44,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public void removeProducts(List<Long> productsIds) {
-        productRepo.deleteAllInBatch(productRepo.findAllById(productsIds));
+        productRepo.deleteAllById(productsIds);
     }
 
     public List<Product> saveAllFromExcel(MultipartFile multipartFile) {

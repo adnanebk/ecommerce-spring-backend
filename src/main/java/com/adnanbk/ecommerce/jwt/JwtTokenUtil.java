@@ -33,16 +33,12 @@ public class JwtTokenUtil {
 
     //generate token for user
     public String generateToken(String email, Map<String, Object> claims,Date expirationTime) {
-        return doGenerateToken(email, expirationTime, claims);
-    }
-
-
-    private String doGenerateToken(String email, Date expirationDate, Map<String, Object> claims) {
         return JWT.create().withSubject(email)
-                .withExpiresAt(expirationDate)
+                .withExpiresAt(expirationTime)
                 .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withClaim("claims", claims).sign(algorithm);
     }
+
 
 
     public String validateTokenAndReturnSubject(String token) throws JWTVerificationException {
@@ -57,8 +53,7 @@ public class JwtTokenUtil {
                 user.getEmail(), user.getPassword(), user.getRoles().stream().map(us->new SimpleGrantedAuthority(us.getName())).toList());
         // Stores additional details about the authentication request (IP address, certificate serial number etc.).
         if (request != null)
-            usernamePasswordAuthenticationToken
-                    .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         // After setting the Authentication in the context, we specify
         // that the current user is authenticated. So it passes the
         // Spring Security Configurations successfully.

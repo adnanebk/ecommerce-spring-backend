@@ -56,7 +56,9 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
-        googleService.verify(jwtDto.getToken());
+        boolean isTokenValid = googleService.verify(jwtDto.getToken());
+        if (!isTokenValid)
+            throwInvalidCredentialException("error.invalid-credential");
         return doLoginSocialUser(jwtDto.getAppUser());
     }
 
@@ -64,7 +66,7 @@ public class AuthServiceImp implements AuthService {
     public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
         boolean isTokenValid = facebookService.verify(jwtDto.getToken());
         if (!isTokenValid)
-            throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-credential"));
+            throwInvalidCredentialException("error.invalid-credential");
         return doLoginSocialUser(jwtDto.getAppUser());
     }
 
@@ -73,20 +75,16 @@ public class AuthServiceImp implements AuthService {
     public JwtDto handleLogin(LoginUserDto appUser) {
 
         try {
-            securityLogin(appUser);
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-            throw new BadCredentialsException(messagesUtil.getDefaultMessage("error.invalid-email-or-password"));
+            throwInvalidCredentialException("error.invalid-email-or-password");
         }
 
         var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
 
         return generateTokens(currentUser);
-    }
-
-    private void securityLogin(LoginUserDto appUser) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Override
@@ -99,7 +97,7 @@ public class AuthServiceImp implements AuthService {
 
 
     @Override
-    public JwtDto refreshNewToken(String refreshToken) {
+    public JwtDto refreshJwtToken(String refreshToken) {
         String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
         return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
     }
@@ -187,10 +185,11 @@ public class AuthServiceImp implements AuthService {
 
     private AppUser saveUser(AppUser user) {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
-        user = userRepo.save(user);
-        return user;
+        return userRepo.save(user);
     }
 
-
+    private void throwInvalidCredentialException(String code) {
+        throw new BadCredentialsException(messagesUtil.getDefaultMessage(code));
+    }
 
 }

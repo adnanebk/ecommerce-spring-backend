@@ -5,7 +5,7 @@ import com.adnanbk.ecommerce.dto.ResponseError;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
-import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
+import com.adnanbk.ecommerce.exceptions.factories.ResponseErrorFactory;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
@@ -28,14 +28,12 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.adnanbk.ecommerce.exceptions.factories.ResponseErrorFactory.createResponseError;
-
 @RestControllerAdvice
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 @RequiredArgsConstructor
 public class ExceptionsHandler {
 
-    private final ErrorMessagesUtil errorMessagesUtil;
+    private final ResponseErrorFactory responseErrorFactory;
 
     @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
     public ApiErrorDto handleConstraintViolation(RuntimeException ex) {
@@ -45,11 +43,11 @@ public class ExceptionsHandler {
             return generateApiErrors(generateErrors(cause));
         }
         if (NestedExceptionUtils.getMostSpecificCause(ex) instanceof SQLIntegrityConstraintViolationException cause) {
-            return returnUniqueErrorMessage(cause);
+            return generateUniqueErrorMessage(cause);
         }
         if (ex instanceof DataIntegrityViolationException cause) {
 
-            return returnUniqueErrorMessage(cause);
+            return generateUniqueErrorMessage(cause);
         }
         return new ApiErrorDto("An error has been thrown during database modification ");
     }
@@ -60,12 +58,12 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                er -> errors.add(createResponseError(er.getField(), er.getDefaultMessage()))
+                er -> errors.add(responseErrorFactory.create(er.getField(), er.getDefaultMessage()))
         );
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
                     if (x.getDefaultMessage() != null)
-                        errors.add(createResponseError(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
+                        errors.add(responseErrorFactory.create(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
                 });
         return generateApiErrors(errors);
     }
@@ -110,13 +108,13 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(createResponseError(violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(responseErrorFactory.create(violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
 
-    private ApiErrorDto returnUniqueErrorMessage(Exception cause) {
-        ResponseError responseError = createResponseError(cause.getMessage(),errorMessagesUtil);
+    private ApiErrorDto generateUniqueErrorMessage(Exception cause) {
+        ResponseError responseError = responseErrorFactory.create(cause.getMessage());
         if (responseError == null)
             return new ApiErrorDto("An error has been thrown during database modification");
 
