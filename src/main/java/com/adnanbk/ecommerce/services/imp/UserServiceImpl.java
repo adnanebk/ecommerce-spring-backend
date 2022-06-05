@@ -3,9 +3,7 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.UserInputDto;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
-import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.UserService;
-import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +12,11 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
-    private final AuthService authService;
-    private  final ErrorMessagesUtil messagesUtil;
 
 
     @Override
-    public ImageDto changeUserImage(String fileName) {
-        userRepo.updateImage(authService.getAuthenticatedUser().getEmail(),fileName);
+    public ImageDto changeUserImage(String fileName, String email) {
+        userRepo.updateImage(email,fileName);
         return new ImageDto(fileName);
     }
 

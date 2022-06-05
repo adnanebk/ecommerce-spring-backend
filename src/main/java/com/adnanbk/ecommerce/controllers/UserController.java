@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,8 +35,8 @@ private final FileService imageService;
     @PatchMapping(value = "upload-image")
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file) {
-        return this.imageService.upload(file).thenApplyAsync(this.userService::changeUserImage);
+    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
+        return this.imageService.upload(file).thenApplyAsync(fileName->userService.changeUserImage(fileName,principal.getName()));
     }
 }
 

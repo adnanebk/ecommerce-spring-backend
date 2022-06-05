@@ -4,7 +4,7 @@ import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.UserInputDto;
 
 public interface UserService {
-    ImageDto changeUserImage(String fileName);
+    ImageDto changeUserImage(String fileName, String email);
 
     void update(UserInputDto user, Long id);
 }
