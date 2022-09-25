@@ -8,7 +8,7 @@ it has been developed using java 16 and spring boot with spring data rest ,
 
 I have used jwt token with refresh token for authentication with the ability to connect with gmail and facebook ,
 
-For performance i have implemented hibernate caching and spring caching and used asynchronous on some methods to handle
+For performance i have implemented hibernate caching and used asynchronous on some methods to handle
 concurrent requests,
 
 I have used swagger for ducumentation
