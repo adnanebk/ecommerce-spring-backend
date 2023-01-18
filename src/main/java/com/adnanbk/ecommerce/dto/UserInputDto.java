@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Getter
 @Setter
+@JsonIgnoreProperties
 public class UserInputDto {
     @Email
     @NotEmpty
@@ -33,6 +35,5 @@ public class UserInputDto {
     @Length(min = 2, message = "{error.min}")
     private String country;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 }

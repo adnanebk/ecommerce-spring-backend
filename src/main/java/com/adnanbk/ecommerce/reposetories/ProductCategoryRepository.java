@@ -1,19 +1,18 @@
 package com.adnanbk.ecommerce.reposetories;
 
-import com.adnanbk.ecommerce.models.ProductCategory;
+import com.adnanbk.ecommerce.models.Category;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import javax.persistence.QueryHint;
+import java.util.List;
 
-@RepositoryRestResource(collectionResourceRel = "productCategory", path = "product-categories")
-public interface ProductCategoryRepository extends CrudRepository<ProductCategory, Long> {
+public interface ProductCategoryRepository extends CrudRepository<Category, Long> {
 
-    ProductCategory findByNameIgnoreCase(String categoryName);
+    Category findByNameIgnoreCase(String categoryName);
 
 
     @Override
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
-    Iterable<ProductCategory> findAll();
+    List<Category> findAll();
 }

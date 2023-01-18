@@ -1,18 +1,18 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.JwtDto;
+import com.adnanbk.ecommerce.dto.AuthDataDto;
 import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserDto;
+import com.adnanbk.ecommerce.dto.UserOutputDto;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
 import com.adnanbk.ecommerce.models.AppUser;
-import com.adnanbk.ecommerce.reposetories.ConfirmationTokenRepository;
 import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
+import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -27,10 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Service
@@ -45,7 +42,6 @@ public class AuthServiceImp implements AuthService {
     private final SocialService facebookService;
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
-    private final ConfirmationTokenRepository confirmationTokenRepo;
 
     @Value("${front.url}")
     private String frontUrl;
@@ -55,24 +51,24 @@ public class AuthServiceImp implements AuthService {
     private long jwtRefreshExpirationTime;
 
     @Override
-    public JwtDto handleLoginWithGoogle(JwtDto jwtDto) {
-        boolean isTokenValid = googleService.verify(jwtDto.getToken());
+    public AuthDataDto handleLoginWithGoogle(AuthDataDto authDataDto) {
+        boolean isTokenValid = googleService.verify(authDataDto.getToken());
         if (!isTokenValid)
             throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(jwtDto.getAppUser());
+        return doLoginSocialUser(authDataDto.getAppUser());
     }
 
     @Override
-    public JwtDto handleLoginWithFacebook(JwtDto jwtDto) {
-        boolean isTokenValid = facebookService.verify(jwtDto.getToken());
+    public AuthDataDto handleLoginWithFacebook(AuthDataDto authDataDto) {
+        boolean isTokenValid = facebookService.verify(authDataDto.getToken());
         if (!isTokenValid)
             throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(jwtDto.getAppUser());
+        return doLoginSocialUser(authDataDto.getAppUser());
     }
 
 
     @Override
-    public JwtDto handleLogin(LoginUserDto appUser) {
+    public AuthDataDto handleLogin(LoginUserDto appUser) {
 
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
@@ -88,7 +84,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     @Override
-    public JwtDto handleRegister(AppUser user) {
+    public AuthDataDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
         user = saveUser(user);
         return generateTokens(user);
@@ -97,7 +93,7 @@ public class AuthServiceImp implements AuthService {
 
 
     @Override
-    public JwtDto refreshJwtToken(String refreshToken) {
+    public AuthDataDto refreshJwtToken(String refreshToken) {
         String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
         return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
     }
@@ -126,7 +122,7 @@ public class AuthServiceImp implements AuthService {
     }
 
     private AppUser verifyConfirmationTokenAndGetUser(String token) {
-          return   confirmationTokenRepo.findById(Objects.requireNonNullElse(token,""))
+          return Optional.ofNullable(ConfirmationTokenUtil.getConfirmationToken(token))
                     .map(confirmationToken->{
                         if (confirmationToken.getExpirationDate().isBefore(LocalDate.now()))
                            throw new InvalidTokenException("token is expired");
@@ -138,24 +134,24 @@ public class AuthServiceImp implements AuthService {
 
     }
 
-    private JwtDto generateTokens(AppUser user, String refreshToken) {
+    private AuthDataDto generateTokens(AppUser user, String refreshToken) {
         var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
         var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
         String token = this.jwtTokenUtil.generateToken(user.getEmail(), generateClaims(user),tokenExpirationDate);
         refreshToken = Objects.requireNonNullElse(refreshToken,
                 this.jwtTokenUtil.generateToken(user.getEmail(), new HashMap<>(),refreshTokenExpirationDate));
-        UserDto userDto = new UserDto();
+        UserOutputDto userDto = new UserOutputDto();
         BeanUtils.copyProperties(user, userDto);
-        return new JwtDto(token, refreshToken, userDto,tokenExpirationDate);
+        return new AuthDataDto(token, refreshToken, userDto,tokenExpirationDate);
     }
 
-    private JwtDto doLoginSocialUser(UserDto user) {
+    private AuthDataDto doLoginSocialUser(UserOutputDto user) {
         var appUser = userRepo.findByEmail(user.getEmail())
-                .orElse(saveUser(new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true)));
+                .orElseGet(()->saveUser(new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true)));
         return generateTokens(appUser);
     }
 
-    private JwtDto generateTokens(AppUser user) {
+    private AuthDataDto generateTokens(AppUser user) {
         return generateTokens(user, null);
     }
 

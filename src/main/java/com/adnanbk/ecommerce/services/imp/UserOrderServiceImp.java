@@ -29,7 +29,7 @@ public class UserOrderServiceImp implements UserOderService {
         var appUser = authService.getAuthenticatedUser();
         var creditCard = userOrder.getCreditCard();
          creditCard.setAppUser(appUser);
-         userOrder.setCreditCard(getOrCreateCreditCardIfNotExist(creditCard));
+        userOrder.setCreditCard(getOrCreateCreditCardIfNotExist(creditCard));
         userOrder.setAppUser(appUser);
         userOrder.setUserOrderItems(orderItemRepo.saveAll(userOrder.getOrderItems()));
         return orderRepository.save(userOrder);

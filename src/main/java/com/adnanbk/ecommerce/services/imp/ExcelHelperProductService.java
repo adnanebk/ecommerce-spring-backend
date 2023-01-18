@@ -26,11 +26,11 @@ import java.util.List;
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    static final String[] HEADERS = {"Name", "Description", "Sku", "Price", "Quantity",
+    static final String[] HEADERS = {"Id","Name", "Description", "Sku", "Price", "Quantity",
             "Category"};
 
     static final String SHEET = "Products";
-    public static final String DEFAULT_IMAGE = "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvcm0yNTEtbWluZC1pbnN0Z3JhbS0wMy5qcGc.jpg";
+    public static final String DEFAULT_IMAGE = "newProduct.jpg";
 
     private final ProductCategoryRepository categoryRepo;
     private  boolean hasRowAnyValue=false;
@@ -72,11 +72,14 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private Product extractProductFromRow(Row currentRow) {
         Product product=new Product();
-        product.setImage(DEFAULT_IMAGE);
         for (int i = 0; i < currentRow.getLastCellNum(); i++) {
             var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            if(currentCell==null)
+                continue;
             setProductPropertiesFromCell(currentCell,i, product);
         }
+        if(product.getId()==null)
+            product.setImage(DEFAULT_IMAGE);
         return product;
     }
 
@@ -85,12 +88,13 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
             hasRowAnyValue=true;
             try {
                 switch (cellIndex) {
-                    case 0 -> product.setName(currentCell.getStringCellValue());
-                    case 1 -> product.setDescription(currentCell.getStringCellValue());
-                    case 2 -> product.setSku(currentCell.getStringCellValue());
-                    case 3 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
-                    case 4 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
-                    case 5 -> {
+                    case 0 -> product.setId((long)currentCell.getNumericCellValue());
+                    case 1 -> product.setName(currentCell.getStringCellValue());
+                    case 2 -> product.setDescription(currentCell.getStringCellValue());
+                    case 3 -> product.setSku(currentCell.getStringCellValue());
+                    case 4 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
+                    case 5 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
+                    case 6 -> {
                         var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
                         if (category == null)
                             throw new ValidationException("category not found");
@@ -132,12 +136,13 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private int fillRowWithProduct(Sheet sheet, int rowIdx, Product product) {
         Row row = sheet.createRow(rowIdx++);
-        row.createCell(0).setCellValue(product.getName());
-        row.createCell(1).setCellValue(product.getDescription());
-        row.createCell(2).setCellValue(product.getSku());
-        row.createCell(3).setCellValue(product.getUnitPrice().doubleValue());
-        row.createCell(4).setCellValue(product.getUnitsInStock());
-        row.createCell(5).setCellValue(product.getCategory().getName());
+        row.createCell(0).setCellValue(product.getId());
+        row.createCell(1).setCellValue(product.getName());
+        row.createCell(2).setCellValue(product.getDescription());
+        row.createCell(3).setCellValue(product.getSku());
+        row.createCell(4).setCellValue(product.getUnitPrice().doubleValue());
+        row.createCell(5).setCellValue(product.getUnitsInStock());
+        row.createCell(6).setCellValue(product.getCategory().getName());
         return rowIdx;
     }
 

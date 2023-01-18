@@ -1,21 +1,20 @@
 package com.adnanbk.ecommerce.aspects;
 
+import com.adnanbk.ecommerce.dto.AuthDataDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
-import com.adnanbk.ecommerce.dto.JwtDto;
+import com.adnanbk.ecommerce.dto.ProductDto;
+import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.models.Product;
-import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.Setter;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Aspect
 @Component
@@ -27,59 +26,50 @@ public class ImagesAspect {
     private String imagesPathUrl;
     private String externalImagesPathUrl;
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.findBySku(..))",returning = "product")
-    public void findByProductSkuAspect(Optional<Product> product) {
-        product.ifPresent(prod->{
-            String pathUrl = getCorrectPathUrl(prod.getImage());
-            prod.setImage(pathUrl);
-        });
+
+    @Pointcut("execution(* com.adnanbk.ecommerce.services.imp.ProductServiceImp.*(..)) ")
+    private void anyProductServiceMethod() {}
+    @Pointcut("execution(* com.adnanbk.ecommerce.services.imp.UserServiceImpl.changeUserImage(..)) ")
+    private void userChangeImage() {}
+    @Pointcut("execution(* com.adnanbk.ecommerce.services.imp.AuthServiceImp.*(..)) ")
+    private void anyUserServiceMethod() {}
+
+    @AfterReturning(value = "userChangeImage()",returning = "image")
+    public void afterUserChangeImage(ImageDto image) {
+        image.setUrl(toImageUrl(image.getUrl()));
+    }
+    @AfterReturning(value = "anyUserServiceMethod()",returning = "user")
+    public void afterUserMethods(AppUser user) {
+        user.setImageUrl(toImageUrl(user.getImageUrl()));
+    }
+    @AfterReturning(value = "anyUserServiceMethod()",returning = "authData")
+    public void afterUserMethods(AuthDataDto authData) {
+        authData.getAppUser().setImageUrl(toImageUrl(authData.getAppUser().getImageUrl()));
+    }
+    @AfterReturning(value = "anyProductServiceMethod()",returning = "product")
+    public void afterProductAspect(Product  product) {
+        setProductImageUrl(product);
     }
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.reposetories.ProductRepository.find*(..,org.springframework.data.domain.Pageable))",returning = "products")
-    public void findAllProductsAspect(Page<Product>  products) {
-        products.forEach(product -> product.setImage(getCorrectPathUrl(product.getImage())));
+    @AfterReturning(value = "anyProductServiceMethod()",returning = "products")
+    public void afterProductsPageAspect(Page<Product>  products) {
+        products.forEach(this::setProductImageUrl);
     }
 
-    @Around(value = "execution(* com.adnanbk.ecommerce.services.imp.ProductServiceImp.updateProducts(..))")
-    public List<Product> updateProductsAspect(ProceedingJoinPoint joinPoint) throws Throwable {
-        var productsArg = (List<Product>) joinPoint.getArgs()[0];
-        productsArg.forEach(product ->
-                product.setImage(product.getImage().replace(imagesPathUrl,"").replace(externalImagesPathUrl,"")));
-
-        var products = (List<Product>) joinPoint.proceed(new Object[]{productsArg});
-        products.forEach(product -> product.setImage(getCorrectPathUrl(product.getImage())));
-        return products;
-    }
-    @Around(value = "execution(* com.adnanbk.ecommerce.services.imp.ProductServiceImp.updateProduct(..))")
-    public Product updateProductAspect(ProceedingJoinPoint joinPoint) throws Throwable {
-       var productArg = (Product) joinPoint.getArgs()[0];
-       var id = (Long) joinPoint.getArgs()[1];
-        productArg.setImage(productArg.getImage().replace(imagesPathUrl,"").replace(externalImagesPathUrl,""));
-         Product product = (Product) joinPoint.proceed(new Object[]{productArg,id});
-        product.setImage(getCorrectPathUrl(product.getImage()));
-        return product;
-    }
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.ProductServiceImp.addProduct(..))",returning = "product")
-    public void addProductAspect(Product  product) {
-        product.setImage(getCorrectPathUrl(product.getImage()));
+    @AfterReturning(value = "anyProductServiceMethod()",returning = "products")
+    public void afterProductsListAspect(List<Product>  products) {
+        products.forEach(this::setProductImageUrl);
     }
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.UserServiceImpl.changeUserImage(..))",returning = "imageDto")
-    public void updateUserImageAspect(ImageDto imageDto) {
-        imageDto.setUrl(imagesPathUrl+imageDto.getUrl());
+    private void setProductImageUrl(Product product) {
+        String imageName = product.getImage();
+        if(StringUtils.hasLength(imageName))
+          product.setImage((imageName.contains("luv2code") ? externalImagesPathUrl : imagesPathUrl)+imageName);
     }
 
-    @AfterReturning(value = "execution(* com.adnanbk.ecommerce.services.imp.AuthServiceImp.handleLogin*(..))",returning = "jwtDto")
-    public void loginAspect(JwtDto jwtDto) {
-        var userImage = jwtDto.getAppUser().getImageUrl();
-        if (!Strings.isNullOrEmpty(userImage) && !userImage.contains("http"))
-            jwtDto.getAppUser().setImageUrl(imagesPathUrl + jwtDto.getAppUser().getImageUrl());
+    private String toImageUrl(String imageName) {
+        return (StringUtils.hasLength(imageName) && !imageName.startsWith("http"))?(imagesPathUrl+imageName): imageName;
     }
 
 
-    private String getCorrectPathUrl(String imageName) {
-        if(imageName.startsWith("http"))
-            return imageName;
-        return (imageName.contains("luv2code") ? externalImagesPathUrl : imagesPathUrl)+imageName;
     }
-}

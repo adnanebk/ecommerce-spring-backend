@@ -4,6 +4,7 @@ import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
+import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
 import com.adnanbk.ecommerce.exceptions.factories.ResponseErrorFactory;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -77,6 +78,13 @@ public class ExceptionsHandler {
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
         return new ApiErrorDto(ex.getMessage());
     }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ApiErrorDto productNotFoundException(ProductNotFoundException ex) {
+        return new ApiErrorDto(ex.getMessage());
+    }
+
+
     @ExceptionHandler(InvalidPasswordException.class)
     public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
         return new ApiErrorDto(ex.getMessage(),Set.of(new ResponseError(ex.getFieldName(),ex.getMessage())));

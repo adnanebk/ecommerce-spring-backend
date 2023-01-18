@@ -22,13 +22,11 @@ public class ConfirmationToken {
     @Id
     private String token;
 
-
     @Future
     private LocalDate expirationDate;
 
     @OneToOne(targetEntity = AppUser.class)
     @JoinColumn(nullable = false, name = "user_id")
     private AppUser appUser;
-
 
 }

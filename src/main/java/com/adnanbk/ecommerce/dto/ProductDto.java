@@ -1,5 +1,10 @@
-package com.adnanbk.ecommerce.models;
+package com.adnanbk.ecommerce.dto;
 
+import com.adnanbk.ecommerce.models.Category;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.google.j2objc.annotations.Property;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -16,23 +21,11 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Entity
-@Table(name = "product",
-        uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueSku")})
 @Getter
 @Setter
-@DynamicUpdate // to generate an update sql statement that contains only updated fields
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class Product {
+public class ProductDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    @NotNull(message = "{error.choose}")
-    private Category category;
-
     @Column(name = "sku")
     @NotEmpty(message = "{error.empty}")
     private String sku;
@@ -41,35 +34,30 @@ public class Product {
     @NotEmpty
     private String name;
 
-    @Column(name = "description", length = 500)
     @Length(min = 10, message = "{error.min}")
     @NotEmpty
     private String description;
 
-    @Column(name = "unit_price")
     @DecimalMin("0.0")
     @NotNull(message = "{error.empty}")
     private BigDecimal unitPrice;
 
     @Column(name = "image")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String image;
 
-    @Column(name = "active")
     private boolean active;
 
-    @Column(name = "units_in_stock")
     @Min(value = 0)
     @NotNull(message = "{error.empty}")
     private Integer unitsInStock;
 
-    @Column(name = "date_created")
-    @CreationTimestamp
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date dateCreated;
-
-    private Date expirationDate;
-
-    @Column(name = "last_updated")
-    @UpdateTimestamp
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date lastUpdated;
+
+    @NotNull(message = "{error.choose}")
+    private CategoryDto category;
 
 }

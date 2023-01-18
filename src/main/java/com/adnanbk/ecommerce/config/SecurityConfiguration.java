@@ -42,11 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.cors().and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/orders/**", "/api/user*/**", "/api/creditCards/**", "/api/auth/user/**").authenticated()
-                .antMatchers("/api/products/v2/**").hasRole("ADMIN")
-                //.antMatchers("/api/google").authenticated()
                 .anyRequest().permitAll();
-        //http.oauth2Login();
 
         //.addFilter(new JWTAuthenticationFilter(authenticationManager(),jwtTokenUtil))
         http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -61,7 +57,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {
-
         return super.authenticationManagerBean();
     }
 

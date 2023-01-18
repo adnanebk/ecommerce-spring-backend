@@ -28,22 +28,21 @@ public class AuthController {
     private final UserMapper userMapper;
     private final ApplicationEventPublisher eventPublisher;
 
-
     private String getRootUrl() {
         return ServletUriComponentsBuilder.fromCurrentRequest().replacePath("/api").toUriString();
     }
 
 
     @PostMapping(value = "register")
-    @ApiOperation(value = "register a new user", response = JwtDto.class)
+    @ApiOperation(value = "register a new user", response = AuthDataDto.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtDto register(@RequestBody @Valid UserInputDto userDto) {
+    public AuthDataDto register(@RequestBody @Valid UserInputDto userDto) {
         return Optional.of(userDto)
                 .map(userMapper::toEntity)
                 .map(user-> {
-                    JwtDto jwtDto =  authService.handleRegister(user);
+                    AuthDataDto authDataDto =  authService.handleRegister(user);
                     eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user));
-                    return  jwtDto;
+                    return authDataDto;
                 })
                 .orElseThrow();
 
@@ -52,22 +51,22 @@ public class AuthController {
 
     @PostMapping("login")
     @ApiOperation(value = "authenticate a user")
-    public JwtDto login(@RequestBody @Valid LoginUserDto appUser) {
+    public AuthDataDto login(@RequestBody @Valid LoginUserDto appUser) {
         return authService.handleLogin(appUser);
     }
 
     @PostMapping("login/google")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
-    public JwtDto googleLogin(@RequestBody @Valid JwtDto jwtDto) {
-        return authService.handleLoginWithGoogle(jwtDto);
+    public AuthDataDto googleLogin(@RequestBody @Valid AuthDataDto authDataDto) {
+        return authService.handleLoginWithGoogle(authDataDto);
 
     }
 
     @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
-    public JwtDto facebookLogin(@RequestBody @Valid JwtDto jwtDto) {
-        return authService.handleLoginWithFacebook(jwtDto);
+    public AuthDataDto facebookLogin(@RequestBody @Valid AuthDataDto authDataDto) {
+        return authService.handleLoginWithFacebook(authDataDto);
     }
 
     @GetMapping("enable")
@@ -78,12 +77,12 @@ public class AuthController {
     @PostMapping("refresh-token")
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
-    public JwtDto refreshNewToken(@RequestBody String refreshToken) {
+    public AuthDataDto refreshNewToken(@RequestBody String refreshToken) {
         return this.authService.refreshJwtToken(refreshToken);
     }
     @GetMapping("user")
     @ApiOperation(value = "get authenticated user details")
-    public UserDto getAuthUser() {
+    public UserOutputDto getAuthUser() {
         return userMapper.toDto(authService.getAuthenticatedUser());
     }
 

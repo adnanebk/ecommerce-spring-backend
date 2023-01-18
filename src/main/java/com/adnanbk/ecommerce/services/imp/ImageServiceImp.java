@@ -42,7 +42,8 @@ public class ImageServiceImp implements FileService {
 
     @Async
     public CompletableFuture<String> upload(MultipartFile image) {
-
+        if(image==null)
+            return CompletableFuture.completedFuture("");
         String fileName = trimImageName(image.getOriginalFilename());
         validateImageExtension(fileName);
         Path filePath = this.root.resolve(fileName);
