@@ -87,7 +87,7 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
-        return new ApiErrorDto(ex.getMessage(),Set.of(new ResponseError(ex.getFieldName(),ex.getMessage())));
+        return new ApiErrorDto(ex.getMessage(),Set.of(new ResponseError("currentPassword",ex.getMessage())));
     }
 
     @ExceptionHandler(JWTVerificationException.class)

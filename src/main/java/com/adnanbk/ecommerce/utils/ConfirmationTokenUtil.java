@@ -4,7 +4,6 @@ import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.models.ConfirmationToken;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

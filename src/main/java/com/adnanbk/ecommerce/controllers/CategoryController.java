@@ -2,14 +2,12 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.CategoryDto;
 import com.adnanbk.ecommerce.mappers.CategoryMapper;
-import com.adnanbk.ecommerce.models.Category;
 import com.adnanbk.ecommerce.services.CategoryService;
-import com.google.common.collect.Iterables;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/categories")

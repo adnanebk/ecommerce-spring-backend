@@ -100,6 +100,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                             throw new ValidationException("category not found");
                         product.setCategory(category);
                     }
+                    default ->  throw new ValidationException("column cannot be mapped");
                 }
             } catch (IllegalStateException ex) {
                 throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");

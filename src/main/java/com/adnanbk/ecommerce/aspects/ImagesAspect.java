@@ -2,19 +2,19 @@ package com.adnanbk.ecommerce.aspects;
 
 import com.adnanbk.ecommerce.dto.AuthDataDto;
 import com.adnanbk.ecommerce.dto.ImageDto;
-import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.models.Product;
 import lombok.Getter;
 import lombok.Setter;
-import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Aspect
 @Component

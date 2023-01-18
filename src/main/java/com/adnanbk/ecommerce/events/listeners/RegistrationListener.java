@@ -27,7 +27,7 @@ public class RegistrationListener {
 
     @Async
     @EventListener
-    public void sendEmailConfirmation(OnRegistrationCompleteEvent event) {
+    public void sendEmailConfirmation(OnRegistrationCompleteEvent event) throws MessagingException, UnsupportedEncodingException {
         var user = event.getUser();
         String  rootUrl = event.getUrl();
         String destAddress = user.getEmail();
@@ -41,15 +41,10 @@ public class RegistrationListener {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
-        try {
             helper.setFrom(email, name);
-
             helper.setTo(destAddress);
             helper.setSubject(subject);
             helper.setText(content, true);
-        } catch (MessagingException | UnsupportedEncodingException e) {
-            throw new RuntimeException("We could not verify the email");
-        }
         javaMailSender.send(message);
     }
 
