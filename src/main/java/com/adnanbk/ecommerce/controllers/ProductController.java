@@ -47,7 +47,7 @@ public class ProductController {
     public ProductDto getBySku(@PathVariable  String sku) {
         return  productMapper.toDto(productService.getBySku(sku));
     }
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = ProductDto.class)
@@ -118,5 +118,4 @@ return  CompletableFuture.supplyAsync(()->{
             .body(file);
 });
     }
-
 }

@@ -1,9 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.dto.AuthDataDto;
-import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.UserOutputDto;
+import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
@@ -51,19 +48,19 @@ public class AuthServiceImp implements AuthService {
     private long jwtRefreshExpirationTime;
 
     @Override
-    public AuthDataDto handleLoginWithGoogle(AuthDataDto authDataDto) {
-        boolean isTokenValid = googleService.verify(authDataDto.getToken());
+    public AuthDataDto handleLoginWithGoogle(SocialLoginDto socialLoginDto) {
+        boolean isTokenValid = googleService.verify(socialLoginDto.token());
         if (!isTokenValid)
             throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(authDataDto.getAppUser());
+        return doLoginSocialUser(socialLoginDto);
     }
 
     @Override
-    public AuthDataDto handleLoginWithFacebook(AuthDataDto authDataDto) {
-        boolean isTokenValid = facebookService.verify(authDataDto.getToken());
+    public AuthDataDto handleLoginWithFacebook(SocialLoginDto socialLoginDto) {
+        boolean isTokenValid = facebookService.verify(socialLoginDto.token());
         if (!isTokenValid)
             throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(authDataDto.getAppUser());
+        return doLoginSocialUser(socialLoginDto);
     }
 
 
@@ -78,9 +75,7 @@ public class AuthServiceImp implements AuthService {
             throwInvalidCredentialException("error.invalid-email-or-password");
         }
 
-        var currentUser = userRepo.findByEmail(appUser.getEmail()).orElseThrow();
-
-        return generateTokens(currentUser);
+        return generateTokens(userRepo.findByEmail(appUser.getEmail()).orElseThrow());
     }
 
     @Override
@@ -137,17 +132,17 @@ public class AuthServiceImp implements AuthService {
     private AuthDataDto generateTokens(AppUser user, String refreshToken) {
         var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
         var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
-        String token = this.jwtTokenUtil.generateToken(user.getEmail(), generateClaims(user),tokenExpirationDate);
-        refreshToken = Objects.requireNonNullElse(refreshToken,
-                this.jwtTokenUtil.generateToken(user.getEmail(), new HashMap<>(),refreshTokenExpirationDate));
         UserOutputDto userDto = new UserOutputDto();
         BeanUtils.copyProperties(user, userDto);
+        refreshToken = Objects.requireNonNullElse(refreshToken,
+                this.jwtTokenUtil.generateToken(user.getEmail(), new HashMap<>(),refreshTokenExpirationDate));
+        String token = this.jwtTokenUtil.generateToken(user.getEmail(), generateClaims(user),tokenExpirationDate);
         return new AuthDataDto(token, refreshToken, userDto,tokenExpirationDate);
     }
 
-    private AuthDataDto doLoginSocialUser(UserOutputDto user) {
-        var appUser = userRepo.findByEmail(user.getEmail())
-                .orElseGet(()->saveUser(new AppUser( user.getEmail(), user.getFirstName(), user.getLastName(),user.getImageUrl(), generateRandomPassword(),true,true)));
+    private AuthDataDto doLoginSocialUser(SocialLoginDto user) {
+        var appUser = userRepo.findByEmail(user.email())
+                .orElseGet(()->saveUser(new AppUser( user.email(), user.firstName(), user.lastName(),user.image(), generateRandomPassword(),true,true)));
         return generateTokens(appUser);
     }
 
@@ -163,19 +158,14 @@ public class AuthServiceImp implements AuthService {
 
     // Method to generate a random alphanumeric password of a specific length
     private String generateRandomPassword() {
-        // ASCII range – alphanumeric (0-9, a-z, A-Z)
         final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         SecureRandom random = new SecureRandom();
         StringBuilder sb = new StringBuilder();
-
-        // each iteration of the loop randomly chooses a character from the given
-        // ASCII range and appends it to the `StringBuilder` instance
         IntStream.range(0,6)
                 .forEach(number->
                         sb.append(chars.charAt(random.nextInt(chars.length())))
                 );
-
         return sb.toString();
     }
 

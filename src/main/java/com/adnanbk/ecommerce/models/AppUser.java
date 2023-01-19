@@ -42,10 +42,10 @@ public class AppUser implements Serializable {
     private String city;
     private String country;
     private boolean enabled=false;
+    private boolean isSocial;
 
     private String imageUrl;
 
-    private boolean isSocial;
 
     @Column
     private String password;

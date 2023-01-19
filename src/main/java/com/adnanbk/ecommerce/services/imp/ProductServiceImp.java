@@ -49,8 +49,6 @@ public class ProductServiceImp implements ProductService {
                      .map(productRepo::save).orElseThrow();
     }
 
-
-
     @Override
     public List<Product> updateProducts(List<Product> products) {
        List<Product> productList = productRepo.findAllById(products.stream().map(Product::getId).toList())
@@ -86,7 +84,6 @@ public class ProductServiceImp implements ProductService {
         } catch (IOException e) {
             throw new CustomFileException("We can't process the file,please try again");
         }
-
     }
 
     @Override

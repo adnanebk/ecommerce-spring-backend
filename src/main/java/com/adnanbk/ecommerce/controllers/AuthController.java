@@ -45,8 +45,6 @@ public class AuthController {
                     return authDataDto;
                 })
                 .orElseThrow();
-
-
     }
 
     @PostMapping("login")
@@ -58,15 +56,15 @@ public class AuthController {
     @PostMapping("login/google")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
-    public AuthDataDto googleLogin(@RequestBody @Valid AuthDataDto authDataDto) {
-        return authService.handleLoginWithGoogle(authDataDto);
+    public AuthDataDto googleLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
+        return authService.handleLoginWithGoogle(socialLoginDto);
 
     }
 
     @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
-    public AuthDataDto facebookLogin(@RequestBody @Valid AuthDataDto authDataDto) {
-        return authService.handleLoginWithFacebook(authDataDto);
+    public AuthDataDto facebookLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
+        return authService.handleLoginWithFacebook(socialLoginDto);
     }
 
     @GetMapping("enable")
@@ -97,8 +95,6 @@ public class AuthController {
     public void sendEmailConfirmation() {
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));
     }
-
-
 
 
 }
