@@ -38,7 +38,10 @@ public class UserOrderServiceImp implements UserOderService {
     private CreditCard getOrCreateCreditCardIfNotExist(CreditCard creditCard) {
         return Optional.ofNullable(creditCard.getCardNumber())
                 .map(cardNumber -> creditCardService.getByCardNumber(cardNumber)
-                        .orElseGet(()->creditCardService.saveCard(creditCard))).orElseThrow();
+                        .orElseGet(()->{
+                            creditCard.setId(null);
+                            return creditCardService.saveCard(creditCard);
+                        })).orElseThrow();
     }
 
     @Override

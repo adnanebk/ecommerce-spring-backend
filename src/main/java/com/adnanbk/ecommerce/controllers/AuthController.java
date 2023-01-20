@@ -5,6 +5,7 @@ import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.AuthService;
+import com.adnanbk.ecommerce.services.SocialService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -25,6 +26,8 @@ public class AuthController {
 
 
     private final AuthService authService;
+    private final SocialService facebookService;
+    private final SocialService googleService;
     private final UserMapper userMapper;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -57,14 +60,14 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
     public AuthDataDto googleLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleLoginWithGoogle(socialLoginDto);
+        return authService.handleSocialLogin(socialLoginDto,googleService);
 
     }
 
     @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
     public AuthDataDto facebookLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleLoginWithFacebook(socialLoginDto);
+        return authService.handleSocialLogin(socialLoginDto,facebookService);
     }
 
     @GetMapping("enable")

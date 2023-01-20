@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.mappers;
 
 import com.adnanbk.ecommerce.dto.CreditCardDto;
-import com.adnanbk.ecommerce.dto.CreditCardEditDto;
 import com.adnanbk.ecommerce.models.CreditCard;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,5 +13,5 @@ public interface CreditCardMapper {
     CreditCardDto toDto(CreditCard creditCard);
 
     @Mapping(target = "expirationDate", expression = "java(java.time.YearMonth.parse(creditCardDto.getExpirationDate(),DateTimeFormatter.ofPattern(\"MM/yy\")).atDay(1))")
-    CreditCard toEntity(CreditCardEditDto creditCardDto);
+    CreditCard toEntity(CreditCardDto creditCardDto);
 }

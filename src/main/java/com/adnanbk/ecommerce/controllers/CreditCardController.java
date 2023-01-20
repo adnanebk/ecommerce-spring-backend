@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.CreditCardDto;
-import com.adnanbk.ecommerce.dto.CreditCardEditDto;
 import com.adnanbk.ecommerce.mappers.CreditCardMapper;
 import com.adnanbk.ecommerce.services.CreditCardService;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +32,7 @@ public class CreditCardController {
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
     @ResponseStatus(HttpStatus.CREATED)
-    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto) {
+    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto) {
        return Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
                 .map(card->creditCardService.saveCard(card))
@@ -42,7 +41,7 @@ public class CreditCardController {
     }
     @PutMapping("/{id}")
     @ApiOperation(value = "update a user credit card")
-    public void updateCreditCard(@RequestBody @Valid CreditCardEditDto creditCardDto, @PathVariable Long id) {
+    public void updateCreditCard(@RequestBody @Valid CreditCardDto creditCardDto, @PathVariable Long id) {
           Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
                 .ifPresent(card->creditCardService.update(card,id));

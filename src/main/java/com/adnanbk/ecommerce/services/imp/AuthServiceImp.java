@@ -11,6 +11,7 @@ import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
 import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
+import com.adnanbk.ecommerce.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +34,6 @@ public class AuthServiceImp implements AuthService {
     private final RoleRepository roleRepository;
     private final JwtTokenUtil jwtTokenUtil;
     private final PasswordEncoder passwordEncode;
-    private final SocialService googleService;
-    private final SocialService facebookService;
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
 
@@ -47,26 +44,19 @@ public class AuthServiceImp implements AuthService {
     @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
     private long jwtRefreshExpirationTime;
 
-    @Override
-    public AuthDataDto handleLoginWithGoogle(SocialLoginDto socialLoginDto) {
-        boolean isTokenValid = googleService.verify(socialLoginDto.token());
-        if (!isTokenValid)
-            throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(socialLoginDto);
-    }
 
     @Override
-    public AuthDataDto handleLoginWithFacebook(SocialLoginDto socialLoginDto) {
-        boolean isTokenValid = facebookService.verify(socialLoginDto.token());
-        if (!isTokenValid)
+    public AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService) {
+        if (!socialService.verify(user.token()))
             throwInvalidCredentialException("error.invalid-credential");
-        return doLoginSocialUser(socialLoginDto);
+        var appUser = userRepo.findByEmail(user.email())
+                .orElseGet(()->saveUser(new AppUser( user.email(), user.firstName(), user.lastName(),user.image(),
+                                     PasswordUtil.generateRandomPassword(),true,true)));
+        return generateTokens(appUser);
     }
-
 
     @Override
     public AuthDataDto handleLogin(LoginUserDto appUser) {
-
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -81,8 +71,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public AuthDataDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
-        user = saveUser(user);
-        return generateTokens(user);
+        return generateTokens(saveUser(user));
     }
 
 
@@ -126,7 +115,6 @@ public class AuthServiceImp implements AuthService {
                         return confirmationToken.getAppUser();
                         }
                     ).orElseThrow(()->new InvalidTokenException("the token is not found"));
-
     }
 
     private AuthDataDto generateTokens(AppUser user, String refreshToken) {
@@ -140,11 +128,7 @@ public class AuthServiceImp implements AuthService {
         return new AuthDataDto(token, refreshToken, userDto,tokenExpirationDate);
     }
 
-    private AuthDataDto doLoginSocialUser(SocialLoginDto user) {
-        var appUser = userRepo.findByEmail(user.email())
-                .orElseGet(()->saveUser(new AppUser( user.email(), user.firstName(), user.lastName(),user.image(), generateRandomPassword(),true,true)));
-        return generateTokens(appUser);
-    }
+
 
     private AuthDataDto generateTokens(AppUser user) {
         return generateTokens(user, null);
@@ -156,19 +140,6 @@ public class AuthServiceImp implements AuthService {
         return claims;
     }
 
-    // Method to generate a random alphanumeric password of a specific length
-    private String generateRandomPassword() {
-        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-        SecureRandom random = new SecureRandom();
-        StringBuilder sb = new StringBuilder();
-        IntStream.range(0,6)
-                .forEach(number->
-                        sb.append(chars.charAt(random.nextInt(chars.length())))
-                );
-        return sb.toString();
-    }
-
     private AppUser saveUser(AppUser user) {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
         return userRepo.save(user);
@@ -177,5 +148,6 @@ public class AuthServiceImp implements AuthService {
     private void throwInvalidCredentialException(String code) {
         throw new BadCredentialsException(messagesUtil.getDefaultMessage(code));
     }
+
 
 }

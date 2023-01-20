@@ -25,7 +25,6 @@ public class CreditCardServiceImpl implements CreditCardService {
        var user =   authService.getAuthenticatedUser();
             activeCreditCardIfNew(creditCard, user.getEmail());
             creditCard.setAppUser(user);
-            creditCard.setId(null);
             return creditCardRepo.save(creditCard);
 
     }

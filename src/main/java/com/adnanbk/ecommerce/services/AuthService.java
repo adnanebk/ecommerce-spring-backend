@@ -8,11 +8,7 @@ import com.adnanbk.ecommerce.models.AppUser;
 
 public interface AuthService {
 
-
-    AuthDataDto handleLoginWithGoogle(SocialLoginDto socialLoginDto);
-
-
-    AuthDataDto handleLoginWithFacebook(SocialLoginDto socialLoginDto);
+    AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService);
 
     AuthDataDto handleLogin(LoginUserDto appUser);
     AuthDataDto handleRegister(AppUser user);
