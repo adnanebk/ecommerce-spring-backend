@@ -13,7 +13,9 @@ import java.util.Set;
 @Table(name = "user", uniqueConstraints = {@UniqueConstraint(columnNames = "email", name = "uniqueEmail")})
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AppUser implements Serializable {
     @Id
@@ -57,15 +59,7 @@ public class AppUser implements Serializable {
                     name = "role_id", referencedColumnName = "id"))
     private Collection<Role> roles=new HashSet<>();
 
-    public AppUser( String email, String firstName, String lastName,String imageUrl, String password,boolean enabled,boolean isSocial) {
-        this.email = email;
-        this.imageUrl=imageUrl;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.password = password;
-        this.enabled=enabled;
-        this.isSocial=isSocial;
-    }
+
 
 
 }

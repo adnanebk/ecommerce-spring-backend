@@ -10,14 +10,18 @@ import com.adnanbk.ecommerce.services.ProductService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,13 +34,6 @@ public class ProductServiceImp implements ProductService {
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
 
-    @Getter
-    @Setter
-    private  String imagesPathUrl;
-    @Getter
-    @Setter
-    private  String externalImagesPathUrl;
-
 
     @Override
     public Product addProduct(Product product) {
@@ -44,6 +41,7 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product updateProduct(Product product,Long id) {
              return   productRepo.findById(id).map(pr->mapProperties(pr,product))
                      .map(productRepo::save).orElseThrow();
@@ -51,11 +49,10 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public List<Product> updateProducts(List<Product> products) {
-       List<Product> productList = productRepo.findAllById(products.stream().map(Product::getId).toList())
-                .parallelStream().map(product -> mapProperties(product,
-                                   products.stream().filter(pr->pr.getId().equals(product.getId())).findFirst().orElseThrow()))
-               .toList();
-     return   productRepo.saveAll(productList);
+       var updatableProducts =  productRepo.findAllById(products.stream().map(Product::getId).toList())
+               .stream()
+               .map(product -> mapProperties(product,products.stream().filter(pr -> pr.getId().equals(product.getId())).findFirst().orElseThrow())).toList();
+        return productRepo.saveAll(updatableProducts);
 
     }
 
@@ -65,21 +62,22 @@ public class ProductServiceImp implements ProductService {
         productRepo.deleteAllById(productsIds);
     }
 
+    @Transactional
     public List<Product> addOrUpdateFromExcel(MultipartFile multipartFile) {
-        try {
-            List<Product> updatableProducts = new ArrayList<>();
-            List<Product> addableProducts = new ArrayList<>();
-             Optional.ofNullable(excelHelper.excelToList(multipartFile.getInputStream()))
-                    .ifPresent(productsList->productsList.forEach(pr->{
-                        if(pr.getId()==null || pr.getId()==0)
-                          addableProducts.add(pr);
-                        else
-                          updatableProducts.add(pr);
-                    }));
-
-            List<Product> savedProducts =productRepo.saveAll(addableProducts);
-                          savedProducts.addAll(updateProducts(updatableProducts));
-               return  savedProducts;
+        try (InputStream inputStream = multipartFile.getInputStream()) {
+            return Optional.ofNullable(excelHelper.excelToList(inputStream))
+                    .map(productsList-> {
+                        List<Product> updatableProducts = new ArrayList<>();
+                        List<Product> addableProducts = new ArrayList<>();
+                                productsList.forEach(pr -> {
+                                    if (pr.getId() == null || pr.getId() == 0)
+                                        addableProducts.add(pr);
+                                    else
+                                        updatableProducts.add(pr);
+                                });
+                                return ListUtils.union(productRepo.saveAll(addableProducts),updateProducts(updatableProducts));
+                            }
+                    ).orElse(new ArrayList<>());
 
         } catch (IOException e) {
             throw new CustomFileException("We can't process the file,please try again");

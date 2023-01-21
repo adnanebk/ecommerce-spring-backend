@@ -22,7 +22,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private  HandlerExceptionResolver handlerExceptionResolver;
 
-    private JwtTokenUtil jwtTokenUtil;
+    private JwtTokenService jwtTokenService;
     private UserRepo userRepo;
 
 
@@ -50,12 +50,12 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Once we get the token we validate it.
-                String email = jwtTokenUtil.validateTokenAndReturnSubject(tokenArr[1]);
+                String email = jwtTokenService.validateTokenAndGetSubject(tokenArr[1]);
                 userRepo.findByEmail(email).ifPresent(user->{
                     if(!user.isEnabled())
                         throw new UserNotEnabledException();
                     // authentication
-                    jwtTokenUtil.setAuthenticationToken(user, request);
+                    jwtTokenService.setAuthenticationToken(user, request);
                 });
 
             }

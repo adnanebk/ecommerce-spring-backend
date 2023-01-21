@@ -3,7 +3,8 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
 import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
-import com.adnanbk.ecommerce.jwt.JwtTokenUtil;
+import com.adnanbk.ecommerce.jwt.JwtTokenService;
+import com.adnanbk.ecommerce.jwt.JwtTokenServiceImp;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
@@ -32,27 +33,21 @@ public class AuthServiceImp implements AuthService {
 
     private final UserRepo userRepo;
     private final RoleRepository roleRepository;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncode;
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
 
     @Value("${front.url}")
     private String frontUrl;
-    @Value("#{${jwt.expiration-time-minutes}*60*1000}")
-    private long jwtExpirationTime;
-    @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
-    private long jwtRefreshExpirationTime;
+
 
 
     @Override
     public AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService) {
         if (!socialService.verify(user.token()))
-            throwInvalidCredentialException("error.invalid-credential");
-        var appUser = userRepo.findByEmail(user.email())
-                .orElseGet(()->saveUser(new AppUser( user.email(), user.firstName(), user.lastName(),user.image(),
-                                     PasswordUtil.generateRandomPassword(),true,true)));
-        return generateTokens(appUser);
+            throw new BadCredentialsException(messagesUtil.getDefaultMessage(("error.invalid-credential")));
+        return buildAuthData(getAppUserOrCreateNewOne(user));
     }
 
     @Override
@@ -62,24 +57,23 @@ public class AuthServiceImp implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-            throwInvalidCredentialException("error.invalid-email-or-password");
+            throw new BadCredentialsException(messagesUtil.getDefaultMessage(("error.invalid-email-or-password")));
         }
 
-        return generateTokens(userRepo.findByEmail(appUser.getEmail()).orElseThrow());
+        return buildAuthData(userRepo.findByEmail(appUser.getEmail()).orElseThrow());
     }
 
     @Override
     public AuthDataDto handleRegister(AppUser user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
-        return generateTokens(saveUser(user));
+        return buildAuthData(saveUser(user));
     }
-
-
 
     @Override
     public AuthDataDto refreshJwtToken(String refreshToken) {
-        String email = this.jwtTokenUtil.validateTokenAndReturnSubject(refreshToken);
-        return  this.userRepo.findByEmail(email).map(user -> generateTokens(user, refreshToken)).orElseThrow();
+        String email = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
+        return  this.userRepo.findByEmail(email).map(this::buildAuthData).orElseThrow();
+
     }
 
 
@@ -117,37 +111,27 @@ public class AuthServiceImp implements AuthService {
                     ).orElseThrow(()->new InvalidTokenException("the token is not found"));
     }
 
-    private AuthDataDto generateTokens(AppUser user, String refreshToken) {
-        var tokenExpirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
-        var refreshTokenExpirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
+    private AuthDataDto buildAuthData(AppUser user) {
         UserOutputDto userDto = new UserOutputDto();
         BeanUtils.copyProperties(user, userDto);
-        refreshToken = Objects.requireNonNullElse(refreshToken,
-                this.jwtTokenUtil.generateToken(user.getEmail(), new HashMap<>(),refreshTokenExpirationDate));
-        String token = this.jwtTokenUtil.generateToken(user.getEmail(), generateClaims(user),tokenExpirationDate);
-        return new AuthDataDto(token, refreshToken, userDto,tokenExpirationDate);
+        JwtTokenServiceImp.Token token = this.jwtTokenService.generateAccessToken(user.getEmail());
+        JwtTokenServiceImp.Token refreshToken = this.jwtTokenService.generateRefreshToken(user.getEmail());
+        return new AuthDataDto(token.value(),refreshToken.value(),token.expirationDate(),userDto);
+
     }
 
-
-
-    private AuthDataDto generateTokens(AppUser user) {
-        return generateTokens(user, null);
-    }
-
-    private HashMap<String, Object> generateClaims(AppUser appUser) {
-        var claims = new HashMap<String, Object>();
-        claims.put("email", appUser.getEmail());
-        return claims;
+    private AppUser getAppUserOrCreateNewOne(SocialLoginDto user) {
+        return userRepo.findByEmail(user.email())
+                .orElseGet(() -> saveUser(
+                        AppUser.builder().email(user.email()).firstName(user.firstName())
+                                .lastName(user.lastName()).imageUrl(user.image())
+                                .password(PasswordUtil.generateRandomPassword())
+                                .enabled(true).isSocial(true).build()));
     }
 
     private AppUser saveUser(AppUser user) {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
         return userRepo.save(user);
     }
-
-    private void throwInvalidCredentialException(String code) {
-        throw new BadCredentialsException(messagesUtil.getDefaultMessage(code));
-    }
-
 
 }

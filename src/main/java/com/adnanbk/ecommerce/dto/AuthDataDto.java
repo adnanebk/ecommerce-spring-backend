@@ -22,11 +22,16 @@ public class AuthDataDto {
     @NotNull
     private UserOutputDto appUser;
 
-    public AuthDataDto(String token, String refreshToken, UserOutputDto appUser, Date expirationDate) {
+    public AuthDataDto(String token, String refreshToken, Date expirationDate,UserOutputDto userOutputDto) {
         this.token = token;
         this.expirationDate=expirationDate;
         this.refreshToken = refreshToken;
-        this.appUser = appUser;
+        this.appUser = userOutputDto;
     }
 
+    public AuthDataDto(String token, Date expirationDate,UserOutputDto userOutputDto) {
+        this.token=token;
+        this.expirationDate=expirationDate;
+        this.appUser=userOutputDto;
+    }
 }

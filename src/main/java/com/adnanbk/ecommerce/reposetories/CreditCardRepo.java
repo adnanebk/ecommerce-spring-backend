@@ -38,4 +38,6 @@ public interface CreditCardRepo extends CrudRepository<CreditCard, Long> {
 
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Optional<CreditCard> findByCardNumber(String cardNumber);
+
+    boolean existsByAppUser_Email(String email);
 }

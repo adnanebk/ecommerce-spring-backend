@@ -9,45 +9,57 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.Map;
 
-@Component
-public class JwtTokenUtil {
-
-
+@Service
+public class JwtTokenServiceImp implements JwtTokenService {
 
     @Value("${jwt.secret}")
     private String secret;
     private Algorithm algorithm;
 
+    @Value("#{${jwt.expiration-time-minutes}*60*1000}")
+    private long jwtExpirationTime;
+
+    @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
+    private long jwtRefreshExpirationTime;
 
     @PostConstruct
     public void init() {
         algorithm = Algorithm.HMAC512(secret.getBytes());
     }
 
-    //generate token for user
-    public String generateToken(String email, Map<String, Object> claims,Date expirationTime) {
-        return JWT.create().withSubject(email)
-                .withExpiresAt(expirationTime)
-                .withIssuedAt(new Date(System.currentTimeMillis()))
-                .withClaim("claims", claims).sign(algorithm);
+    //generate value for user
+    @Override
+    public Token generateAccessToken(String subject) {
+        var expirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
+        String value = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
+                .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
+        return new Token(value,expirationDate);
+    }
+    @Override
+    public Token generateRefreshToken(String subject) {
+        var expirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
+        String token = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
+                .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
+        return new Token(token,expirationDate);
     }
 
 
 
-    public String validateTokenAndReturnSubject(String token) throws JWTVerificationException {
+    @Override
+    public String validateTokenAndGetSubject(String token) throws JWTVerificationException {
         var verifier = JWT.require(algorithm).build();
         var decodedJwt = verifier.verify(token);
         return decodedJwt.getSubject();
 
     }
 
+    @Override
     public void setAuthenticationToken(AppUser user, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                 user.getEmail(), user.getPassword(), user.getRoles().stream().map(us->new SimpleGrantedAuthority(us.getName())).toList());
@@ -60,4 +72,9 @@ public class JwtTokenUtil {
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
     }
+
+     public record Token(String value, Date expirationDate){}
+
 }
+
+

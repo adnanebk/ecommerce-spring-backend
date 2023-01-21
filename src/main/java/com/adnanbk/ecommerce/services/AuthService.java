@@ -12,7 +12,9 @@ public interface AuthService {
 
     AuthDataDto handleLogin(LoginUserDto appUser);
     AuthDataDto handleRegister(AppUser user);
+
     AuthDataDto refreshJwtToken(String refreshToken);
+
     String enableUser(String token);
 
     AppUser getAuthenticatedUser();

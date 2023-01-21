@@ -20,18 +20,18 @@ public class CreditCardServiceImpl implements CreditCardService {
 
 
     @Override
-    @Transactional
     public CreditCard saveCard(CreditCard creditCard) {
        var user =   authService.getAuthenticatedUser();
-            activeCreditCardIfNew(creditCard, user.getEmail());
+            if(isNewCard(user.getEmail()))
+                creditCard.setActive(true);
             creditCard.setAppUser(user);
             return creditCardRepo.save(creditCard);
 
     }
 
-    private void activeCreditCardIfNew(CreditCard creditCard, String email) {
-        if (creditCardRepo.findAllByAppUser_Email(email).isEmpty())
-            creditCard.setActive(true);
+    private boolean isNewCard(String email) {
+        return !creditCardRepo.existsByAppUser_Email(email);
+
     }
 
     @Override
