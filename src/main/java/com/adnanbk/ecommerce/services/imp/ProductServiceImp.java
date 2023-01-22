@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -87,10 +88,10 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Page<Product> getAll(ProductPageDto productPage) {
+    public Page<Product> getAll(ProductPageDto productPage, Pageable pageable) {
         return productRepo.findPagedProducts
                                 (productPage.getCategory(),productPage.getSearch()
-                                        ,productPage.getPageable());
+                                        ,pageable);
     }
 
     @Override

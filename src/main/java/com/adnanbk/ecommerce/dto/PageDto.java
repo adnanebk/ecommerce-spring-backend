@@ -15,11 +15,4 @@ public class PageDto {
     private String sortProperty="id";
     private String sortDirection="ASC";
     private String search;
-    private Pageable pageable;
-
-    public void buildPageable() {
-        this.pageable = PageRequest.of(number,size,
-                Sort.by(Sort.Direction.valueOf(sortDirection),sortProperty));
-
-    }
 }

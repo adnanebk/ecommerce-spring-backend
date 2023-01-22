@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.controllers;
 
+import com.adnanbk.ecommerce.dto.PageDto;
 import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
@@ -9,6 +10,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,8 +41,7 @@ public class ProductController {
     @GetMapping
     @ApiOperation(value = "Get a page of products")
     public Page<ProductDto> getProducts(ProductPageDto productPageDto) {
-        productPageDto.buildPageable();
-        return  productService.getAll(productPageDto)
+        return  productService.getAll(productPageDto,buildPageable(productPageDto))
                 .map(productMapper::toDto);
     }
 
@@ -117,5 +120,11 @@ return  CompletableFuture.supplyAsync(()->{
             .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
             .body(file);
 });
+    }
+
+        private Pageable buildPageable(PageDto pageDto) {
+        return PageRequest.of(pageDto.getNumber(),pageDto.getSize(),
+                Sort.by(Sort.Direction.valueOf(pageDto.getSortDirection()),pageDto.getSortProperty()));
+
     }
 }
