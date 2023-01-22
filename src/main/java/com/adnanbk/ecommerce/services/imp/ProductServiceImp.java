@@ -38,7 +38,6 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    @Transactional
     public Product updateProduct(Product product,Long id) {
              return   productRepo.findById(id).map(pr->mapProperties(pr,product))
                      .map(productRepo::save).orElseThrow();
