@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.jwt;
 
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
+import com.adnanbk.ecommerce.models.Role;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.AllArgsConstructor;
@@ -55,7 +56,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     if(!user.isEnabled())
                         throw new UserNotEnabledException();
                     // authentication
-                    jwtTokenService.setAuthenticationToken(user, request);
+                    jwtTokenService.setAuthenticationToken(email,user.getPassword(),user.getRoles().stream().map(Role::getName).toList(),request);
                 });
 
             }

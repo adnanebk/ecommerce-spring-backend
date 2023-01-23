@@ -4,6 +4,7 @@ import com.adnanbk.ecommerce.models.AppUser;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 
 public interface JwtTokenService {
     //generate value for user
@@ -13,5 +14,5 @@ public interface JwtTokenService {
 
     String validateTokenAndGetSubject(String token) throws JWTVerificationException;
 
-    void setAuthenticationToken(AppUser user, HttpServletRequest request);
+    void setAuthenticationToken(String email, String password, Collection<String> roles, HttpServletRequest request);
 }

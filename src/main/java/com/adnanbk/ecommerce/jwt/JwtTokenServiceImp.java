@@ -1,6 +1,5 @@
 package com.adnanbk.ecommerce.jwt;
 
-import com.adnanbk.ecommerce.models.AppUser;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
 import java.util.Date;
 
 @Service
@@ -60,9 +60,9 @@ public class JwtTokenServiceImp implements JwtTokenService {
     }
 
     @Override
-    public void setAuthenticationToken(AppUser user, HttpServletRequest request) {
+    public void setAuthenticationToken(String email, String password, Collection<String> roles, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                user.getEmail(), user.getPassword(), user.getRoles().stream().map(us->new SimpleGrantedAuthority(us.getName())).toList());
+                email, password, roles.stream().map(SimpleGrantedAuthority::new).toList());
         // Stores additional details about the authentication request (IP address, certificate serial number etc.).
         if (request != null)
             usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
