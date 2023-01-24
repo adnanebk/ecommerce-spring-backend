@@ -27,17 +27,17 @@ public class FacebookService implements SocialService {
 
     private String apiInspector;
 
-    private  String access_token;
+    private  String accessToken;
 
     @PostConstruct
     public void init(){
-     this.access_token=clientId + '|' + clientSecret;
+     this.accessToken =clientId + '|' + clientSecret;
     }
 
     public boolean verify(String authToken) {
         return Optional.ofNullable(authToken)
                        .map(token->restTemplate.getForEntity(apiInspector + "?input_token={token}&access_token={app-token}"
-                               , String.class, authToken, access_token).getStatusCode().is2xxSuccessful())
+                               , String.class, authToken, accessToken).getStatusCode().is2xxSuccessful())
                        .orElse(false);
 
     }
