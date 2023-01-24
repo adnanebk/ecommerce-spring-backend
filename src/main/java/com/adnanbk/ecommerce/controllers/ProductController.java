@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,6 +55,7 @@ public class ProductController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = ProductDto.class)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ProductDto> addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart MultipartFile file) {
 
                 return   this.imageService.upload(file).thenApplyAsync(imageName->
@@ -70,6 +72,7 @@ public class ProductController {
     @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = ProductDto.class)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ProductDto> updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) MultipartFile file,@PathVariable Long id) {
         return   this.imageService.upload(file).thenApplyAsync(image->
                 Optional.of(productDto)
@@ -86,6 +89,7 @@ public class ProductController {
 
     @PutMapping("/list")
     @ApiOperation(value = "update products", notes = "This endpoint updates  products and bind their categories by using bulk update ")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<ProductDto> updateProducts(@Valid @RequestBody List<ProductDto> products) {
         return productService.updateProducts(
                 products.stream().map(productMapper::toEntity).toList()
@@ -96,6 +100,7 @@ public class ProductController {
     @DeleteMapping
     @ApiOperation(value = "remove list of products")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void removeProducts(@RequestParam("Ids") List<Long> listOfIds) {
         if (!listOfIds.isEmpty())
             productService.removeProducts(listOfIds);
@@ -103,6 +108,7 @@ public class ProductController {
 
     @PostMapping("/excel")
     @ApiOperation(value = "add or update products from excel file", notes = "you can download an excel file and fill it")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Callable<List<ProductDto>> addProductsFromExcel(@RequestPart  MultipartFile file) {
         return () -> productService.addOrUpdateFromExcel(file)
                     .stream().map(productMapper::toDto).toList();
@@ -110,9 +116,10 @@ public class ProductController {
 
     @GetMapping("/excel/download/{ids}")
     @ApiOperation(value = "download excel file of products")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<InputStreamResource>>
     downloadExcelFromProducts(@PathVariable List<Long> ids) {
-return  CompletableFuture.supplyAsync(()->{
+    return  CompletableFuture.supplyAsync(()->{
     String filename = "products-" + LocalDate.now() + ".xlsx";
     InputStreamResource file = new InputStreamResource(productService.convertToExcel(ids));
     return ResponseEntity.ok()

@@ -56,7 +56,6 @@ public class JwtTokenServiceImp implements JwtTokenService {
         var verifier = JWT.require(algorithm).build();
         var decodedJwt = verifier.verify(token);
         return decodedJwt.getSubject();
-
     }
 
     @Override

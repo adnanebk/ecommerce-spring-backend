@@ -10,12 +10,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.Optional;
 
 
@@ -50,6 +48,12 @@ public class AuthController {
                 .orElseThrow();
     }
 
+    @PostMapping("refresh-token")
+    @ApiOperation(value = "generate new refresh token")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AuthDataDto refreshNewToken(@RequestBody String refreshToken) {
+        return this.authService.refreshJwtToken(refreshToken);
+    }
     @PostMapping("login")
     @ApiOperation(value = "authenticate a user")
     public AuthDataDto login(@RequestBody @Valid LoginUserDto appUser) {
@@ -70,17 +74,6 @@ public class AuthController {
         return authService.handleSocialLogin(socialLoginDto,facebookService);
     }
 
-    @GetMapping("enable")
-    @ApiOperation(value = "enable the user with the token sent to his email")
-    public ResponseEntity<String> enableUser(@RequestParam String token) {
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(authService.enableUser(token))).build();
-    }
-    @PostMapping("refresh-token")
-    @ApiOperation(value = "generate new refresh token")
-    @ResponseStatus(HttpStatus.CREATED)
-    public AuthDataDto refreshNewToken(@RequestBody String refreshToken) {
-        return this.authService.refreshJwtToken(refreshToken);
-    }
     @GetMapping("user")
     @ApiOperation(value = "get authenticated user details")
     public UserOutputDto getAuthUser() {
@@ -98,6 +91,7 @@ public class AuthController {
     public void sendEmailConfirmation() {
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));
     }
+
 
 
 }

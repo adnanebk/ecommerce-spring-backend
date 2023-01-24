@@ -1,23 +1,27 @@
 package com.adnanbk.ecommerce.config;
 
+import com.adnanbk.ecommerce.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.servlet.Filter;
 import java.util.List;
 
 @EnableWebSecurity
@@ -25,13 +29,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsService customUserDetailsService;
+    private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-    private final Filter jwtAuthorizationFilter;
+    @Value("${api.publicPaths}")
+    private String[] publicPaths;
 
-
-    public @Bean
-    PasswordEncoder passwordEncoder() {
+    public @Bean PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -40,24 +43,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //must be removed in production
         http.headers().frameOptions().disable();
         http.cors().and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .anyRequest().permitAll();
-
-        //.addFilter(new JWTAuthenticationFilter(authenticationManager(),jwtTokenUtil))
-        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .antMatchers(publicPaths).permitAll()
+                .antMatchers(HttpMethod.GET,"/api/products/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/categories/**").permitAll()
+                .anyRequest().authenticated();
+                http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-    protected @Override
-    void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
-    }
 
-    @Override
+
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
@@ -70,6 +73,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         configuration.setExposedHeaders(List.of("x-auth-token"));
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    // add this to not trigger the filter more than once
+    @Bean
+    public FilterRegistrationBean<JwtAuthorizationFilter> registration(JwtAuthorizationFilter filter) {
+        var registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
     }
 
 }

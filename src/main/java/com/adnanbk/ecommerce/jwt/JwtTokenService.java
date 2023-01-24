@@ -1,6 +1,5 @@
 package com.adnanbk.ecommerce.jwt;
 
-import com.adnanbk.ecommerce.models.AppUser;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 
 import javax.servlet.http.HttpServletRequest;

@@ -1,10 +1,13 @@
 package com.adnanbk.ecommerce.services;
 
 import com.adnanbk.ecommerce.dto.ImageDto;
-import com.adnanbk.ecommerce.dto.UserInputDto;
+import com.adnanbk.ecommerce.models.AppUser;
 
 public interface UserService {
     ImageDto changeUserImage(String fileName, String email);
 
-    void update(UserInputDto user, Long id);
+
+    void update(AppUser user, String email);
+
+    String enableUser(String token);
 }

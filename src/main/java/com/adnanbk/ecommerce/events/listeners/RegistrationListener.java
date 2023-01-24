@@ -20,10 +20,10 @@ public class RegistrationListener {
 
     private final JavaMailSender javaMailSender;
     @Value("${spring.mail.name}")
-    private String name;
+    private String senderName;
 
-    @Value("${spring.mail.email}")
-    private String email;
+    @Value("${spring.mail.username}")
+    private String senderEmail;
 
     @Async
     @EventListener
@@ -32,16 +32,16 @@ public class RegistrationListener {
         String  rootUrl = event.getUrl();
         String destAddress = user.getEmail();
         String token =ConfirmationTokenUtil.setConfirmationTokenForUser(user).getToken();
-        String verifyURL = rootUrl + "/auth/enable?token=" +token;
+        String verifyURL = rootUrl + "/user/enable?token=" +token;
         String subject = "Please verify your registration";
         String content = String.format("Dear %s,<br>Please click the link below to verify your registration:<br>"
                 + "<h3><a href=\"%s\" target=\"_self\">VERIFY</a></h3>"
-                + "Thank you,<br> %s.", user.getFirstName(), verifyURL, name);
+                + "Thank you,<br> %s.", user.getFirstName(), verifyURL, senderName);
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
-            helper.setFrom(email, name);
+            helper.setFrom(senderEmail, senderName);
             helper.setTo(destAddress);
             helper.setSubject(subject);
             helper.setText(content, true);

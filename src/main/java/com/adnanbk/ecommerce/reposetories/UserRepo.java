@@ -29,9 +29,5 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE AppUser us SET us.enabled = :enabled WHERE us.id= :id")
     void enableUser(Long id, boolean enabled);
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query("UPDATE AppUser us SET us.firstName = :firstName,us.lastName = :lastName,us.email = :email,us.city = :city," +
-            "us.country = :country,us.street = :street     WHERE us.id= :id")
-    void update(String firstName, String lastName, String email, String city, String country, String street, Long id);
+
 }

@@ -2,7 +2,6 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
-import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.jwt.JwtTokenService;
 import com.adnanbk.ecommerce.jwt.JwtTokenServiceImp;
 import com.adnanbk.ecommerce.models.AppUser;
@@ -10,12 +9,10 @@ import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
-import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import com.adnanbk.ecommerce.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,9 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +33,6 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncode;
     private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
-
-    @Value("${front.url}")
-    private String frontUrl;
 
 
 
@@ -74,15 +66,6 @@ public class AuthServiceImp implements AuthService {
     public AuthDataDto refreshJwtToken(String refreshToken) {
         String email = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
         return  this.userRepo.findByEmail(email).map(this::buildAuthData).orElseThrow();
-
-    }
-
-
-    @Override
-    public String enableUser(String token) {
-        var user = verifyConfirmationTokenAndGetUser(token);
-        userRepo.enableUser(user.getId(),true);
-        return frontUrl + "?verified=true";
     }
 
     @Override
@@ -98,18 +81,6 @@ public class AuthServiceImp implements AuthService {
             throw new InvalidPasswordException(messagesUtil.getDefaultMessage("error.invalid-password"));
         var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
         userRepo.updatePassword(user.getId(),newPassword);
-    }
-
-    private AppUser verifyConfirmationTokenAndGetUser(String token) {
-          return Optional.ofNullable(ConfirmationTokenUtil.getConfirmationToken(token))
-                    .map(confirmationToken->{
-                        if (confirmationToken.getExpirationDate().isBefore(LocalDate.now()))
-                           throw new InvalidTokenException("token is expired");
-                        if(confirmationToken.getAppUser().isEnabled())
-                            throw new InvalidTokenException("token is already enabled");
-                        return confirmationToken.getAppUser();
-                        }
-                    ).orElseThrow(()->new InvalidTokenException("the token is not found"));
     }
 
     private AuthDataDto buildAuthData(AppUser user) {

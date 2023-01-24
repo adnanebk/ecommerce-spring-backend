@@ -3,10 +3,11 @@ package com.adnanbk.ecommerce.jwt;
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
 import com.adnanbk.ecommerce.models.Role;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -15,12 +16,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Objects;
+import java.util.Set;
 
 @Component
 @AllArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    @Value("${api.publicPaths}")
+    private Set<String> publicPaths;
     private  HandlerExceptionResolver handlerExceptionResolver;
 
     private JwtTokenService jwtTokenService;
@@ -29,29 +32,25 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String reqUri = request.getRequestURI();
-        return !reqUri.contains("orders") &&
-                !reqUri.contains("user") &&
-                !reqUri.contains("/api/auth/user/**") &&
-                !reqUri.contains("products/v2") &&
-                !reqUri.contains("creditCards");
+        String header =request.getHeader("Authorization");
+        String path =request.getRequestURI();
+        String method =request.getMethod();
+        return (!StringUtils.hasLength(header) || !header.startsWith("Bearer "))
+                || method.equalsIgnoreCase("get") && (path.contains("products") || path.contains("categories"))
+                || publicPaths.stream().anyMatch(p->path.startsWith(p.replace("**","")));
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        final String requestTokenHeader = Objects.requireNonNullElse
-                (request.getHeader("Authorization"), "");
+        final String header = request.getHeader("Authorization");
         try {
             // JWT Token is in the form "Bearer token". Remove Bearer word and get
             // only the Token
-            var tokenArr = requestTokenHeader.split("Bearer ");
-            if (tokenArr.length != 2)
-                throw new JWTVerificationException("Request header not contains a valid authorization");
-
+            var token = header.split("Bearer ")[1];
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Once we get the token we validate it.
-                String email = jwtTokenService.validateTokenAndGetSubject(tokenArr[1]);
+                String email = jwtTokenService.validateTokenAndGetSubject(token);
                 userRepo.findByEmail(email).ifPresent(user->{
                     if(!user.isEnabled())
                         throw new UserNotEnabledException();

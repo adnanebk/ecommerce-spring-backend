@@ -15,8 +15,6 @@ public interface AuthService {
 
     AuthDataDto refreshJwtToken(String refreshToken);
 
-    String enableUser(String token);
-
     AppUser getAuthenticatedUser();
 
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto);
