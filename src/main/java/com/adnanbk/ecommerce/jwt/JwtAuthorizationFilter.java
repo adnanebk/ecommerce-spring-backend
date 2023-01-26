@@ -37,7 +37,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String method =request.getMethod();
         return (!StringUtils.hasLength(header) || !header.startsWith("Bearer "))
                 || method.equalsIgnoreCase("get") && (path.contains("products") || path.contains("categories"))
-                || publicPaths.stream().anyMatch(p->path.startsWith(p.replace("**","")));
+                || publicPaths.stream().anyMatch(p->path.startsWith(p.replace("/**","")));
     }
 
     @Override
@@ -60,6 +60,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
             }
         } catch (RuntimeException ex){
+
            handlerExceptionResolver.resolveException(request,response,null,ex);
             return; // return from this method so the response not enter to the chain and duplicate the exceptions
         }
