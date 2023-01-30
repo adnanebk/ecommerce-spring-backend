@@ -18,9 +18,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 
 @Component
@@ -32,8 +30,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final String SHEET = "Products";
     public static final String DEFAULT_IMAGE = "newProduct.jpg";
 
+
     private final ProductCategoryRepository categoryRepo;
-    private  boolean hasRowAnyValue=false;
 
     public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
@@ -50,17 +48,12 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         try (Workbook workbook = new XSSFWorkbook(is)) {
             Sheet sheet = workbook.getSheet(SHEET);
             Iterator<Row> rows = sheet.iterator();
-
-            // skip header
             skipHeader(rows);
             while (rows.hasNext()) {
                 Row currentRow = rows.next();
-                currentRow.getFirstCellNum();
-                if (currentRow.getPhysicalNumberOfCells() <= 0)
+                if (!hasAnyCell(currentRow))
                     continue;
-                hasRowAnyValue = false;
                 Product product = extractProductFromRow(currentRow);
-                if (hasRowAnyValue)
                     products.add(product);
             }
 
@@ -70,64 +63,45 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         }
     }
 
+    private boolean hasAnyCell(Row currentRow) {
+        return currentRow.getPhysicalNumberOfCells() > 0;
+    }
+
     private Product extractProductFromRow(Row currentRow) {
         Product product=new Product();
-        for (int i = 0; i < currentRow.getLastCellNum(); i++) {
-            var currentCell = currentRow.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
-            if(currentCell==null)
-                continue;
-            setProductPropertiesFromCell(currentCell,i, product);
-        }
+        getCell(0,currentRow).map(Cell::getNumericCellValue).map(Double::longValue)
+                    .ifPresent(product::setId);
+        getCell(1,currentRow).map(Cell::getStringCellValue)
+                    .ifPresent(product::setName);
+        getCell(2,currentRow).map(Cell::getStringCellValue)
+                    .ifPresent(product::setDescription);
+        getCell(3,currentRow).map(Cell::getStringCellValue)
+                    .ifPresent(product::setSku);
+        getCell(4,currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf)
+                    .ifPresent(product::setUnitPrice);
+        getCell(5,currentRow).map(Cell::getNumericCellValue).map(Double::intValue)
+                    .ifPresent(product::setUnitsInStock);
+        getCell(6,currentRow).map(Cell::getStringCellValue)
+                    .ifPresent(cat->product.setCategory(categoryRepo.findByNameIgnoreCase(cat)));
         if(product.getId()==null)
             product.setImage(DEFAULT_IMAGE);
         return product;
     }
 
-    private void setProductPropertiesFromCell(Cell currentCell, int cellIndex, Product product) {
-        if (currentCell != null) {
-            hasRowAnyValue=true;
-            try {
-                switch (cellIndex) {
-                    case 0 -> product.setId((long)currentCell.getNumericCellValue());
-                    case 1 -> product.setName(currentCell.getStringCellValue());
-                    case 2 -> product.setDescription(currentCell.getStringCellValue());
-                    case 3 -> product.setSku(currentCell.getStringCellValue());
-                    case 4 -> product.setUnitPrice(BigDecimal.valueOf(currentCell.getNumericCellValue()));
-                    case 5 -> product.setUnitsInStock((int) currentCell.getNumericCellValue());
-                    case 6 -> {
-                        var category = categoryRepo.findByNameIgnoreCase(currentCell.getStringCellValue());
-                        if (category == null)
-                            throw new ValidationException("category not found");
-                        product.setCategory(category);
-                    }
-                    default ->  throw new ValidationException("column cannot be mapped");
-                }
-            } catch (IllegalStateException ex) {
-                throw new ValidationException("fail to load data from Excel file: , check if you are using valid data with correct orders");
-            }
-        }
+    private Optional<Cell> getCell(int colIdx, Row currentRow) {
+        return Optional.ofNullable(currentRow.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
     }
 
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
-
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet(SHEET);
-
-            // Header
-            Row headerRow = sheet.createRow(0);
-
-            for (int col = 0; col < HEADERS.length; col++) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(HEADERS[col]);
-            }
-
+            createHeaders(sheet);
             int rowIdx = 1;
             for (Product product : products) {
-                fillRowWithProduct(sheet, rowIdx, product);
+                fillRowWithProduct(sheet.createRow(rowIdx++), product);
             }
-
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
@@ -135,8 +109,15 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         }
     }
 
-    private int fillRowWithProduct(Sheet sheet, int rowIdx, Product product) {
-        Row row = sheet.createRow(rowIdx++);
+    private  void createHeaders(Sheet sheet) {
+        Row headerRow = sheet.createRow(0);
+        for (int colIdx = 0; colIdx < HEADERS.length; colIdx++) {
+            Cell cell = headerRow.createCell(colIdx);
+            cell.setCellValue(HEADERS[colIdx]);
+        }
+    }
+
+    private void fillRowWithProduct( Row row, Product product) {
         row.createCell(0).setCellValue(product.getId());
         row.createCell(1).setCellValue(product.getName());
         row.createCell(2).setCellValue(product.getDescription());
@@ -144,7 +125,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(4).setCellValue(product.getUnitPrice().doubleValue());
         row.createCell(5).setCellValue(product.getUnitsInStock());
         row.createCell(6).setCellValue(product.getCategory().getName());
-        return rowIdx;
     }
 
     private void skipHeader(Iterator<Row> rows) {
