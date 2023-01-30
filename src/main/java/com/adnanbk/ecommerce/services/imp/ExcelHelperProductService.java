@@ -82,7 +82,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         getCell(5,currentRow).map(Cell::getNumericCellValue).map(Double::intValue)
                     .ifPresent(product::setUnitsInStock);
         getCell(6,currentRow).map(Cell::getStringCellValue)
-                    .ifPresent(cat->product.setCategory(categoryRepo.findByNameIgnoreCase(cat)));
+                    .map(categoryRepo::findByNameIgnoreCase)
+                    .ifPresent(product::setCategory);
         if(product.getId()==null)
             product.setImage(DEFAULT_IMAGE);
         return product;
