@@ -81,9 +81,7 @@ public class ProductServiceImp implements ProductService {
         }
     }
 
-    private static boolean isNewProduct(Product pr) {
-        return Optional.ofNullable(pr.getId()).isEmpty();
-    }
+
 
     @Override
     public Product getBySku(String sku) {
@@ -104,6 +102,9 @@ public class ProductServiceImp implements ProductService {
                    .map(productRepo::findAllById)
                    .map(excelHelper::listToExcel)
                    .orElseThrow();
+    }
+    private  boolean isNewProduct(Product pr) {
+        return Optional.ofNullable(pr.getId()).isEmpty();
     }
 
 private  Product mapProperties(Product target, Product src) {
