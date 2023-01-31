@@ -67,7 +67,7 @@ public class ProductServiceImp implements ProductService {
                         List<Product> updatableProducts = new ArrayList<>();
                         List<Product> addableProducts = new ArrayList<>();
                                 productsList.forEach(pr -> {
-                                    if (pr.getId() == null || pr.getId() == 0)
+                                    if (isNewProduct(pr))
                                         addableProducts.add(pr);
                                     else
                                         updatableProducts.add(pr);
@@ -79,6 +79,10 @@ public class ProductServiceImp implements ProductService {
         } catch (IOException e) {
             throw new CustomFileException("We can't process the file,please try again");
         }
+    }
+
+    private static boolean isNewProduct(Product pr) {
+        return Optional.ofNullable(pr.getId()).isEmpty();
     }
 
     @Override
