@@ -3,11 +3,17 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
+import com.adnanbk.ecommerce.jwt.JwtTokenService;
+import com.adnanbk.ecommerce.jwt.JwtTokenServiceImp;
 import com.adnanbk.ecommerce.mappers.UserMapper;
+import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
+import com.adnanbk.ecommerce.services.imp.FacebookService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -24,15 +30,11 @@ public class AuthController {
 
 
     private final AuthService authService;
-    private final SocialService facebookService;
     private final SocialService googleService;
+    private final FacebookService facebookService;
+    private final JwtTokenService jwtTokenService;
     private final UserMapper userMapper;
     private final ApplicationEventPublisher eventPublisher;
-
-    private String getRootUrl() {
-        return ServletUriComponentsBuilder.fromCurrentRequest().replacePath("/api").toUriString();
-    }
-
 
     @PostMapping(value = "register")
     @ApiOperation(value = "register a new user", response = AuthDataDto.class)
@@ -40,8 +42,9 @@ public class AuthController {
     public AuthDataDto register(@RequestBody @Valid UserInputDto userDto) {
         return Optional.of(userDto)
                 .map(userMapper::toEntity)
+                .map(authService::handleRegister)
                 .map(user-> {
-                    AuthDataDto authDataDto =  authService.handleRegister(user);
+                    AuthDataDto authDataDto =  buildAuthData(authService.handleRegister(user));
                     eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user));
                     return authDataDto;
                 })
@@ -52,26 +55,27 @@ public class AuthController {
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthDataDto refreshNewToken(@RequestBody String refreshToken) {
-        return this.authService.refreshJwtToken(refreshToken);
+        String email  = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
+              return   buildAuthData(this.authService.getUserByEmail(email));
     }
     @PostMapping("login")
     @ApiOperation(value = "authenticate a user")
     public AuthDataDto login(@RequestBody @Valid LoginUserDto appUser) {
-        return authService.handleLogin(appUser);
+        return buildAuthData(authService.handleLogin(appUser));
     }
 
     @PostMapping("login/google")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
     public AuthDataDto googleLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleSocialLogin(socialLoginDto,googleService);
+        return buildAuthData(authService.handleSocialLogin(socialLoginDto,googleService));
 
     }
 
     @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
     public AuthDataDto facebookLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleSocialLogin(socialLoginDto,facebookService);
+        return buildAuthData(authService.handleSocialLogin(socialLoginDto,facebookService));
     }
 
     @GetMapping("user")
@@ -91,7 +95,17 @@ public class AuthController {
     public void sendEmailConfirmation() {
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));
     }
+    private String getRootUrl() {
+        return ServletUriComponentsBuilder.fromCurrentRequest().replacePath("/api").toUriString();
+    }
 
-
+    private AuthDataDto buildAuthData(AppUser user) {
+       return  Optional.of(user)
+                 .map(userMapper::toDto).map(userDto-> {
+                     JwtTokenServiceImp.Token token = this.jwtTokenService.generateAccessToken(user.getEmail());
+                     JwtTokenServiceImp.Token refreshToken = this.jwtTokenService.generateRefreshToken(user.getEmail());
+                     return new AuthDataDto(token.value(), refreshToken.value(), token.expirationDate(), userDto);
+                 }).orElseThrow();
+    }
 
 }

@@ -10,10 +10,7 @@ import java.util.Locale;
 
 @Component
 @RequiredArgsConstructor
-@Setter
 public class ErrorMessagesUtil {
-
-    private  Locale  locale;
 
     private  final MessageSource messageSource;
 
@@ -21,10 +18,7 @@ public class ErrorMessagesUtil {
        return messageSource.getMessage(code,null, LocaleContextHolder.getLocale());
    }
     public String getMessage(String code) {
-        return messageSource.getMessage(code,null, locale);
+        return messageSource.getMessage(code,null,LocaleContextHolder.getLocale() );
     }
-    public String getMessage(String code,Locale locale) {
-       this.locale=locale;
-        return messageSource.getMessage(code,null, locale);
-    }
+
 }

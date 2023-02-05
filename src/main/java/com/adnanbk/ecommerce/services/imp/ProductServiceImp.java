@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.ProductPageDto;
-import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
@@ -18,11 +17,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,16 +40,17 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public Product updateProduct(Product product,Long id) {
-             return   productRepo.findById(id).map(pr->mapProperties(pr,product))
+             return   productRepo.findById(id).map(pr-> mapPropertiesAndGet(pr,product))
                      .map(productRepo::save).orElseThrow();
     }
 
     @Override
     public List<Product> updateProducts(List<Product> products) {
-       var updatableProducts =  productRepo.findAllById(products.stream().map(Product::getId).toList())
+       Map<Long,Product> productsMap = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+       var currentProductsInDb =  productRepo.findAllById(products.stream().map(Product::getId).toList())
                .stream()
-               .map(product -> mapProperties(product,products.stream().filter(pr -> pr.getId().equals(product.getId())).findFirst().orElseThrow())).toList();
-        return productRepo.saveAll(updatableProducts);
+               .map(product -> mapPropertiesAndGet(product,productsMap.get(product.getId()))).toList();
+        return productRepo.saveAll(currentProductsInDb);
 
     }
 
@@ -61,8 +62,7 @@ public class ProductServiceImp implements ProductService {
 
     @Transactional
     public List<Product> addOrUpdateFromExcel(MultipartFile multipartFile) {
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            return Optional.ofNullable(excelHelper.excelToList(inputStream))
+            return Optional.ofNullable(excelHelper.excelToList(multipartFile))
                     .map(productsList-> {
                         List<Product> updatableProducts = new ArrayList<>();
                         List<Product> addableProducts = new ArrayList<>();
@@ -72,13 +72,13 @@ public class ProductServiceImp implements ProductService {
                                     else
                                         updatableProducts.add(pr);
                                 });
-                                return ListUtils.union(productRepo.saveAll(addableProducts),updateProducts(updatableProducts));
+                                var currentProductsInDb = productRepo.findAllById(updatableProducts.stream().map(Product::getId).toList());
+                        List<Product> union = ListUtils.union(addableProducts, mapPropertiesAndGet(currentProductsInDb, updatableProducts));
+                        return productRepo.saveAll(union);
                             }
                     ).orElse(new ArrayList<>());
 
-        } catch (IOException e) {
-            throw new CustomFileException("We can't process the file,please try again");
-        }
+
     }
 
 
@@ -107,7 +107,7 @@ public class ProductServiceImp implements ProductService {
         return Optional.ofNullable(pr.getId()).isEmpty();
     }
 
-private  Product mapProperties(Product target, Product src) {
+private  Product mapPropertiesAndGet(Product target, Product src) {
     target.setSku(src.getSku());
     target.setUnitPrice(src.getUnitPrice());
     target.setName(src.getName());
@@ -119,4 +119,8 @@ private  Product mapProperties(Product target, Product src) {
       target.setImage(src.getImage());
     return target;
 }
+    private  List<Product> mapPropertiesAndGet(List<Product> targets, List<Product> srcs) {
+        Map<Long,Product> productsMap = srcs.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+        return  targets.stream().map(target-> mapPropertiesAndGet(target,productsMap.get(target.getId()))).toList();
+    }
 }

@@ -4,6 +4,7 @@ import com.adnanbk.ecommerce.dto.UserInputDto;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.UserService;
+import com.adnanbk.ecommerce.utils.FileUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,7 +39,8 @@ private final FileService imageService;
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
-        return this.imageService.upload(file).thenApplyAsync(fileName->userService.changeUserImage(fileName,principal.getName()));
+        return this.imageService.upload(file)
+                .thenApplyAsync(fileName->userService.changeUserImage(FileUtil.toImageUrl(fileName),principal.getName()));
     }
 
     @GetMapping("/user/enable")

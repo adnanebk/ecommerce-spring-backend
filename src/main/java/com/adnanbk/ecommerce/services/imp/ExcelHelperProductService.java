@@ -19,15 +19,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
-
+import java.util.concurrent.CompletableFuture;
+import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
-    static final String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static final String[] HEADERS = {"Id","Name", "Description", "Sku", "Price", "Quantity",
             "Category"};
 
-    static final String SHEET = "Products";
+    static final String SHEET_NAME = "Products";
     public static final String DEFAULT_IMAGE = "newProduct.jpg";
 
 
@@ -37,35 +37,30 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         this.categoryRepo = categoryRepo;
     }
 
-    @Override
-    public boolean hasExcelFormat(MultipartFile file) {
-        return TYPE.equals(file.getContentType());
-    }
+
+
 
     @Override
-    public List<Product> excelToList(InputStream is) {
-        List<Product> products = new ArrayList<>();
-        try (Workbook workbook = new XSSFWorkbook(is)) {
-            Sheet sheet = workbook.getSheet(SHEET);
-            Iterator<Row> rows = sheet.iterator();
+    public List<Product> excelToList(MultipartFile file) {
+        if(!hasExcelFormat(file))
+            throw new CustomFileException("Only excel formats are valid");
+        try(InputStream is = file.getInputStream();
+            Workbook workbook = new XSSFWorkbook(is)
+        ) {
+            List<Product> products = new ArrayList<>();
+            Iterator<Row> rows = workbook.getSheet(SHEET_NAME).iterator();
             skipHeader(rows);
-            while (rows.hasNext()) {
-                Row currentRow = rows.next();
-                if (!hasAnyCell(currentRow))
-                    continue;
-                Product product = extractProductFromRow(currentRow);
-                    products.add(product);
-            }
-
+            rows.forEachRemaining(currentRow->{
+                if (hasAnyCell(currentRow))
+                    CompletableFuture.runAsync(()->products.add(extractProductFromRow(currentRow)));
+            });
             return products;
         } catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
         }
     }
 
-    private boolean hasAnyCell(Row currentRow) {
-        return currentRow.getPhysicalNumberOfCells() > 0;
-    }
+
 
     private Product extractProductFromRow(Row currentRow) {
         Product product=new Product();
@@ -89,18 +84,13 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         return product;
     }
 
-    private Optional<Cell> getCell(int colIdx, Row currentRow) {
-        return Optional.ofNullable(currentRow.getCell(colIdx, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
-    }
-
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet(SHEET);
-            createHeaders(sheet);
+              Sheet sheet = createSheet(SHEET_NAME,workbook,HEADERS);
             int rowIdx = 1;
-            for (Product product : products) {
+            for(Product product:products){
                 fillRowWithProduct(sheet.createRow(rowIdx++), product);
             }
             workbook.write(out);
@@ -110,13 +100,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         }
     }
 
-    private  void createHeaders(Sheet sheet) {
-        Row headerRow = sheet.createRow(0);
-        for (int colIdx = 0; colIdx < HEADERS.length; colIdx++) {
-            Cell cell = headerRow.createCell(colIdx);
-            cell.setCellValue(HEADERS[colIdx]);
-        }
-    }
 
     private void fillRowWithProduct( Row row, Product product) {
         row.createCell(0).setCellValue(product.getId());
@@ -131,6 +114,14 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     private void skipHeader(Iterator<Row> rows) {
         if (rows.hasNext())
             rows.next();
+    }
+
+    private Optional<Cell> getCell(int colIndex, Row currentRow) {
+        return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
+    }
+
+    private boolean hasAnyCell(Row currentRow) {
+        return currentRow.getPhysicalNumberOfCells() > 0;
     }
 
 
