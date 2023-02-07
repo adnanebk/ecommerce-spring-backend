@@ -10,7 +10,7 @@ import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
-import com.adnanbk.ecommerce.utils.PasswordUtil;
+import com.adnanbk.ecommerce.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -87,7 +87,7 @@ public class AuthServiceImp implements AuthService {
                 .orElseGet(() -> saveUser(
                         AppUser.builder().email(user.email()).firstName(user.firstName())
                                 .lastName(user.lastName()).imageUrl(user.image())
-                                .password(PasswordUtil.generateRandomPassword())
+                                .password(StringUtil.generateRandomPassword())
                                 .enabled(true).isSocial(true).build()));
     }
 

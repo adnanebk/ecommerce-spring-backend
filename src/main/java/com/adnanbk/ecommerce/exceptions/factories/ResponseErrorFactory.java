@@ -2,6 +2,7 @@ package com.adnanbk.ecommerce.exceptions.factories;
 
 import com.adnanbk.ecommerce.dto.ResponseError;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
+import com.adnanbk.ecommerce.utils.StringUtil;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -30,15 +31,8 @@ public class ResponseErrorFactory {
     }
 
     public  ResponseError create(String fieldName, String errorMessage) {
-        String formattedName = fieldName.equals(fieldName.toLowerCase()) ? fieldName : formatToWordsWithSpaces(fieldName);
-
+        String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
         return new ResponseError(fieldName, formattedName+" " +errorMessage);
-    }
-
-    private  String formatToWordsWithSpaces(String fieldName) {
-        return StringUtils
-                .uncapitalize(fieldName.replaceAll("([a-z])([A-Z]+)", "$1 $2").toLowerCase());
-
     }
 
 
