@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static com.adnanbk.ecommerce.services.ExcelHelperService.createSheet;
+import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 import static com.adnanbk.ecommerce.services.ExcelHelperService.hasExcelFormat;
 
 @Component
@@ -123,10 +123,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private Optional<Cell> getCell(int colIndex, Row currentRow) {
         return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
-    }
-
-    private boolean hasAnyCell(Row currentRow) {
-        return currentRow.getPhysicalNumberOfCells() > 0;
     }
 
 

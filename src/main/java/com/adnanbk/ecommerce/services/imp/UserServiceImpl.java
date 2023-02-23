@@ -7,7 +7,6 @@ import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.UserService;
 import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,8 +18,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
 
-    @Value("${front.url}")
-    private String frontUrl;
+
 
 
     @Override
@@ -49,10 +47,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String enableUser(String token) {
+    public void enableUser(String token) {
         var user = verifyConfirmationTokenAndGetUser(token);
         userRepo.enableUser(user.getId(),true);
-        return frontUrl + "?verified=true";
     }
     private AppUser verifyConfirmationTokenAndGetUser(String token) {
         return Optional.ofNullable(ConfirmationTokenUtil.getConfirmationToken(token))

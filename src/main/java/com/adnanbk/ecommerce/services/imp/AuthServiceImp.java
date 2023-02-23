@@ -9,7 +9,6 @@ import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
-import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import com.adnanbk.ecommerce.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +28,6 @@ public class AuthServiceImp implements AuthService {
     private final UserRepo userRepo;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncode;
-    private  final ErrorMessagesUtil messagesUtil;
     private final AuthenticationManager authenticationManager;
 
 
@@ -37,7 +35,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public AppUser handleSocialLogin(SocialLoginDto user, SocialService socialService) {
         if (!socialService.verify(user.token()))
-            throw new BadCredentialsException(messagesUtil.getDefaultMessage(("error.invalid-credential")));
+            throw new BadCredentialsException(("error.invalid-credential"));
         return getAppUserOrCreateNewOne(user);
     }
 
@@ -48,7 +46,7 @@ public class AuthServiceImp implements AuthService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
-            throw new BadCredentialsException(messagesUtil.getDefaultMessage(("error.invalid-email-or-password")));
+            throw new BadCredentialsException("error.invalid-email-or-password");
         }
 
         return userRepo.findByEmail(appUser.getEmail()).orElseThrow();
@@ -71,7 +69,7 @@ public class AuthServiceImp implements AuthService {
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto) {
         AppUser user = this.getAuthenticatedUser();
         if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-            throw new InvalidPasswordException(messagesUtil.getDefaultMessage("error.invalid-password"));
+            throw new InvalidPasswordException("error.invalid-password");
         var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
         userRepo.updatePassword(user.getId(),newPassword);
     }

@@ -1,36 +1,27 @@
 package com.adnanbk.ecommerce.exceptions.factories;
 
 import com.adnanbk.ecommerce.dto.ResponseError;
-import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import com.adnanbk.ecommerce.utils.StringUtil;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 
-@Component
 public class ResponseErrorFactory {
-
- private ErrorMessagesUtil errorMessagesUtil;
-
-    public ResponseErrorFactory(ErrorMessagesUtil errorMessagesUtil) {
-        this.errorMessagesUtil = errorMessagesUtil;
+    private ResponseErrorFactory() {
     }
 
-
-    public  ResponseError create(String uniqueErrorMessage) {
-           String message = this.errorMessagesUtil.getDefaultMessage("error.already-exist");
-        if (uniqueErrorMessage.toLowerCase().contains("uniqueName".toLowerCase()))
-            return create("name", message);
-        if (uniqueErrorMessage.toLowerCase().contains("uniqueCardNumber".toLowerCase()))
-            return create("cardNumber", message);
-        if (uniqueErrorMessage.toLowerCase().contains("uniqueSku".toLowerCase()))
-            return create("sku", message);
-        if (uniqueErrorMessage.toLowerCase().contains("uniqueEmail".toLowerCase()))
-            return create("email", message);
+    public static ResponseError create(String uniqueMessage, Exception uniqueErrorException) {
+        String message = uniqueErrorException.getMessage();
+        if (message.toLowerCase().contains("uniqueName".toLowerCase()))
+            return create("name", uniqueMessage);
+        if (message.toLowerCase().contains("uniqueCardNumber".toLowerCase()))
+            return create("cardNumber", uniqueMessage);
+        if (message.toLowerCase().contains("uniqueSku".toLowerCase()))
+            return create("sku", uniqueMessage);
+        if (message.toLowerCase().contains("uniqueEmail".toLowerCase()))
+            return create("email", uniqueMessage);
         return null;
     }
 
-    public  ResponseError create(String fieldName, String errorMessage) {
+    public static   ResponseError create(String fieldName, String errorMessage) {
         String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
         return new ResponseError(fieldName, formattedName+" " +errorMessage);
     }

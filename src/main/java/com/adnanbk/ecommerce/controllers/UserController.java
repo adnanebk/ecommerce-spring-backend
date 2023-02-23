@@ -7,6 +7,7 @@ import com.adnanbk.ecommerce.services.UserService;
 import com.adnanbk.ecommerce.utils.FileUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,9 @@ public class UserController {
 
 private final UserService userService;
 private final UserMapper userMapper;
+
+    @Value("${front.url}")
+    private String frontUrl;
 private final FileService imageService;
 
     @PatchMapping("/users/current")
@@ -46,7 +50,8 @@ private final FileService imageService;
     @GetMapping("/user/enable")
     @ApiOperation(value = "enable the user with the token sent to his email")
     public ResponseEntity<String> enableUser(@RequestParam String token) {
+        userService.enableUser(token);
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(userService.enableUser(token))).build();
+                .location(URI.create(frontUrl + "?verified=true")).build();
     }
 }

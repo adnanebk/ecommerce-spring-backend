@@ -20,7 +20,7 @@ public interface ExcelHelperService<T> {
         return TYPE.equals(file.getContentType());
     }
 
-    static  Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
+    static   Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
             Sheet sheet = workbook.createSheet(sheetName);
             Row headerRow = sheet.createRow(0);
             for (int colIdx = 0; colIdx < headers.length; colIdx++) {
@@ -28,6 +28,9 @@ public interface ExcelHelperService<T> {
                 cell.setCellValue(headers[colIdx]);
             }
          return sheet;
+    }
+    static boolean hasAnyCell(Row currentRow) {
+        return currentRow.getPhysicalNumberOfCells() > 0;
     }
 
 

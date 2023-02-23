@@ -7,6 +7,7 @@ import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
 import com.adnanbk.ecommerce.exceptions.factories.ResponseErrorFactory;
+import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ExceptionsHandler {
 
-    private final ResponseErrorFactory responseErrorFactory;
+    private final ErrorMessagesUtil errorMessagesUtil;
 
     @ExceptionHandler({PersistenceException.class, ConstraintViolationException.class})
     public ApiErrorDto handleConstraintViolation(RuntimeException ex) {
@@ -59,56 +60,58 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                er -> errors.add(responseErrorFactory.create(er.getField(), er.getDefaultMessage()))
+                er -> errors.add(ResponseErrorFactory.create(er.getField(), er.getDefaultMessage()))
         );
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
                     if (x.getDefaultMessage() != null)
-                        errors.add(responseErrorFactory.create(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
+                        errors.add(ResponseErrorFactory.create(Objects.requireNonNull(x.getCode()), x.getDefaultMessage()));
                 });
         return generateApiErrors(errors);
     }
 
     @ExceptionHandler(ValidationException.class)
     public ApiErrorDto handleValidationException(ValidationException ex) {
-        return new ApiErrorDto(ex.getMessage());
+        return new ApiErrorDto(formatMessage(formatMessage(ex.getMessage())));
     }
+
 
     @ExceptionHandler(BadCredentialsException.class)
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
-        return new ApiErrorDto(ex.getMessage());
+        return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(ProductNotFoundException.class)
     public ApiErrorDto productNotFoundException(ProductNotFoundException ex) {
-        return new ApiErrorDto(ex.getMessage());
+        return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
 
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
-        return new ApiErrorDto(ex.getMessage(),Set.of(new ResponseError("currentPassword",ex.getMessage())));
+        return new ApiErrorDto(formatMessage(ex.getMessage()),Set.of(new ResponseError("currentPassword",formatMessage(ex.getMessage()))));
     }
+ 
 
     @ExceptionHandler(JWTVerificationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiErrorDto jWTVerificationException(JWTVerificationException ex) {
         if(ex instanceof TokenExpiredException)
-            return new ApiErrorDto(ex.getMessage(),"jwt.expired");
+            return new ApiErrorDto(formatMessage(ex.getMessage()),"jwt.expired");
 
-        return new ApiErrorDto(ex.getMessage());
+        return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(UserNotEnabledException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiErrorDto userNotEnabledException(UserNotEnabledException ex) {
-        return new ApiErrorDto(ex.getMessage(),"user.not.enabled");
+        return new ApiErrorDto(formatMessage(ex.getMessage()),"user.not.enabled");
     }
 
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseBody
     public String invalidTokenException(InvalidTokenException ex) {
-        return "<h2>" + ex.getMessage() + "</h2>";
+        return "<h2>" + formatMessage(ex.getMessage()) + "</h2>";
     }
 
 
@@ -116,13 +119,13 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(responseErrorFactory.create(violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(ResponseErrorFactory.create(violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
 
     private ApiErrorDto generateUniqueErrorMessage(Exception cause) {
-        ResponseError responseError = responseErrorFactory.create(cause.getMessage());
+        ResponseError responseError = ResponseErrorFactory.create(this.errorMessagesUtil.getMessage("error.already-exist"),cause);
         if (responseError == null)
             return new ApiErrorDto("An error has been thrown during database modification");
 
@@ -132,5 +135,8 @@ public class ExceptionsHandler {
 
     private ApiErrorDto generateApiErrors(Set<ResponseError> responseErrors) {
         return new ApiErrorDto("Try to fix these errors", responseErrors);
+    }
+    private String formatMessage(String message) {
+        return message.startsWith("error.")?errorMessagesUtil.getMessage(message):message;
     }
 }
