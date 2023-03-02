@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.QueryHint;
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -31,4 +32,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                (lower(c.name) like lower(concat('%', :cat,'%'))) )
              )""")
     Page<Product> findPagedProducts(@Param("cat") String category,@Param("sr") String search, Pageable pageable);
+
+    List<Product> findAllBySkuIn(List<String> skus);
 }

@@ -4,6 +4,7 @@ import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductCategoryRepository;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
+import com.adnanbk.ecommerce.utils.FileUtil;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -21,10 +22,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
-import static com.adnanbk.ecommerce.services.ExcelHelperService.hasExcelFormat;
 
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
@@ -59,7 +58,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
             skipHeader(rows);
             rows.forEachRemaining(currentRow->{
                 if (hasAnyCell(currentRow))
-                    CompletableFuture.runAsync(()->products.add(extractProductFromRow(currentRow)));
+                    products.add(extractProductFromRow(currentRow));
             });
             return products;
         } catch (IOException e) {
@@ -77,7 +76,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                 .unitPrice(getCell(UNIT_PRICE_CELL,currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf).orElse(null))
                 .unitsInStock(getCell(UNITS_IN_STOCK_CELL,currentRow).map(Cell::getNumericCellValue).map(Double::intValue).orElse(null))
                 .category(getCell(CATEGORY_CELL,currentRow).map(Cell::getStringCellValue).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                .image(getCell(CATEGORY_CELL,currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
+                .image(getCell(IMAGE_URL_CELL,currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
                 .build();
     }
 
@@ -104,7 +103,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(UNIT_PRICE_CELL).setCellValue(product.getUnitPrice().doubleValue());
         row.createCell(UNITS_IN_STOCK_CELL).setCellValue(product.getUnitsInStock());
         row.createCell(CATEGORY_CELL).setCellValue(product.getCategory().getName());
-        row.createCell(IMAGE_URL_CELL).setCellValue(product.getImage());
+        row.createCell(IMAGE_URL_CELL).setCellValue(FileUtil.toImageUrl(product.getImage()));
     }
 
 

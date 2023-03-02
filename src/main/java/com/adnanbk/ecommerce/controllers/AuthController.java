@@ -4,7 +4,6 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.jwt.JwtTokenService;
-import com.adnanbk.ecommerce.jwt.JwtTokenServiceImp;
 import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.services.AuthService;

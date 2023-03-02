@@ -4,6 +4,7 @@ import com.adnanbk.ecommerce.dto.ProductPageDto;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
+import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.services.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
+    private final UserRepo userRepo;
 
 
     @Override
@@ -58,15 +60,12 @@ public class ProductServiceImp implements ProductService {
     public List<Product> addOrUpdateFromExcel(MultipartFile multipartFile) {
             return Optional.ofNullable(excelHelper.excelToList(multipartFile))
                     .map(productsList-> {
-                        List<Product> updatableProducts = new ArrayList<>();
-                        List<Product> addableProducts = new ArrayList<>();
-                                productsList.forEach(pr -> {
-                                    if (isNewProduct(pr))
-                                        addableProducts.add(pr);
-                                    else
-                                        updatableProducts.add(pr);
-                                });
-                        return productRepo.saveAll(ListUtils.union(addableProducts, mapProductsInDb(updatableProducts)));
+                        Map<String,Product> productsMap = productsList.stream().collect(Collectors.toMap(Product::getSku, Function.identity()));
+                        List<Product> updatableProducts = productRepo.findAllBySkuIn(productsList.stream().map(Product::getSku).toList())
+                                .stream().map(product -> mapPropertiesAndGet(product,productsMap.remove(product.getSku()))).toList();
+                        List<Product> addableProducts = productsMap.values().stream().toList();
+
+                        return productRepo.saveAll(ListUtils.union(addableProducts, updatableProducts));
                             }
                     ).orElse(new ArrayList<>());
 
@@ -92,9 +91,7 @@ public class ProductServiceImp implements ProductService {
                    .map(excelHelper::listToExcel)
                    .orElseThrow();
     }
-    private  boolean isNewProduct(Product pr) {
-        return Optional.ofNullable(pr.getId()).isEmpty();
-    }
+
     private List<Product> mapProductsInDb(List<Product> products) {
         if(products==null || products.isEmpty())
             return  new ArrayList<>();
