@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
@@ -29,21 +28,24 @@ import static com.adnanbk.ecommerce.services.ExcelHelperService.hasExcelFormat;
 
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
-    static final String[] HEADERS = {"Id","Name", "Description", "Sku", "Price", "Quantity",
-            "Category"};
-
+    static final String[] HEADERS = {"Sku","Name", "Description", "Price", "Quantity","Category","Image url"};
     static final String SHEET_NAME = "Products";
     public static final String DEFAULT_IMAGE = "newProduct.jpg";
 
+    static final int SKU_CELL = 0;
+    static final int NAME_CELL = 1;
+    static final int DESCRIPTION_CELL = 2;
+
+    static final int UNIT_PRICE_CELL = 3;
+    static final int UNITS_IN_STOCK_CELL = 4;
+    static final int CATEGORY_CELL = 5;
+    static final int IMAGE_URL_CELL = 6;
 
     private final ProductCategoryRepository categoryRepo;
 
     public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
     }
-
-
-
 
     @Override
     public List<Product> excelToList(MultipartFile file) {
@@ -68,27 +70,16 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
 
     private Product extractProductFromRow(Row currentRow) {
-        Product product=new Product();
-        getCell(0,currentRow).map(Cell::getNumericCellValue).map(Double::longValue)
-                    .ifPresent(product::setId);
-        getCell(1,currentRow).map(Cell::getStringCellValue)
-                    .ifPresent(product::setName);
-        getCell(2,currentRow).map(Cell::getStringCellValue)
-                    .ifPresent(product::setDescription);
-        getCell(3,currentRow).map(Cell::getStringCellValue)
-                    .ifPresent(product::setSku);
-        getCell(4,currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf)
-                    .ifPresent(product::setUnitPrice);
-        getCell(5,currentRow).map(Cell::getNumericCellValue).map(Double::intValue)
-                    .ifPresent(product::setUnitsInStock);
-        getCell(6,currentRow).map(Cell::getStringCellValue)
-                    .map(categoryRepo::findByNameIgnoreCase)
-                    .ifPresent(product::setCategory);
-        if(product.getId()==null)
-            product.setImage(DEFAULT_IMAGE);
-        return product;
+        return Product.builder()
+                .name(getCell(NAME_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
+                .description(getCell(DESCRIPTION_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
+                .sku(getCell(SKU_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
+                .unitPrice(getCell(UNIT_PRICE_CELL,currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf).orElse(null))
+                .unitsInStock(getCell(UNITS_IN_STOCK_CELL,currentRow).map(Cell::getNumericCellValue).map(Double::intValue).orElse(null))
+                .category(getCell(CATEGORY_CELL,currentRow).map(Cell::getStringCellValue).map(categoryRepo::findByNameIgnoreCase).orElse(null))
+                .image(getCell(CATEGORY_CELL,currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
+                .build();
     }
-
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
         try (Workbook workbook = new XSSFWorkbook();
@@ -107,22 +98,13 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
 
     private void fillRowWithProduct( Row row, Product product) {
-        row.createCell(0).setCellValue(product.getId());
-        row.createCell(1).setCellValue(product.getName());
-        row.createCell(2).setCellValue(product.getDescription());
-        row.createCell(3).setCellValue(product.getSku());
-        row.createCell(4).setCellValue(product.getUnitPrice().doubleValue());
-        row.createCell(5).setCellValue(product.getUnitsInStock());
-        row.createCell(6).setCellValue(product.getCategory().getName());
-    }
-
-    private void skipHeader(Iterator<Row> rows) {
-        if (rows.hasNext())
-            rows.next();
-    }
-
-    private Optional<Cell> getCell(int colIndex, Row currentRow) {
-        return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
+        row.createCell(NAME_CELL).setCellValue(product.getName());
+        row.createCell(DESCRIPTION_CELL).setCellValue(product.getDescription());
+        row.createCell(SKU_CELL).setCellValue(product.getSku());
+        row.createCell(UNIT_PRICE_CELL).setCellValue(product.getUnitPrice().doubleValue());
+        row.createCell(UNITS_IN_STOCK_CELL).setCellValue(product.getUnitsInStock());
+        row.createCell(CATEGORY_CELL).setCellValue(product.getCategory().getName());
+        row.createCell(IMAGE_URL_CELL).setCellValue(product.getImage());
     }
 
 

@@ -7,7 +7,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public interface ExcelHelperService<T> {
       String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -31,6 +33,14 @@ public interface ExcelHelperService<T> {
     }
     static boolean hasAnyCell(Row currentRow) {
         return currentRow.getPhysicalNumberOfCells() > 0;
+    }
+
+     static Optional<Cell> getCell(int colIndex, Row currentRow) {
+        return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
+    }
+    static void skipHeader(Iterator<Row> rows) {
+        if (rows.hasNext())
+            rows.next();
     }
 
 

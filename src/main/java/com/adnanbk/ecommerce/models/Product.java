@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
@@ -21,6 +20,9 @@ import java.util.Date;
         uniqueConstraints = {@UniqueConstraint(columnNames = "sku", name = "uniqueSku")})
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @DynamicUpdate // to generate an update sql statement that contains only updated fields
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Product {
