@@ -46,14 +46,8 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public List<Product> updateProducts(List<Product> products) {
-       Map<Long,Product> productsMap = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
-       var currentProductsInDb =  productRepo.findAllById(products.stream().map(Product::getId).toList())
-               .stream()
-               .map(product -> mapPropertiesAndGet(product,productsMap.get(product.getId()))).toList();
-        return productRepo.saveAll(currentProductsInDb);
-
+       return productRepo.saveAll(mapProductsInDb(products));
     }
-
 
     @Override
     public void removeProducts(List<Long> productsIds) {
@@ -72,16 +66,11 @@ public class ProductServiceImp implements ProductService {
                                     else
                                         updatableProducts.add(pr);
                                 });
-                                var currentProductsInDb = productRepo.findAllById(updatableProducts.stream().map(Product::getId).toList());
-                        List<Product> union = ListUtils.union(addableProducts, mapPropertiesAndGet(currentProductsInDb, updatableProducts));
-                        return productRepo.saveAll(union);
+                        return productRepo.saveAll(ListUtils.union(addableProducts, mapProductsInDb(updatableProducts)));
                             }
                     ).orElse(new ArrayList<>());
 
-
     }
-
-
 
     @Override
     public Product getBySku(String sku) {
@@ -106,21 +95,26 @@ public class ProductServiceImp implements ProductService {
     private  boolean isNewProduct(Product pr) {
         return Optional.ofNullable(pr.getId()).isEmpty();
     }
+    private List<Product> mapProductsInDb(List<Product> products) {
+        if(products==null || products.isEmpty())
+            return  new ArrayList<>();
+        Map<Long,Product> productsMap = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
+        return   productRepo.findAllById(products.stream().map(Product::getId).toList())
+                .stream()
+                .map(product -> mapPropertiesAndGet(product,productsMap.get(product.getId()))).toList();
 
-private  Product mapPropertiesAndGet(Product target, Product src) {
-    target.setSku(src.getSku());
-    target.setUnitPrice(src.getUnitPrice());
-    target.setName(src.getName());
-    target.setCategory(src.getCategory());
-    target.setUnitsInStock(src.getUnitsInStock());
-    target.setDescription(src.getDescription());
-    target.setActive(src.isActive());
-    if(StringUtils.hasLength(src.getImage()))
-      target.setImage(src.getImage());
-    return target;
-}
-    private  List<Product> mapPropertiesAndGet(List<Product> targets, List<Product> srcs) {
-        Map<Long,Product> productsMap = srcs.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
-        return  targets.stream().map(target-> mapPropertiesAndGet(target,productsMap.get(target.getId()))).toList();
+    }
+
+    private  Product mapPropertiesAndGet(Product target, Product src) {
+        target.setSku(src.getSku());
+        target.setUnitPrice(src.getUnitPrice());
+        target.setName(src.getName());
+        target.setCategory(src.getCategory());
+        target.setUnitsInStock(src.getUnitsInStock());
+        target.setDescription(src.getDescription());
+        target.setActive(src.isActive());
+        if(StringUtils.hasLength(src.getImage()))
+            target.setImage(src.getImage());
+        return target;
     }
 }
