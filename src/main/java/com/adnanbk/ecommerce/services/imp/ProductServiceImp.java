@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.ProductPageDto;
+import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
@@ -8,7 +9,6 @@ import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.services.ProductService;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.ListUtils;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,10 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -57,18 +54,16 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Transactional
-    public List<Product> addOrUpdateFromExcel(MultipartFile multipartFile) {
+    public Map<Operation, List<Product>> addOrUpdateFromExcel(MultipartFile multipartFile) {
             return Optional.ofNullable(excelHelper.excelToList(multipartFile))
                     .map(productsList-> {
                         Map<String,Product> productsMap = productsList.stream().collect(Collectors.toMap(Product::getSku, Function.identity()));
                         List<Product> updatableProducts = productRepo.findAllBySkuIn(productsList.stream().map(Product::getSku).toList())
                                 .stream().map(product -> mapPropertiesAndGet(product,productsMap.remove(product.getSku()))).toList();
                         List<Product> addableProducts = productsMap.values().stream().toList();
-
-                        return productRepo.saveAll(ListUtils.union(addableProducts, updatableProducts));
+                        return Map.of(Operation.ADDED, productRepo.saveAll(addableProducts),Operation.UPDATED,productRepo.saveAll(updatableProducts));
                             }
-                    ).orElse(new ArrayList<>());
-
+                    ).orElse(new HashMap<>());
     }
 
     @Override
@@ -115,3 +110,4 @@ public class ProductServiceImp implements ProductService {
         return target;
     }
 }
+

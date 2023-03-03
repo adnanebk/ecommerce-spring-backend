@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.dto.PageDto;
 import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
+import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
@@ -24,7 +25,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
@@ -109,9 +112,13 @@ public class ProductController {
     @PostMapping("/excel")
     @ApiOperation(value = "add or update products from excel file", notes = "you can download an excel file and fill it")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Callable<List<ProductDto>> addProductsFromExcel(@RequestPart  MultipartFile file) {
-        return () -> productService.addOrUpdateFromExcel(file)
-                    .stream().map(productMapper::toDto).toList();
+    public CompletableFuture<Map<Operation,List<ProductDto>>> addProductsFromExcel(@RequestPart  MultipartFile file) {
+        return CompletableFuture.supplyAsync(()->{
+            Map<Operation,List<ProductDto>> result = new HashMap<>();
+           productService.addOrUpdateFromExcel(file).forEach((op,products)->result.put(op,products.stream().map(productMapper::toDto).toList()));
+           return result;
+        });
+
     }
 
     @GetMapping("/excel/download/{ids}")
