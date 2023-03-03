@@ -49,7 +49,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(publicPaths).permitAll()
-                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/h2-console/**","/swagger*/**","/v2/api-docs/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/products/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/categories/**").permitAll()
                 .anyRequest().authenticated();
