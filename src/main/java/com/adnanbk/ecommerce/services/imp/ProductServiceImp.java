@@ -5,7 +5,6 @@ import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
-import com.adnanbk.ecommerce.reposetories.UserRepo;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.services.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +28,6 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
-    private final UserRepo userRepo;
-
 
     @Override
     public Product addProduct(Product product) {
@@ -63,7 +60,7 @@ public class ProductServiceImp implements ProductService {
                         List<Product> addableProducts = productsMap.values().stream().toList();
                         return Map.of(Operation.ADDED, productRepo.saveAll(addableProducts),Operation.UPDATED,productRepo.saveAll(updatableProducts));
                             }
-                    ).orElse(new HashMap<>());
+                    ).orElse(new EnumMap<>(Operation.class));
     }
 
     @Override

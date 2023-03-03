@@ -25,11 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.Callable;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -114,7 +110,7 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<Map<Operation,List<ProductDto>>> addProductsFromExcel(@RequestPart  MultipartFile file) {
         return CompletableFuture.supplyAsync(()->{
-            Map<Operation,List<ProductDto>> result = new HashMap<>();
+            Map<Operation,List<ProductDto>> result = new EnumMap<>(Operation.class);
            productService.addOrUpdateFromExcel(file).forEach((op,products)->result.put(op,products.stream().map(productMapper::toDto).toList()));
            return result;
         });
