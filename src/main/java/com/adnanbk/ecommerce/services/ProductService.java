@@ -29,4 +29,6 @@ public interface ProductService {
 
 
     Product getBySku(String sku);
+
+    void removeProduct(Long id);
 }

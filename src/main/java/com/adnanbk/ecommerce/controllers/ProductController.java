@@ -131,7 +131,13 @@ public class ProductController {
             .body(file);
 });
     }
-
+    @DeleteMapping("/{id}")
+    @ApiOperation(value = "remove a product")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void removeProduct(@PathVariable Long id) {
+        productService.removeProduct(id);
+    }
         private Pageable buildPageable(PageDto pageDto) {
         return PageRequest.of(pageDto.getNumber(),pageDto.getSize(),
                 Sort.by(Sort.Direction.valueOf(pageDto.getSortDirection()),pageDto.getSortProperty()));

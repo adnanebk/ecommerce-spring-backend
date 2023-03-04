@@ -70,6 +70,11 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    public void removeProduct(Long id) {
+        productRepo.deleteById(id);
+    }
+
+    @Override
     public Page<Product> getAll(ProductPageDto productPage, Pageable pageable) {
         return productRepo.findPagedProducts
                                 (productPage.getCategory(),productPage.getSearch()
