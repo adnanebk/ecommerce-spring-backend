@@ -108,7 +108,7 @@ public class ProductController {
     @PostMapping("/excel")
     @ApiOperation(value = "add or update products from excel file", notes = "you can download an excel file and fill it")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<Map<Operation,List<ProductDto>>> addProductsFromExcel(@RequestPart  MultipartFile file) {
+    public CompletableFuture<Map<Operation,List<ProductDto>>> addOrUpdateProductsFromExcel(@RequestPart  MultipartFile file) {
         return CompletableFuture.supplyAsync(()->{
             Map<Operation,List<ProductDto>> result = new EnumMap<>(Operation.class);
            productService.addOrUpdateFromExcel(file).forEach((op,products)->result.put(op,products.stream().map(productMapper::toDto).toList()));
