@@ -41,7 +41,7 @@ public class AuthController {
                 .map(userMapper::toEntity)
                 .map(authService::handleRegister)
                 .map(user-> {
-                    AuthDataDto authDataDto =  buildAuthData(authService.handleRegister(user));
+                    AuthDataDto authDataDto =  buildAuthData(user);
                     eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),user));
                     return authDataDto;
                 })
