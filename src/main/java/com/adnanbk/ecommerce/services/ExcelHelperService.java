@@ -1,9 +1,8 @@
 package com.adnanbk.ecommerce.services;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -25,9 +24,19 @@ public interface ExcelHelperService<T> {
     static   Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
             Sheet sheet = workbook.createSheet(sheetName);
             Row headerRow = sheet.createRow(0);
+        CellStyle headerStyle = workbook.createCellStyle();
+        headerStyle.setFillForegroundColor(IndexedColors.BLUE_GREY.getIndex());
+        headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        XSSFFont font = ((XSSFWorkbook) workbook).createFont();
+        font.setFontName("Arial");
+        font.setFontHeightInPoints((short) 10);
+        font.setBold(true);
+        headerStyle.setFont(font);
+
             for (int colIdx = 0; colIdx < headers.length; colIdx++) {
                 Cell cell = headerRow.createCell(colIdx);
                 cell.setCellValue(headers[colIdx]);
+                cell.setCellStyle(headerStyle);
             }
          return sheet;
     }
@@ -38,7 +47,7 @@ public interface ExcelHelperService<T> {
      static Optional<Cell> getCell(int colIndex, Row currentRow) {
         return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
     }
-    static void skipHeader(Iterator<Row> rows) {
+    static void skipRow(Iterator<Row> rows) {
         if (rows.hasNext())
             rows.next();
     }

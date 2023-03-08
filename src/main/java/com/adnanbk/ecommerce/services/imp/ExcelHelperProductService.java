@@ -55,7 +55,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         ) {
             List<Product> products = new ArrayList<>();
             Iterator<Row> rows = workbook.getSheet(SHEET_NAME).iterator();
-            skipHeader(rows);
+            // skip header
+            skipRow(rows);
             rows.forEachRemaining(currentRow->{
                 if (hasAnyCell(currentRow))
                     products.add(extractProductFromRow(currentRow));

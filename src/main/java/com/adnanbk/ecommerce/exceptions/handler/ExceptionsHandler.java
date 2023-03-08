@@ -17,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -107,12 +106,12 @@ public class ExceptionsHandler {
     public ApiErrorDto userNotEnabledException(UserNotEnabledException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()),"user.not.enabled");
     }
-
     @ExceptionHandler(InvalidTokenException.class)
-    @ResponseBody
-    public String invalidTokenException(InvalidTokenException ex) {
-        return "<h2>" + formatMessage(ex.getMessage()) + "</h2>";
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorDto invalidTokenException(InvalidTokenException ex) {
+        return new ApiErrorDto(formatMessage(ex.getMessage()),"user.not.enabled");
     }
+
 
 
     private Set<ResponseError> generateErrors(ConstraintViolationException cause) {

@@ -42,14 +42,14 @@ public class AuthServiceImp implements AuthService {
     @Override
     public AppUser handleLogin(LoginUserDto appUser) {
         try {
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.getEmail(), appUser.getPassword()));
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.email(), appUser.password()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
         catch (BadCredentialsException e) {
             throw new BadCredentialsException("error.invalid-email-or-password");
         }
 
-        return userRepo.findByEmail(appUser.getEmail()).orElseThrow();
+        return userRepo.findByEmail(appUser.email()).orElseThrow();
     }
 
     @Override

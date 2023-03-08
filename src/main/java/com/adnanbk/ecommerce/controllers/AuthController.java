@@ -75,19 +75,19 @@ public class AuthController {
         return buildAuthData(authService.handleSocialLogin(socialLoginDto,facebookService));
     }
 
-    @GetMapping("user")
+    @GetMapping("user-info")
     @ApiOperation(value = "get authenticated user details")
     public UserOutputDto getAuthUser() {
         return userMapper.toDto(authService.getAuthenticatedUser());
     }
 
-    @PatchMapping("user/change-password")
+    @PatchMapping("/change-password")
     @ApiOperation(value = "change the user password")
     public void changeUserPassword(@RequestBody @Valid ChangeUserPasswordDto changeUserPasswordDto) {
         this.authService.changePassword(changeUserPasswordDto);
     }
 
-    @PatchMapping("user/send-confirmation")
+    @PatchMapping("/send-confirmation")
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation() {
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(getRootUrl(),authService.getAuthenticatedUser()));

@@ -52,7 +52,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 // Once we get the token we validate it.
                 String email = jwtTokenService.validateTokenAndGetSubject(token);
                 userRepo.findByEmail(email).ifPresent(user->{
-                    if(!user.isEnabled())
+                    if(!user.isEnabled() && !request.getRequestURI().contains("send-confirmation")
+                      && !request.getRequestURI().contains("current/enable"))
                         throw new UserNotEnabledException();
                     // authentication
                     jwtTokenService.setAuthenticationToken(email,user.getPassword(),user.getRoles().stream().map(Role::getName).toList(),request);

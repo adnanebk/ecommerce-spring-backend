@@ -2,6 +2,7 @@ package com.adnanbk.ecommerce.events.listeners;
 
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
 import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
+import com.adnanbk.ecommerce.utils.StringUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
@@ -29,14 +30,14 @@ public class RegistrationListener {
     @EventListener
     public void sendEmailConfirmation(OnRegistrationCompleteEvent event) throws MessagingException, UnsupportedEncodingException {
         var user = event.getUser();
-        String  rootUrl = event.getUrl();
         String destAddress = user.getEmail();
-        String token =ConfirmationTokenUtil.setConfirmationTokenForUser(user).getToken();
-        String verifyURL = rootUrl + "/user/enable?token=" +token;
+        String confirmCode = StringUtil.generateCode(5);
+        ConfirmationTokenUtil.seTokenForUser(user.getEmail(),confirmCode);
         String subject = "Please verify your registration";
-        String content = String.format("Dear %s,<br>Please click the link below to verify your registration:<br>"
-                + "<h3><a href=\"%s\" target=\"_self\">VERIFY</a></h3>"
-                + "Thank you,<br> %s.", user.getFirstName(), verifyURL, senderName);
+        String content = String.format("""
+                Dear %s,<br>Please use this code to active your account :<br>
+                <strong>%s</strong><br>
+                 Thank you,<br>""",user.getFirstName(),confirmCode);
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

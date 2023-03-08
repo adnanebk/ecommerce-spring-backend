@@ -9,18 +9,16 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.security.Principal;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -31,7 +29,7 @@ private final UserMapper userMapper;
     private String frontUrl;
 private final FileService imageService;
 
-    @PatchMapping("/users/current")
+    @PatchMapping("/current")
     @ApiOperation(value = "change authenticated user information")
     public void changeUserInformation(@RequestBody @Valid UserInputDto userDto, Principal  principal)
     {
@@ -39,7 +37,7 @@ private final FileService imageService;
                 .map(userMapper::toEntity)
                 .ifPresent(user->userService.update(user,principal.getName()));
     }
-    @PatchMapping("/users/current/upload-image")
+    @PatchMapping("/current/upload-image")
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
@@ -47,11 +45,9 @@ private final FileService imageService;
                 .thenApplyAsync(fileName->userService.changeUserImage(FileUtil.toImageUrl(fileName),principal.getName()));
     }
 
-    @GetMapping("/user/enable")
+    @PostMapping("/current/enable")
     @ApiOperation(value = "enable the user with the token sent to his email")
-    public ResponseEntity<String> enableUser(@RequestParam String token) {
-        userService.enableUser(token);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(frontUrl + "?verified=true")).build();
+    public void enableUser(@RequestBody String token,Principal principal) {
+        userService.enableUser(token,principal.getName());
     }
 }

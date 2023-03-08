@@ -9,5 +9,5 @@ public interface UserService {
 
     void update(AppUser user, String email);
 
-    void enableUser(String token);
+    void enableUser(String token, String email);
 }
