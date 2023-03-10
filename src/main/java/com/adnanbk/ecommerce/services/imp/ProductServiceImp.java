@@ -83,15 +83,10 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public ByteArrayInputStream convertToExcel(List<Long> productIds) {
-         return   Optional.ofNullable(productIds)
-                   .map(productRepo::findAllById)
-                   .map(excelHelper::listToExcel)
-                   .orElseThrow();
+         return  excelHelper.listToExcel(productRepo.findAllById(productIds));
     }
 
     private List<Product> mapProductsInDb(List<Product> products) {
-        if(products==null || products.isEmpty())
-            return  new ArrayList<>();
         Map<Long,Product> productsMap = products.stream().collect(Collectors.toMap(Product::getId, Function.identity()));
         return   productRepo.findAllById(products.stream().map(Product::getId).toList())
                 .stream()
