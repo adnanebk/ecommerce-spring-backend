@@ -22,6 +22,8 @@ public class ResponseErrorFactory {
     }
 
     public static   ResponseError create(String fieldName, String errorMessage) {
+        if(fieldName.contains("."))
+            fieldName=fieldName.substring(fieldName.lastIndexOf(".")+1);
         String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
         return new ResponseError(fieldName, formattedName+" " +errorMessage);
     }
