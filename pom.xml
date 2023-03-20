@@ -130,10 +130,8 @@
                         <builder>paketobuildpacks/builder:tiny</builder>
                         <env>
                             <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                            <USE_NATIVE_IMAGE_JAVA_PLATFORM_MODULE_SYSTEM>false</USE_NATIVE_IMAGE_JAVA_PLATFORM_MODULE_SYSTEM>
                         </env>
-                        <buildpacks>
-                            <buildpack>gcr.io/paketo-buildpacks/java:6.34.0</buildpack>
-                        </buildpacks>
                     </image>
                 </configuration>
             </plugin>
