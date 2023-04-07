@@ -68,9 +68,6 @@ public class JwtTokenServiceImp implements JwtTokenService {
     }
 
 
-     public record Tokens(String access, String refresh, Date expirationDate, Date refreshExpirationDate
-     ){}
-
 }
 
 
