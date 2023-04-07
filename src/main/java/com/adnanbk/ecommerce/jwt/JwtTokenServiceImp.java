@@ -34,7 +34,7 @@ public class JwtTokenServiceImp implements JwtTokenService {
         refreshTokenExpirationTime *=60*1000*1440;
     }
 
-    //generate value for user
+
     @Override
     public Tokens generateTokens(String subject) {
         var expirationDate = new Date(System.currentTimeMillis()+tokenExpirationTime);
