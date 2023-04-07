@@ -99,9 +99,8 @@ public class AuthController {
     private AuthDataDto buildAuthData(AppUser user) {
        return  Optional.of(user)
                  .map(userMapper::toDto).map(userDto-> {
-                     var token = this.jwtTokenService.generateAccessToken(user.getEmail());
-                     var refreshToken = this.jwtTokenService.generateRefreshToken(user.getEmail());
-                     return new AuthDataDto(token.value(), refreshToken.value(), token.expirationDate(), userDto);
+                     var tokens = this.jwtTokenService.generateTokens(user.getEmail());
+                     return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userDto);
                  }).orElseThrow();
     }
 

@@ -7,9 +7,8 @@ import java.util.Collection;
 
 public interface JwtTokenService {
     //generate value for user
-    JwtTokenServiceImp.Token generateAccessToken(String subject);
+    JwtTokenServiceImp.Tokens generateTokens(String subject);
 
-    JwtTokenServiceImp.Token generateRefreshToken(String subject);
 
     String validateTokenAndGetSubject(String token) throws JWTVerificationException;
 

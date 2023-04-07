@@ -3,7 +3,8 @@ package com.adnanbk.ecommerce.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,40 +17,34 @@ import java.util.Collection;
 import java.util.Date;
 
 @Service
+@ConfigurationProperties(prefix = "jwt")
+@Setter
 public class JwtTokenServiceImp implements JwtTokenService {
 
-    @Value("${jwt.secret}")
+
     private String secret;
     private Algorithm algorithm;
-
-    @Value("#{${jwt.expiration-time-minutes}*60*1000}")
-    private long jwtExpirationTime;
-
-    @Value("#{${jwtRefresh.expiration-time-days}*60*1000*1440}")
-    private long jwtRefreshExpirationTime;
+    private long tokenExpirationTime;
+    private long refreshTokenExpirationTime;
 
     @PostConstruct
     public void init() {
         algorithm = Algorithm.HMAC512(secret.getBytes());
+        tokenExpirationTime *=60*1000;
+        refreshTokenExpirationTime *=60*1000*1440;
     }
 
     //generate value for user
     @Override
-    public Token generateAccessToken(String subject) {
-        var expirationDate = new Date(System.currentTimeMillis()+jwtExpirationTime);
-        String value = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
+    public Tokens generateTokens(String subject) {
+        var expirationDate = new Date(System.currentTimeMillis()+tokenExpirationTime);
+        var refreshExpirationDate = new Date(System.currentTimeMillis()+refreshTokenExpirationTime);
+        String accessToken = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
                 .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
-        return new Token(value,expirationDate);
-    }
-    @Override
-    public Token generateRefreshToken(String subject) {
-        var expirationDate = new Date(System.currentTimeMillis()+jwtRefreshExpirationTime);
-        String token = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
+        String refreshToken = JWT.create().withSubject(subject).withExpiresAt(refreshExpirationDate)
                 .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
-        return new Token(token,expirationDate);
+        return new Tokens(accessToken, refreshToken,expirationDate,refreshExpirationDate);
     }
-
-
 
     @Override
     public String validateTokenAndGetSubject(String token) throws JWTVerificationException {
@@ -72,7 +67,9 @@ public class JwtTokenServiceImp implements JwtTokenService {
 
     }
 
-     public record Token(String value, Date expirationDate){}
+
+     public record Tokens(String access, String refresh, Date expirationDate, Date refreshExpirationDate
+     ){}
 
 }
 
