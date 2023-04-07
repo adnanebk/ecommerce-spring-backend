@@ -1,9 +1,9 @@
 package com.adnanbk.ecommerce.services.imp;
 
-import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.SocialLoginDto;
+import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
+import com.adnanbk.ecommerce.jwt.JwtTokenService;
+import com.adnanbk.ecommerce.mappers.UserMapper;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.RoleRepository;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +31,18 @@ public class AuthServiceImp implements AuthService {
     private final PasswordEncoder passwordEncode;
     private final AuthenticationManager authenticationManager;
 
-
+    private final JwtTokenService jwtTokenService;
+    private final UserMapper userMapper;
 
     @Override
-    public AppUser handleSocialLogin(SocialLoginDto user, SocialService socialService) {
+    public AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService) {
         if (!socialService.verify(user.token()))
             throw new BadCredentialsException(("error.invalid-credential"));
-        return getAppUserOrCreateNewOne(user);
+        return buildAuthData(getAppUserOrCreateNewOne(user));
     }
 
     @Override
-    public AppUser handleLogin(LoginUserDto appUser) {
+    public AuthDataDto handleLogin(LoginUserDto appUser) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.email(), appUser.password()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -49,34 +51,41 @@ public class AuthServiceImp implements AuthService {
             throw new BadCredentialsException("error.invalid-email-or-password");
         }
 
-        return userRepo.findByEmail(appUser.email()).orElseThrow();
+        return userRepo.findByEmail(appUser.email()).map(this::buildAuthData).orElseThrow();
     }
 
     @Override
-    public AppUser handleRegister(AppUser user) {
+    public AuthDataDto handleRegister(UserInputDto user) {
         user.setPassword(passwordEncode.encode(user.getPassword()));
-        return saveUser(user);
+        return this.buildAuthData(saveUser(userMapper.toEntity(user)));
     }
 
 
     @Override
     public AppUser getAuthenticatedUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-         return  userRepo.findByEmail(authentication.getName()).orElseThrow();
+        return userRepo.findByEmail(authentication.getName()).orElseThrow();
     }
 
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto) {
-        AppUser user = this.getAuthenticatedUser();
-        if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-            throw new InvalidPasswordException("error.invalid-password");
-        var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
-        userRepo.updatePassword(user.getId(),newPassword);
+        var user = this.getAuthenticatedUser();
+            if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
+                throw new InvalidPasswordException("error.invalid-password");
+            var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
+            userRepo.updatePassword(user.getId(),newPassword);
+
     }
 
     @Override
     public AppUser getUserByEmail(String email) {
         return userRepo.findByEmail(email).orElseThrow();
+    }
+
+    @Override
+    public AuthDataDto refreshNewToken(String refreshToken) {
+        String email  = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
+        return   buildAuthData(getUserByEmail(email));
     }
 
 
@@ -92,6 +101,13 @@ public class AuthServiceImp implements AuthService {
     private AppUser saveUser(AppUser user) {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
         return userRepo.save(user);
+    }
+    private AuthDataDto buildAuthData(AppUser user) {
+        return  Optional.of(user)
+                .map(userMapper::toDto).map(userDto-> {
+                    var tokens = this.jwtTokenService.generateTokens(user.getEmail());
+                    return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userDto);
+                }).orElseThrow();
     }
 
 }

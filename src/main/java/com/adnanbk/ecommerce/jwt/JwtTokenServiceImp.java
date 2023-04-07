@@ -39,12 +39,11 @@ public class JwtTokenServiceImp implements JwtTokenService {
     public Tokens generateTokens(String subject) {
         var expirationDate = new Date(System.currentTimeMillis()+tokenExpirationTime);
         var refreshExpirationDate = new Date(System.currentTimeMillis()+refreshTokenExpirationTime);
-        String accessToken = JWT.create().withSubject(subject).withExpiresAt(expirationDate)
-                .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
-        String refreshToken = JWT.create().withSubject(subject).withExpiresAt(refreshExpirationDate)
-                .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
+        String accessToken = generateToken(subject, expirationDate);
+        String refreshToken = generateToken(subject, refreshExpirationDate);
         return new Tokens(accessToken, refreshToken,expirationDate,refreshExpirationDate);
     }
+
 
     @Override
     public String validateTokenAndGetSubject(String token) throws JWTVerificationException {
@@ -67,6 +66,10 @@ public class JwtTokenServiceImp implements JwtTokenService {
 
     }
 
+    private String generateToken(String subject, Date expirationDate) {
+        return JWT.create().withSubject(subject).withExpiresAt(expirationDate)
+                .withIssuedAt(new Date(System.currentTimeMillis())).sign(algorithm);
+    }
 
 }
 

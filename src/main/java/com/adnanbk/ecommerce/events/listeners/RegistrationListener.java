@@ -29,15 +29,15 @@ public class RegistrationListener {
     @Async
     @EventListener
     public void sendEmailConfirmation(OnRegistrationCompleteEvent event) throws MessagingException, UnsupportedEncodingException {
-        var user = event.getUser();
-        String destAddress = user.getEmail();
+        var eventSource = event.getEventSource();
+        String destAddress = eventSource.email();
         String confirmCode = StringUtil.generateCode(5);
-        ConfirmationTokenUtil.seTokenForUser(user.getEmail(),confirmCode);
+        ConfirmationTokenUtil.seTokenForUser(eventSource.email(),confirmCode);
         String subject = "Please verify your registration";
         String content = String.format("""
                 Dear %s,<br>Please use this code to active your account :<br>
                 <strong>%s</strong><br>
-                 Thank you,<br>""",user.getFirstName(),confirmCode);
+                 Thank you,<br>""",eventSource.firstName(),confirmCode);
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);

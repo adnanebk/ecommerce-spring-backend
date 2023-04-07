@@ -1,16 +1,14 @@
 package com.adnanbk.ecommerce.services;
 
-import com.adnanbk.ecommerce.dto.ChangeUserPasswordDto;
-import com.adnanbk.ecommerce.dto.LoginUserDto;
-import com.adnanbk.ecommerce.dto.SocialLoginDto;
+import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.models.AppUser;
 
 public interface AuthService {
 
-    AppUser handleSocialLogin(SocialLoginDto user, SocialService socialService);
+    AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService);
 
-    AppUser handleLogin(LoginUserDto appUser);
-    AppUser handleRegister(AppUser user);
+    AuthDataDto handleLogin(LoginUserDto appUser);
+    AuthDataDto handleRegister(UserInputDto userInputDto);
 
 
     AppUser getAuthenticatedUser();
@@ -18,4 +16,6 @@ public interface AuthService {
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto);
 
     AppUser getUserByEmail(String email);
+
+    AuthDataDto refreshNewToken(String refreshToken);
 }
