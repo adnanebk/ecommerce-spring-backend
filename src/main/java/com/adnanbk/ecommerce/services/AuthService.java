@@ -15,7 +15,6 @@ public interface AuthService {
 
     void changePassword(ChangeUserPasswordDto changeUserPasswordDto);
 
-    AppUser getUserByEmail(String email);
 
     AuthDataDto refreshNewToken(String refreshToken);
 }

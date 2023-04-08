@@ -18,10 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
@@ -77,8 +74,9 @@ public class AuthServiceImp implements AuthService {
 
     }
 
-    @Override
-    public AppUser getUserByEmail(String email) {
+
+
+    private AppUser getUserByEmail(String email) {
         return userRepo.findByEmail(email).orElseThrow();
     }
 
@@ -103,11 +101,9 @@ public class AuthServiceImp implements AuthService {
         return userRepo.save(user);
     }
     private AuthDataDto buildAuthData(AppUser user) {
-        return  Optional.of(user)
-                .map(userMapper::toDto).map(userDto-> {
-                    var tokens = this.jwtTokenService.generateTokens(user.getEmail());
-                    return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userDto);
-                }).orElseThrow();
+       var tokens = this.jwtTokenService.generateTokens(user.getEmail());
+       return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userMapper.toDto(user));
+
     }
 
 }
