@@ -3,7 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 
 import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.events.OnRegistrationCompleteEvent;
-import com.adnanbk.ecommerce.events.listeners.EventSource;
+import com.adnanbk.ecommerce.events.RegistrationEventSource;
 import com.adnanbk.ecommerce.services.AuthService;
 import com.adnanbk.ecommerce.services.SocialService;
 import com.adnanbk.ecommerce.services.imp.FacebookService;
@@ -36,7 +36,7 @@ public class AuthController {
                 .map(authService::handleRegister)
                 .map(authDataDto-> {
                     var user  = authDataDto.appUser();
-                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new EventSource(user.getFirstName(),user.getEmail())));
+                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(),user.getEmail())));
                     return authDataDto;
                 })
                 .orElseThrow();
@@ -79,7 +79,7 @@ public class AuthController {
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation() {
         var user = authService.getAuthenticatedUser();
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new EventSource(user.getFirstName(),user.getEmail())));
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(),user.getEmail())));
     }
 
 

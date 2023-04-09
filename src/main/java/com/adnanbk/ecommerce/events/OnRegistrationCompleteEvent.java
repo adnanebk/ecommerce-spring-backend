@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.events;
 
 
-import com.adnanbk.ecommerce.events.listeners.EventSource;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
@@ -9,9 +8,9 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 @Setter
 public final class OnRegistrationCompleteEvent extends ApplicationEvent {
-    private  EventSource eventSource;
+    private  RegistrationEventSource eventSource;
 
-    public OnRegistrationCompleteEvent(EventSource eventSource) {
+    public OnRegistrationCompleteEvent(RegistrationEventSource eventSource) {
         super(eventSource);
         this.eventSource = eventSource;
 
