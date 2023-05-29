@@ -43,8 +43,8 @@ public class ImageServiceImp implements FileService {
     @Async
     public CompletableFuture<String> upload(MultipartFile image) {
         if(image==null)
-           throw new CustomFileException("you must choose a file");
-        String fileName = image.getOriginalFilename().replace(" ", "");
+            return CompletableFuture.completedFuture("");
+        String fileName = trimImageName(image.getOriginalFilename());
         validateImageExtension(fileName);
         Path filePath = this.root.resolve(fileName);
         try {
@@ -73,6 +73,11 @@ public class ImageServiceImp implements FileService {
     private void validateImageExtension(String fileName) {
         if (!fileName.endsWith(".jpg") && !fileName.endsWith(".png") && !fileName.endsWith(".jpeg"))
             throw new CustomFileException("Image type not supported , we accept only jpg or png files");
+    }
+
+    private String trimImageName(String imageName) {
+        return Objects.requireNonNullElse(imageName, "")
+                .replace(" ", "").trim();
     }
 
 }
