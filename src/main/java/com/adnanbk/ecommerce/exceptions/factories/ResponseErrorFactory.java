@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.exceptions.factories;
 
 import com.adnanbk.ecommerce.dto.ResponseError;
+import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.utils.StringUtil;
 
 
@@ -26,6 +27,12 @@ public class ResponseErrorFactory {
             fieldName=fieldName.substring(fieldName.lastIndexOf(".")+1);
         String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
         return new ResponseError(fieldName, formattedName+" " +errorMessage);
+    }
+    public static   ResponseError create(Object rootBean, String fieldName, String errorMessage) {
+        if(fieldName.contains("."))
+            fieldName=fieldName.substring(fieldName.lastIndexOf(".")+1);
+        String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
+        return new ResponseError(rootBean,fieldName, formattedName+" " +errorMessage);
     }
 
 

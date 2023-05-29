@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -27,6 +28,7 @@ public class Category {
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "category")
+    @JsonIgnore
     private List<Product> products;
 
 

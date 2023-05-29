@@ -62,7 +62,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                     products.add(extractProductFromRow(currentRow));
             });
             return products;
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
         }
     }

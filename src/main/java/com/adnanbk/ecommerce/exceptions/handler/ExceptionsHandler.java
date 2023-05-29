@@ -59,7 +59,7 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                er -> errors.add(ResponseErrorFactory.create(er.getField(), er.getDefaultMessage()))
+                er -> errors.add(ResponseErrorFactory.create(ex.getBindingResult().getTarget(),er.getField(), er.getDefaultMessage()))
         );
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
@@ -118,7 +118,7 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(ResponseErrorFactory.create(violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(ResponseErrorFactory.create(violation.getRootBean(),violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
