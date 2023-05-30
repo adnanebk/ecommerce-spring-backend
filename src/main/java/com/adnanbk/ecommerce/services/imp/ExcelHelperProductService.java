@@ -68,23 +68,16 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
 
     private Product extractProductFromRow(Row currentRow) {
-        try {
             return Product.builder()
-                    .name(getCell(NAME_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
-                    .description(getCell(DESCRIPTION_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
-                    .sku(getCell(SKU_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
-                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf).orElse(null))
-                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(Cell::getNumericCellValue).map(Double::intValue).orElse(null))
-                    .category(getCell(CATEGORY_CELL, currentRow).map(Cell::getStringCellValue).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                    .image(getCell(IMAGE_URL_CELL, currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
+                    .name(getCell(NAME_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
+                    .description(getCell(DESCRIPTION_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
+                    .sku(getCell(SKU_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
+                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::convertToNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
+                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::convertToNumberOrThrow).map(Double::intValue).orElse(null))
+                    .category(getCell(CATEGORY_CELL, currentRow).map(this::convertToStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
+                    .image(getCell(IMAGE_URL_CELL, currentRow).map(this::convertToStringOrThrow).orElse(DEFAULT_IMAGE))
                     .build();
-        }
-        catch (IllegalStateException e){
-            throw new ValidationException(String.format("Incorrect type for the cell at row %s",currentRow.getRowNum()));
-        }
     }
-
-
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
         try (Workbook workbook = new XSSFWorkbook();

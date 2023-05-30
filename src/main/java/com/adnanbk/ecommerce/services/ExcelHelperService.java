@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.ValidationException;
 import java.io.ByteArrayInputStream;
 import java.util.Iterator;
 import java.util.List;
@@ -52,7 +53,15 @@ public interface ExcelHelperService<T> {
             rows.next();
     }
 
+      default Double convertToNumberOrThrow(Cell cell){
+        if(!cell.getCellType().equals(CellType.NUMERIC))
+            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in numeric format",cell.getRowIndex(),cell.getColumnIndex()+1));
+        return cell.getNumericCellValue();
+    }
 
-
-
+    default String convertToStringOrThrow(Cell cell){
+        if(!cell.getCellType().equals(CellType.STRING))
+            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in string format",cell.getRowIndex(),cell.getColumnIndex()+1));
+        return cell.getStringCellValue();
+    }
 }
