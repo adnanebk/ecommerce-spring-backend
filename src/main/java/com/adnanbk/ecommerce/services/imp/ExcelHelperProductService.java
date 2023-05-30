@@ -5,10 +5,7 @@ import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductCategoryRepository;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.utils.FileUtil;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,7 +59,8 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                     products.add(extractProductFromRow(currentRow));
             });
             return products;
-        } catch (Exception e) {
+        }
+        catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
         }
     }
@@ -70,16 +68,23 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
 
     private Product extractProductFromRow(Row currentRow) {
-        return Product.builder()
-                .name(getCell(NAME_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
-                .description(getCell(DESCRIPTION_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
-                .sku(getCell(SKU_CELL,currentRow).map(Cell::getStringCellValue).orElse(null))
-                .unitPrice(getCell(UNIT_PRICE_CELL,currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf).orElse(null))
-                .unitsInStock(getCell(UNITS_IN_STOCK_CELL,currentRow).map(Cell::getNumericCellValue).map(Double::intValue).orElse(null))
-                .category(getCell(CATEGORY_CELL,currentRow).map(Cell::getStringCellValue).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                .image(getCell(IMAGE_URL_CELL,currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
-                .build();
+        try {
+            return Product.builder()
+                    .name(getCell(NAME_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
+                    .description(getCell(DESCRIPTION_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
+                    .sku(getCell(SKU_CELL, currentRow).map(Cell::getStringCellValue).orElse(null))
+                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(Cell::getNumericCellValue).map(BigDecimal::valueOf).orElse(null))
+                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(Cell::getNumericCellValue).map(Double::intValue).orElse(null))
+                    .category(getCell(CATEGORY_CELL, currentRow).map(Cell::getStringCellValue).map(categoryRepo::findByNameIgnoreCase).orElse(null))
+                    .image(getCell(IMAGE_URL_CELL, currentRow).map(Cell::getStringCellValue).orElse(DEFAULT_IMAGE))
+                    .build();
+        }
+        catch (IllegalStateException e){
+            throw new ValidationException(String.format("Incorrect type for the cell at row %s",currentRow.getRowNum()));
+        }
     }
+
+
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
         try (Workbook workbook = new XSSFWorkbook();
@@ -106,6 +111,5 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(CATEGORY_CELL).setCellValue(product.getCategory().getName());
         row.createCell(IMAGE_URL_CELL).setCellValue(FileUtil.toImageUrl(product.getImage()));
     }
-
 
 }
