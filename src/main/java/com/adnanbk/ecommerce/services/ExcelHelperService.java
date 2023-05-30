@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface ExcelHelperService<T> {
       String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     List<T> excelToList(MultipartFile file);
 
@@ -61,7 +62,7 @@ public interface ExcelHelperService<T> {
 
     default String convertToStringOrThrow(Cell cell){
         if(!cell.getCellType().equals(CellType.STRING))
-            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in string format",cell.getRowIndex(),cell.getColumnIndex()+1));
+            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in string format",cell.getRowIndex(),alphabet.charAt(cell.getColumnIndex())));
         return cell.getStringCellValue();
     }
 }
