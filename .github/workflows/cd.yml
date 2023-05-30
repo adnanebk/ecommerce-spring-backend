@@ -34,10 +34,10 @@ jobs:
               --path . \
               --env "BP_JVM_VERSION=17" \
               --env "BP_NATIVE_IMAGE=true" \
-              --cache-image ghcr.io/adnanebk/spring-boot-ecommerce-paketo-cache-image:latest \
+              --cache-image ghcr.io/adnanebk/spring-full-stack-ecommerce:latest \
               --publish
       - name: Install flyctl via https://github.com/superfly/flyctl-actions
         uses: superfly/flyctl-actions/setup-flyctl@master
       
       - name: Deploy our Spring Boot app to fly.io
-        run: flyctl deploy --image ghcr.io/adnanebk/spring-ecommerce-flyio:latest
+        run: flyctl deploy --image ghcr.io/adnanebk/spring-full-stack-ecommerce:latest
