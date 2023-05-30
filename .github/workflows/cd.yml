@@ -30,7 +30,7 @@ jobs:
         run: |
           pack build ghcr.io/adnanebk/spring-boot-ecommerce:latest \
               --builder paketobuildpacks/builder:tiny \
-              --buildpack paketo-buildpacks/java-native-image@5.12.0 \
+              --buildpack paketo-buildpacks/java-native-image@7.16 \
               --path . \
               --env "BP_JVM_VERSION=17" \
               --env "BP_NATIVE_IMAGE=true" \
