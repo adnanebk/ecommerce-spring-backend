@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public interface ExcelHelperService<T> {
       String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-      String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     List<T> excelToList(MultipartFile file);
 
