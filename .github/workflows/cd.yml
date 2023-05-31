@@ -28,13 +28,13 @@ jobs:
       # to pin the GraalVM version (5.12.0 = GraalVM 21.3)
       - name: Build app with pack CLI & publish to GitHub Container Registry
         run: |
-          pack build ghcr.io/adnanebk/spring-boot-ecommerce:latest \
+          pack build ghcr.io/adnanebk/spring-boot-ecommerce-ang:latest \
               --builder paketobuildpacks/builder:tiny \
               --buildpack paketo-buildpacks/java-native-image@7.16.2 \
               --path . \
               --env "BP_JVM_VERSION=17" \
               --env "BP_NATIVE_IMAGE=true" \
-              --cache-image ghcr.io/adnanebk/spring-full-stack-ecommerce:latest \
+              --cache-image ghcr.io/adnanebk/spring-boot-ecommerce-ang:latest \
               --publish
       - name: Install flyctl via https://github.com/superfly/flyctl-actions
         uses: superfly/flyctl-actions/setup-flyctl@master
