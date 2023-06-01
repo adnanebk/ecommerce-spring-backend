@@ -31,7 +31,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final int SKU_CELL = 0;
     static final int NAME_CELL = 1;
     static final int DESCRIPTION_CELL = 2;
-
     static final int UNIT_PRICE_CELL = 3;
     static final int UNITS_IN_STOCK_CELL = 4;
     static final int CATEGORY_CELL = 5;
@@ -69,13 +68,13 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private Product extractProductFromRow(Row currentRow) {
             return Product.builder()
-                    .name(getCell(NAME_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
-                    .description(getCell(DESCRIPTION_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
-                    .sku(getCell(SKU_CELL, currentRow).map(this::convertToStringOrThrow).orElse(null))
-                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::convertToNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
-                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::convertToNumberOrThrow).map(Double::intValue).orElse(null))
-                    .category(getCell(CATEGORY_CELL, currentRow).map(this::convertToStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                    .image(getCell(IMAGE_URL_CELL, currentRow).map(this::convertToStringOrThrow).orElse(DEFAULT_IMAGE))
+                    .name(getCell(NAME_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                    .description(getCell(DESCRIPTION_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                    .sku(getCell(SKU_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
+                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(Double::intValue).orElse(null))
+                    .category(getCell(CATEGORY_CELL, currentRow).map(this::getValueAsStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
+                    .image(getCell(IMAGE_URL_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(DEFAULT_IMAGE))
                     .build();
     }
 

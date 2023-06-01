@@ -127,15 +127,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
 
                 <configuration>
-                    <layers>
-                        <enabled>true</enabled>
-                    </layers>
-                    <image>
-                        <builder>paketobuildpacks/builder:tiny</builder>
-                        <env>
-                            <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
-                        </env>
-                    </image>
+                    <imageName>adnanebk/spring-boot-ecommerce-ang</imageName>
                 </configuration>
 
             </plugin>
