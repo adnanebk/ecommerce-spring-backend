@@ -27,4 +27,6 @@ public class FileUtil {
             url=imageName.contains("luv2code") ?externalImagesPathUrl:imagesPathUrl;
         return url+imageName;
     }
+
+
 }
