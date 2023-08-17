@@ -31,8 +31,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
 
-    @Value("${api.publicPaths}")
-    private String[] publicPaths;
 
     public @Bean PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -48,8 +46,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(publicPaths).permitAll()
-                .antMatchers("/h2-console/**","/swagger*/**","/v2/api-docs/**").permitAll()
+                .antMatchers("/h2-console/**","/swagger*/**","/v2/api-docs/**",
+                "/api/auth/login/**","/api/auth/register/**","/api/auth/refresh-token/**",
+                "/uploads/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/products/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/categories/**").permitAll()
                 .anyRequest().authenticated();

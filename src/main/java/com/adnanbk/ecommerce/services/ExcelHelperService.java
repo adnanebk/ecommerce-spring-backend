@@ -56,7 +56,7 @@ public interface ExcelHelperService<T> {
 
        default Double getValueAsNumberOrThrow(Cell cell){
         if(!cell.getCellType().equals(CellType.NUMERIC))
-            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in numeric format",cell.getRowIndex(),cell.getColumnIndex()+1));
+            throw new ValidationException(String.format("type for the cell at row %s and column %s should be in numeric format",cell.getRowIndex(),ALPHABET.charAt(cell.getColumnIndex())));
         return cell.getNumericCellValue();
     }
 
