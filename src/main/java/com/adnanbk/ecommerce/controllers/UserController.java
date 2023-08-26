@@ -24,9 +24,6 @@ public class UserController {
 
 private final UserService userService;
 private final UserMapper userMapper;
-
-    @Value("${front.url}")
-    private String frontUrl;
 private final FileService imageService;
 
     @PatchMapping("/current")
