@@ -1,43 +1,18 @@
-name: fly deploy
+name: Heroku Deploy
 
-on: [push]
-
+on:
+  push:
+    branches:
+      - master
 jobs:
-  autodeploy:
+  build:
     runs-on: ubuntu-latest
-    env:
-      FLY_API_TOKEN: ${{ secrets.FLY_TOKEN }}
-
     steps:
+      - name: Add Heroku remote
+        run: heroku git:remote --app ang-shop
       - uses: actions/checkout@v2
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+      - uses: akhileshns/heroku-deploy@v3.12.12
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install pack CLI via the official buildpack Action https://github.com/buildpacks/github-actions#setup-pack-cli-action
-        uses: buildpacks/github-actions/setup-pack@v5.0.0
-
-      # Caching Paketo Build see https://stackoverflow.com/a/66598693/4964553
-      # BP_OCI_SOURCE as --env creates the GitHub Container Registry <-> Repository link (https://paketo.io/docs/buildpacks/configuration/#applying-custom-labels)
-      # BP_JVM_VERSION 17, because we use Java 17 inside our Maven build but Paketo defaults to 11
-      # Explicitely defining the java-native-image buildpack as described here https://paketo.io/docs/howto/java/#configure-the-graalvm-version
-      # to pin the GraalVM version (5.12.0 = GraalVM 21.3)
-      - name: Build app with pack CLI & publish to GitHub Container Registry
-        run: |
-          pack build ghcr.io/adnanebk/spring-boot-ecommerce-ang:latest \
-              --builder paketobuildpacks/builder:tiny \
-              --buildpack paketo-buildpacks/java-native-image@7.16.2 \
-              --path . \
-              --env "BP_JVM_VERSION=17" \
-              --env "BP_NATIVE_IMAGE=true" \
-              --cache-image ghcr.io/adnanebk/spring-boot-ecommerce-ang:latest \
-              --publish
-      - name: Install flyctl via https://github.com/superfly/flyctl-actions
-        uses: superfly/flyctl-actions/setup-flyctl@master
-      
-      - name: Deploy our Spring Boot app to fly.io
-        run: flyctl deploy --image ghcr.io/adnanebk/spring-full-stack-ecommerce:latest
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "ang-shop"
+          heroku_email: "benkouider.adnane@gmail.com"
