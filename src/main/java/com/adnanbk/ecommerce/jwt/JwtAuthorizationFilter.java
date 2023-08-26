@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.jwt;
 
 import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
+import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.models.Role;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import lombok.AllArgsConstructor;
@@ -49,7 +50,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 // Once we get the token we validate it.
                 String email = jwtTokenService.validateTokenAndGetSubject(token.get());
                 userRepo.findByEmail(email).ifPresent(user->{
-                    if(!user.isEnabled() && !request.getMethod().equalsIgnoreCase("get"))
+                    if(!isUserEnabledOrAllowed(request, user))
                         throw new UserNotEnabledException();
                     // authentication
                     jwtTokenService.setAuthenticationToken(email,user.getPassword(),user.getRoles().stream().map(Role::getName).toList(),request);
@@ -63,5 +64,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
 
+    }
+
+    private static boolean isUserEnabledOrAllowed(HttpServletRequest request, AppUser user) {
+        return user.isEnabled() || request.getMethod().equalsIgnoreCase("get")
+                || request.getRequestURI().contains("send-confirmation")
+                || request.getRequestURI().contains("current/enable");
     }
 }
