@@ -16,3 +16,5 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "ang-shop"
           heroku_email: "benkouider.adnane@gmail.com"
+        env:
+          BASE-URL: "https://ang-shop.herokuapp.com"
