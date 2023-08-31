@@ -1,4 +1,4 @@
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_excel-pojo-converter)](https://sonarcloud.io/summary/new_code?id=adnanebk_excel-pojo-converter)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_ecommerce-angular-backend)](https://sonarcloud.io/summary/new_code?id=adnanebk_ecommerce-angular-backend)
 
 # ecommerce-angular-backend
 
