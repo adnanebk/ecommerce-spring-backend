@@ -7,7 +7,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.ValidationException;
 import java.io.ByteArrayInputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +22,7 @@ public interface ExcelHelperService<T> {
         return TYPE.equals(file.getContentType());
     }
 
-    static   Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
+    static  Sheet createSheet(String sheetName,Workbook workbook,String[] headers) {
             Sheet sheet = workbook.createSheet(sheetName);
             Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = workbook.createCellStyle();
@@ -34,24 +33,24 @@ public interface ExcelHelperService<T> {
         font.setFontHeightInPoints((short) 10);
         font.setBold(true);
         headerStyle.setFont(font);
-
-            for (int colIdx = 0; colIdx < headers.length; colIdx++) {
-                Cell cell = headerRow.createCell(colIdx);
-                cell.setCellValue(headers[colIdx]);
-                cell.setCellStyle(headerStyle);
-            }
-         return sheet;
+        createHeaders(headers, headerRow, headerStyle);
+        return sheet;
     }
-    static boolean hasAnyCell(Row currentRow) {
+
+    private static void createHeaders(String[] headers, Row headerRow, CellStyle headerStyle) {
+        for (int colIdx = 0; colIdx < headers.length; colIdx++) {
+            Cell cell = headerRow.createCell(colIdx);
+            cell.setCellValue(headers[colIdx]);
+            cell.setCellStyle(headerStyle);
+        }
+    }
+
+    default boolean hasAnyCell(Row currentRow) {
         return currentRow.getPhysicalNumberOfCells() > 0;
     }
 
      static Optional<Cell> getCell(int colIndex, Row currentRow) {
         return Optional.ofNullable(currentRow.getCell(colIndex, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL));
-    }
-    static void skipRow(Iterator<Row> rows) {
-        if (rows.hasNext())
-            rows.next();
     }
 
        default Double getValueAsNumberOrThrow(Cell cell){

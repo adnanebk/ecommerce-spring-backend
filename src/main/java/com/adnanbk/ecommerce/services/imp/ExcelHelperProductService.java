@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 
@@ -49,15 +50,12 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         try(InputStream is = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(is)
         ) {
-            List<Product> products = new ArrayList<>();
-            Iterator<Row> rows = workbook.getSheet(SHEET_NAME).iterator();
-            // skip header
-            skipRow(rows);
-            rows.forEachRemaining(currentRow->{
-                if (hasAnyCell(currentRow))
-                    products.add(extractProductFromRow(currentRow));
-            });
-            return products;
+            Sheet sheet = workbook.getSheetAt(0);
+            return StreamSupport.stream(sheet.spliterator(), false)
+                    .filter(this::hasAnyCell)
+                    .skip(1)
+                    .map(this::extractProductFromRow)
+                    .toList();
         }
         catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
