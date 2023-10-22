@@ -1,7 +1,6 @@
 package com.adnanbk.ecommerce.exceptions.factories;
 
 import com.adnanbk.ecommerce.dto.ResponseError;
-import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.utils.StringUtil;
 
 

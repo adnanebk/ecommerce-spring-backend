@@ -5,10 +5,8 @@ import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.models.Role;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
