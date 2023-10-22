@@ -1,27 +1,22 @@
 package com.adnanbk.ecommerce.utils;
 
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Component
+@ConfigurationProperties(prefix = "uploads")
+@Getter
+@Setter
 public class FileUtil {
-    private static String imagesPathUrl;
-    private static String externalImagesPathUrl;
+    private  String imagesPathUrl;
+    private  String externalImagesPathUrl;
 
 
-
-    @Value("${uploads.imagesPathUrl}")
-    private synchronized void setImagesPathUrl(String imagesPathUrl){
-        FileUtil.imagesPathUrl=imagesPathUrl;
-    }
-    @Value("${uploads.externalImagesPathUrl}")
-    private synchronized void  setExternalImagesPathUrl(String externalImagesPathUrl){
-        FileUtil.externalImagesPathUrl=externalImagesPathUrl;
-    }
-
-    public  static String toImageUrl(String imageName) {
+    public String toImageUrl(String imageName) {
         String url = "";
         if(StringUtils.hasLength(imageName) && !imageName.startsWith("http"))
             url=imageName.contains("luv2code") ?externalImagesPathUrl:imagesPathUrl;

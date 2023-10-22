@@ -4,16 +4,24 @@ import com.adnanbk.ecommerce.dto.CategoryDto;
 import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.models.Category;
 import com.adnanbk.ecommerce.models.Product;
+import com.adnanbk.ecommerce.utils.FileUtil;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
-public interface ProductMapper {
+public abstract class ProductMapper {
 
-    ProductDto toDto(Product product);
+  @Autowired
+  protected   FileUtil fileUtil;
 
-    Product toEntity(ProductDto userDto);
+  @Mapping(target = "image", expression = "java(fileUtil.toImageUrl(product.getImage()))")
+    public abstract ProductDto toDto(Product product);
 
-    CategoryDto toDto(Category category);
+    public abstract Product toEntity(ProductDto userDto);
 
-    Category toEntity(CategoryDto categoryDto);
+    public abstract CategoryDto toDto(Category category);
+
+    public abstract Category toEntity(CategoryDto categoryDto);
+
 }

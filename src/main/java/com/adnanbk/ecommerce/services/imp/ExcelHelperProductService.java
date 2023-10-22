@@ -16,8 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -38,9 +36,11 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     static final int IMAGE_URL_CELL = 6;
 
     private final ProductCategoryRepository categoryRepo;
+    private FileUtil fileUtil;
 
-    public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
+    public ExcelHelperProductService(ProductCategoryRepository categoryRepo,FileUtil fileUtil) {
         this.categoryRepo = categoryRepo;
+        this.fileUtil = fileUtil;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(UNIT_PRICE_CELL).setCellValue(product.getUnitPrice().doubleValue());
         row.createCell(UNITS_IN_STOCK_CELL).setCellValue(product.getUnitsInStock());
         row.createCell(CATEGORY_CELL).setCellValue(product.getCategory().getName());
-        row.createCell(IMAGE_URL_CELL).setCellValue(FileUtil.toImageUrl(product.getImage()));
+        row.createCell(IMAGE_URL_CELL).setCellValue(fileUtil.toImageUrl(product.getImage()));
     }
 
 }

@@ -7,7 +7,6 @@ import com.adnanbk.ecommerce.services.UserService;
 import com.adnanbk.ecommerce.utils.FileUtil;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +24,7 @@ public class UserController {
 private final UserService userService;
 private final UserMapper userMapper;
 private final FileService imageService;
+private final FileUtil fileUtil;
 
     @PatchMapping("/current")
     @ApiOperation(value = "change authenticated user information")
@@ -39,7 +39,7 @@ private final FileService imageService;
     @ResponseStatus(HttpStatus.CREATED)
     public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
         return this.imageService.upload(file)
-                .thenApplyAsync(fileName->userService.changeUserImage(FileUtil.toImageUrl(fileName),principal.getName()));
+                .thenApplyAsync(fileName->userService.changeUserImage(fileUtil.toImageUrl(fileName),principal.getName()));
     }
 
     @PostMapping("/current/enable")

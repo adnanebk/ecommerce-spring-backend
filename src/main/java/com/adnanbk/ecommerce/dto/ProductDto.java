@@ -1,6 +1,5 @@
 package com.adnanbk.ecommerce.dto;
 
-import com.adnanbk.ecommerce.utils.FileUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,7 +52,4 @@ public class ProductDto {
     @NotNull(message = "{error.choose}")
     private CategoryDto category;
 
-    public void setImage(String image) {
-        this.image = FileUtil.toImageUrl(image);
-    }
 }
