@@ -37,8 +37,8 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Override
     @Transactional
     public void activateCreditCard(Long id) {
-        var currentActiveCard = creditCardRepo.findCurrentActivatedCard().orElseThrow();
-        creditCardRepo.updateActiveCard(currentActiveCard.getId(),false);
+        creditCardRepo.findCurrentActivatedCard()
+                .ifPresent(currentActiveCard-> creditCardRepo.updateActiveCard(currentActiveCard.getId(),false));
         creditCardRepo.updateActiveCard(id,true);
     }
 
