@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.adnanbk</groupId>
-    <artifactId>ecommerce-ang</artifactId>
+    <artifactId>ecommerce-springboot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>ecommerce-ang</name>
+    <name>ecommerce-springboot</name>
     <description>Demo prring-security-configoject for Spring Boot</description>
 
 
