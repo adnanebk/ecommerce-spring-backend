@@ -17,10 +17,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -55,15 +52,13 @@ public class ProductServiceImp implements ProductService {
 
    @Transactional
     public Map<Operation, List<Product>> addOrUpdateFromExcel(MultipartFile multipartFile) {
-            return Optional.ofNullable(excelHelper.excelToList(multipartFile))
-                    .map(productsList-> {
-                        Map<String,Product> productsMap = productsList.stream().collect(Collectors.toMap(Product::getSku, Function.identity()));
-                        List<Product> updatableProducts = productRepo.findAllBySkuIn(productsList.stream().map(Product::getSku).toList())
-                                .stream().map(product -> mapPropertiesAndGet(product,productsMap.remove(product.getSku()))).toList();
-                        List<Product> addableProducts = productsMap.values().stream().toList();
-                        return Map.of(Operation.ADDED, productRepo.saveAll(addableProducts),Operation.UPDATED,productRepo.saveAll(updatableProducts));
-                            }
-                    ).orElse(new EnumMap<>(Operation.class));
+        Map<String,Product> productsMap = excelHelper.excelToList(multipartFile).stream().collect(Collectors.toMap(Product::getSku, Function.identity(),(existed,newest)-> {
+            throw new IllegalStateException("Product sku "+existed.getSku() +" already exists");
+        }));
+        List<Product> updatableProducts = productRepo.findAllBySkuIn(new ArrayList<>(productsMap.keySet()))
+                .stream().map(product -> mapPropertiesAndGet(product,productsMap.remove(product.getSku()))).toList();
+        return Map.of(Operation.ADDED, productRepo.saveAll(productsMap.values()),Operation.UPDATED,productRepo.saveAll(updatableProducts));
+
     }
 
     @Override
