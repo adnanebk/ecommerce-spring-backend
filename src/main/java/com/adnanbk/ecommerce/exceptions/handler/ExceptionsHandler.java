@@ -118,7 +118,7 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(ResponseErrorFactory.create(violation.getRootBean(),violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(ResponseErrorFactory.create(violation.getLeafBean(),violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
