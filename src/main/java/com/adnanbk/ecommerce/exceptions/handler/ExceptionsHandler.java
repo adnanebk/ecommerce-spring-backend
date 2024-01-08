@@ -2,10 +2,7 @@ package com.adnanbk.ecommerce.exceptions.handler;
 
 import com.adnanbk.ecommerce.dto.ApiErrorDto;
 import com.adnanbk.ecommerce.dto.ResponseError;
-import com.adnanbk.ecommerce.exceptions.InvalidPasswordException;
-import com.adnanbk.ecommerce.exceptions.InvalidTokenException;
-import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
-import com.adnanbk.ecommerce.exceptions.UserNotEnabledException;
+import com.adnanbk.ecommerce.exceptions.*;
 import com.adnanbk.ecommerce.exceptions.factories.ResponseErrorFactory;
 import com.adnanbk.ecommerce.utils.ErrorMessagesUtil;
 import com.auth0.jwt.exceptions.JWTVerificationException;
@@ -79,7 +76,10 @@ public class ExceptionsHandler {
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
-
+    @ExceptionHandler(ProductSkuAlreadyExistException.class)
+    public ApiErrorDto productSkuAlreadyExistException(ProductSkuAlreadyExistException ex) {
+        return new ApiErrorDto(formatMessage(ex.getMessage()));
+    }
     @ExceptionHandler(ProductNotFoundException.class)
     public ApiErrorDto productNotFoundException(ProductNotFoundException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
