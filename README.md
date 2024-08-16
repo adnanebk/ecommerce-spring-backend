@@ -23,6 +23,8 @@ Displaying products with filters and pagination
 
 Product details
 
+Credit cart management
+
 Products managements by admin
 
 using excel to add/modify products
@@ -30,8 +32,6 @@ using excel to add/modify products
 Add to Cart ability with its management
 
 Displaying Orders
-
-Credit cart management
 
 making orders ability
 
