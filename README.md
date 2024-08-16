@@ -9,21 +9,36 @@ This is the back end side of the application.
 
 it has been developed using Angular, java 17 and spring boot  ,
 
-core features : 
+core features :
+
 Classic and social Authentication (using jwt with refresh token)
+
 Roles access ability
+
 Account information
+
 Password changing ability
+
 Displaying products with filters and pagination
+
 Product details
+
 Products managements by admin
+
 using excel to add/modify products
+
 Add to Cart ability with its management
+
 Displaying Orders
+
 Credit cart management
+
 making orders ability
+
 Dark/light theme switching
+
 Swagger documentation
+
 and more
 
 
