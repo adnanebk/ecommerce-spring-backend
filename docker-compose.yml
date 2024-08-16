@@ -1,0 +1,14 @@
+version: '1'
+services:
+  spring-app:
+    container_name: spring-app
+    build: .
+    image: adnanebk/springboot-ang-ecommerce:latest
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      - spring-cloud-network
+networks:
+  spring-cloud-network:
+    driver: bridge

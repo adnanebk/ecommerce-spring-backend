@@ -1,0 +1,20 @@
+name: Heroku Deploy
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Heroku remote
+        run: heroku git:remote --app ang-shop
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "ang-shop"
+          heroku_email: "benkouider.adnane@gmail.com"
+        env:
+          BASE-URL: "https://ang-shop.herokuapp.com"
