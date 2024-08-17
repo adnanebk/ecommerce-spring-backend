@@ -11,35 +11,35 @@ it has been developed using Angular, java 17 and spring boot  ,
 
 core features :
 
-Classic and social Authentication (using jwt with refresh token)
+* Classic and social Authentication (using jwt with refresh token)
 
-Roles access ability
+* Roles access ability
 
-Account information
+* Account information
 
-Password changing ability
+* Password changing ability
 
-Displaying products with filters and pagination
+* Displaying products with filters and pagination
 
-Product details
+* Product details
 
-Credit cart management
+* Credit cart management
 
-Products managements by admin
+* Products managements by admin
 
-using excel to add/modify products
+* using excel to add/modify products
 
-Add to Cart ability with its management
+* Add to Cart ability with its management
 
-Displaying Orders
+* Displaying Orders
 
-making orders ability
+* Making orders ability
 
-Dark/light theme switching
+* Dark/light theme switching
 
-Swagger documentation
+* Swagger documentation
 
-and more
+* and more
 
 I have implemented CI/CD pipelines to automate quality checks using SonarClkoud and the deployment, with the backend deployed to Heroku and the frontend deployed to Netlify
 
