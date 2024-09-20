@@ -67,6 +67,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private static boolean isUserEnabledOrAllowed(HttpServletRequest request, AppUser user) {
         return user.isEnabled() || request.getMethod().equalsIgnoreCase("get")
                 || request.getRequestURI().contains("send-confirmation")
-                || request.getRequestURI().contains("current/enable");
+                || request.getRequestURI().contains("users/");
     }
 }
