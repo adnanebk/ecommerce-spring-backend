@@ -5,6 +5,7 @@ import javax.validation.constraints.NotEmpty;
 
 
 public record LoginUserDto(
-    @NotEmpty String email,
-    @NotEmpty String password
-){}
+        @NotEmpty String email,
+        @NotEmpty String password
+) {
+}

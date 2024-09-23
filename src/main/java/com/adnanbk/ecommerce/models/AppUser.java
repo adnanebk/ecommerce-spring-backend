@@ -41,7 +41,7 @@ public class AppUser implements Serializable {
 
     private String city;
     private String country;
-    private boolean enabled=false;
+    private boolean enabled = false;
     private boolean isSocial;
 
     private String imageUrl;
@@ -57,9 +57,7 @@ public class AppUser implements Serializable {
                     name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
                     name = "role_id", referencedColumnName = "id"))
-    private Collection<Role> roles=new HashSet<>();
-
-
+    private Collection<Role> roles = new HashSet<>();
 
 
 }

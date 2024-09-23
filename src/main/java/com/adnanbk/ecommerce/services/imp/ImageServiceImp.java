@@ -35,7 +35,7 @@ public class ImageServiceImp implements FileService {
     private void createUploadingDirectory() {
         try {
             root = Paths.get(uploadDir);
-                Files.createDirectories(root);
+            Files.createDirectories(root);
         } catch (IOException e) {
             throw new CustomFileException("Could not initialize folder for upload!");
         }
@@ -55,7 +55,7 @@ public class ImageServiceImp implements FileService {
 
     @Override
     public String upload(List<MultipartFile> images) {
-       return  images.stream().map(this::upload).collect(Collectors.joining(Constants.IMAGES_SEPARATOR));
+        return images.stream().map(this::upload).collect(Collectors.joining(Constants.IMAGES_SEPARATOR));
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ImageServiceImp implements FileService {
             Path path = root.resolve(filename);
             Resource resource = new UrlResource(path.toUri());
             if (resource.exists() || resource.isReadable()) {
-                return  path.toString();
+                return path.toString();
             } else {
                 throw new CustomFileException("file either not exists or not readable");
             }

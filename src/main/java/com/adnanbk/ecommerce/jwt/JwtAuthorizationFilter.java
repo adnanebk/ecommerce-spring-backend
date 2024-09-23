@@ -21,7 +21,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
-    private  HandlerExceptionResolver handlerExceptionResolver;
+    private HandlerExceptionResolver handlerExceptionResolver;
 
     private JwtTokenService jwtTokenService;
     private UserRepo userRepo;
@@ -29,7 +29,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path =request.getRequestURI();
+        String path = request.getRequestURI();
         return path.contains("refresh-token");
     }
 
@@ -41,23 +41,23 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             // JWT Token is in the form "Bearer token". Remove Bearer word and get
             // only the Token
             var token = Optional.ofNullable(header)
-                                       .map(h->h.split("Bearer "))
-                                       .filter(arr->arr.length==2)
-                                       .map(arr->arr[1]);
+                    .map(h -> h.split("Bearer "))
+                    .filter(arr -> arr.length == 2)
+                    .map(arr -> arr[1]);
             if (token.isPresent() && SecurityContextHolder.getContext().getAuthentication() == null) {
                 // Once we get the token we validate it.
                 String email = jwtTokenService.validateTokenAndGetSubject(token.get());
-                userRepo.findByEmail(email).ifPresent(user->{
-                    if(!isUserEnabledOrAllowed(request, user))
+                userRepo.findByEmail(email).ifPresent(user -> {
+                    if (!isUserEnabledOrAllowed(request, user))
                         throw new UserNotEnabledException();
                     // authentication
-                    jwtTokenService.setAuthenticationToken(email,user.getPassword(),user.getRoles().stream().map(Role::getName).toList(),request);
+                    jwtTokenService.setAuthenticationToken(email, user.getPassword(), user.getRoles().stream().map(Role::getName).toList(), request);
                 });
 
             }
-        } catch (RuntimeException ex){
+        } catch (RuntimeException ex) {
 
-           handlerExceptionResolver.resolveException(request,response,null,ex);
+            handlerExceptionResolver.resolveException(request, response, null, ex);
             return; // return from this method so the response not enter to the chain and duplicate the exceptions
         }
         chain.doFilter(request, response);

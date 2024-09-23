@@ -8,6 +8,7 @@ public interface AuthService {
     AuthDataDto handleSocialLogin(SocialLoginDto user, SocialService socialService);
 
     AuthDataDto handleLogin(LoginUserDto appUser);
+
     AuthDataDto handleRegister(UserInputDto userInputDto);
 
 

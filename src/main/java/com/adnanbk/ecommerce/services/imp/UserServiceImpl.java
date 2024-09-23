@@ -15,18 +15,16 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
 
 
-
-
     @Override
     public ImageDto changeUserImage(String fileName, String email) {
-        userRepo.updateImage(email,fileName);
+        userRepo.updateImage(email, fileName);
         return new ImageDto(fileName);
     }
 
 
     @Override
     public void update(AppUser user, String email) {
-        userRepo.findByEmail(email).ifPresent(savedUser->{
+        userRepo.findByEmail(email).ifPresent(savedUser -> {
             mapUser(user, savedUser);
             userRepo.save(savedUser);
 
@@ -44,10 +42,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void enableUser(String token, String email) {
-        ConfirmationTokenUtil.verifyToken(email,token);
-        userRepo.enableUser(email,true);
+        ConfirmationTokenUtil.verifyToken(email, token);
+        userRepo.enableUser(email, true);
     }
-
 
 
 }

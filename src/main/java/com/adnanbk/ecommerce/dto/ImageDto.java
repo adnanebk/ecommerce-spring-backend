@@ -1,6 +1,4 @@
 package com.adnanbk.ecommerce.dto;
 
-public  record ImageDto(String url)
-
-{
+public record ImageDto(String url) {
 }

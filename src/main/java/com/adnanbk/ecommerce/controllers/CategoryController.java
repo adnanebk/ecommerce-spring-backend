@@ -17,15 +17,15 @@ public class CategoryController {
     private CategoryService categoryService;
     private CategoryMapper categoryMapper;
 
-   @GetMapping
-   Iterable<CategoryDto> getAll(){
-       return  categoryService.getAll().stream()
-               .map(categoryMapper::toDto).toList();
+    @GetMapping
+    Iterable<CategoryDto> getAll() {
+        return categoryService.getAll().stream()
+                .map(categoryMapper::toDto).toList();
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    CategoryDto create(@RequestBody @Valid CategoryDto categoryDto){
+    CategoryDto create(@RequestBody @Valid CategoryDto categoryDto) {
         return Optional.of(categoryDto)
                 .map(categoryMapper::toEntity)
                 .map(categoryService::create)
@@ -34,16 +34,16 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    CategoryDto update(@PathVariable Long id,@RequestBody @Valid CategoryDto categoryDto){
-        return   Optional.of(categoryDto)
+    CategoryDto update(@PathVariable Long id, @RequestBody @Valid CategoryDto categoryDto) {
+        return Optional.of(categoryDto)
                 .map(categoryMapper::toEntity)
-                .map(cat->categoryService.update(id,cat))
+                .map(cat -> categoryService.update(id, cat))
                 .map(categoryMapper::toDto).orElseThrow();
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    void remove(@PathVariable Long id){
-         categoryService.remove(id);
+    void remove(@PathVariable Long id) {
+        categoryService.remove(id);
     }
 }

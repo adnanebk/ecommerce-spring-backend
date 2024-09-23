@@ -27,18 +27,18 @@ public class FacebookService implements SocialService {
 
     private String apiInspector;
 
-    private  String accessToken;
+    private String accessToken;
 
     @PostConstruct
-    public void init(){
-     this.accessToken =clientId + '|' + clientSecret;
+    public void init() {
+        this.accessToken = clientId + '|' + clientSecret;
     }
 
     public boolean verify(String authToken) {
         return Optional.ofNullable(authToken)
-                       .map(token->restTemplate.getForEntity(apiInspector + "?input_token={token}&access_token={app-token}"
-                               , String.class, authToken, accessToken).getStatusCode().is2xxSuccessful())
-                       .orElse(false);
+                .map(token -> restTemplate.getForEntity(apiInspector + "?input_token={token}&access_token={app-token}"
+                        , String.class, authToken, accessToken).getStatusCode().is2xxSuccessful())
+                .orElse(false);
 
     }
 

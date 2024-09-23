@@ -20,7 +20,6 @@ import java.util.Optional;
 public class OrderController {
 
 
-
     private final UserOderService userOderService;
     private final OrderMapper orderMapper;
 
@@ -46,6 +45,6 @@ public class OrderController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "remove a user order")
     public void remove(@PathVariable long id) {
-      userOderService.remove(id);
+        userOderService.remove(id);
     }
 }

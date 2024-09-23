@@ -56,7 +56,7 @@ public class ExceptionsHandler {
         Set<ResponseError> errors = new HashSet<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
-                er -> errors.add(ResponseErrorFactory.create(ex.getBindingResult().getTarget(),er.getField(), er.getDefaultMessage()))
+                er -> errors.add(ResponseErrorFactory.create(ex.getBindingResult().getTarget(), er.getField(), er.getDefaultMessage()))
         );
         ex.getBindingResult().getGlobalErrors()
                 .forEach(x -> {
@@ -76,10 +76,12 @@ public class ExceptionsHandler {
     public ApiErrorDto badCredentialsException(BadCredentialsException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
+
     @ExceptionHandler(ProductSkuAlreadyExistException.class)
     public ApiErrorDto productSkuAlreadyExistException(ProductSkuAlreadyExistException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
+
     @ExceptionHandler(ProductNotFoundException.class)
     public ApiErrorDto productNotFoundException(ProductNotFoundException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
@@ -88,15 +90,15 @@ public class ExceptionsHandler {
 
     @ExceptionHandler(InvalidPasswordException.class)
     public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
-        return new ApiErrorDto(formatMessage(ex.getMessage()),Set.of(new ResponseError("currentPassword",formatMessage(ex.getMessage()))));
+        return new ApiErrorDto(formatMessage(ex.getMessage()), Set.of(new ResponseError("currentPassword", formatMessage(ex.getMessage()))));
     }
- 
+
 
     @ExceptionHandler(JWTVerificationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiErrorDto jWTVerificationException(JWTVerificationException ex) {
-        if(ex instanceof TokenExpiredException)
-            return new ApiErrorDto(formatMessage(ex.getMessage()),"jwt.expired");
+        if (ex instanceof TokenExpiredException)
+            return new ApiErrorDto(formatMessage(ex.getMessage()), "jwt.expired");
 
         return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
@@ -104,27 +106,27 @@ public class ExceptionsHandler {
     @ExceptionHandler(UserNotEnabledException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiErrorDto userNotEnabledException(UserNotEnabledException ex) {
-        return new ApiErrorDto(formatMessage(ex.getMessage()),"user.not.enabled");
+        return new ApiErrorDto(formatMessage(ex.getMessage()), "user.not.enabled");
     }
+
     @ExceptionHandler(InvalidTokenException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorDto invalidTokenException(InvalidTokenException ex) {
-        return new ApiErrorDto(formatMessage(ex.getMessage()),"user.not.enabled");
+        return new ApiErrorDto(formatMessage(ex.getMessage()), "user.not.enabled");
     }
-
 
 
     private Set<ResponseError> generateErrors(ConstraintViolationException cause) {
         Set<ResponseError> errors = new HashSet<>();
         for (ConstraintViolation<?> violation : cause.getConstraintViolations()) {
             if (violation.getPropertyPath() != null)
-                errors.add(ResponseErrorFactory.create(violation.getLeafBean(),violation.getPropertyPath().toString(), violation.getMessage()));
+                errors.add(ResponseErrorFactory.create(violation.getLeafBean(), violation.getPropertyPath().toString(), violation.getMessage()));
         }
         return errors;
     }
 
     private ApiErrorDto generateUniqueErrorMessage(Exception cause) {
-        ResponseError responseError = ResponseErrorFactory.create(this.errorMessagesUtil.getMessage("error.already-exist"),cause);
+        ResponseError responseError = ResponseErrorFactory.create(this.errorMessagesUtil.getMessage("error.already-exist"), cause);
         if (responseError == null)
             return new ApiErrorDto("An error has been thrown during database modification");
 
@@ -135,7 +137,8 @@ public class ExceptionsHandler {
     private ApiErrorDto generateApiErrors(Set<ResponseError> responseErrors) {
         return new ApiErrorDto("Try to fix these errors", responseErrors);
     }
+
     private String formatMessage(String message) {
-        return message.startsWith("error.")?errorMessagesUtil.getMessage(message):message;
+        return message.startsWith("error.") ? errorMessagesUtil.getMessage(message) : message;
     }
 }

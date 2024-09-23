@@ -21,11 +21,11 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public CreditCard saveCard(CreditCard creditCard) {
-       var user =   authService.getAuthenticatedUser();
-            if(isNewCard(user.getEmail()))
-                creditCard.setActive(true);
-            creditCard.setAppUser(user);
-            return creditCardRepo.save(creditCard);
+        var user = authService.getAuthenticatedUser();
+        if (isNewCard(user.getEmail()))
+            creditCard.setActive(true);
+        creditCard.setAppUser(user);
+        return creditCardRepo.save(creditCard);
 
     }
 
@@ -38,8 +38,8 @@ public class CreditCardServiceImpl implements CreditCardService {
     @Transactional
     public void activateCreditCard(Long id) {
         creditCardRepo.findCurrentActivatedCard()
-                .ifPresent(currentActiveCard-> creditCardRepo.updateActiveCard(currentActiveCard.getId(),false));
-        creditCardRepo.updateActiveCard(id,true);
+                .ifPresent(currentActiveCard -> creditCardRepo.updateActiveCard(currentActiveCard.getId(), false));
+        creditCardRepo.updateActiveCard(id, true);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public void update(CreditCard creditCard, Long id) {
-                this.creditCardRepo.update(creditCard.getCardType(),creditCard.getCardNumber(),creditCard.getExpirationDate(),id);
+        this.creditCardRepo.update(creditCard.getCardType(), creditCard.getCardNumber(), creditCard.getExpirationDate(), id);
     }
 
 
@@ -61,6 +61,6 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public void removeById(Long id) {
-     creditCardRepo.deleteById(id);
+        creditCardRepo.deleteById(id);
     }
 }

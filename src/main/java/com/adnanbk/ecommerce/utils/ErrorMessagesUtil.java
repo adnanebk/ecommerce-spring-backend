@@ -11,11 +11,10 @@ import org.springframework.stereotype.Component;
 public class ErrorMessagesUtil {
 
 
-
-    private  final MessageSource messageSource;
+    private final MessageSource messageSource;
 
     public String getMessage(String code) {
-        return messageSource.getMessage(code,null,LocaleContextHolder.getLocale() );
+        return messageSource.getMessage(code, null, LocaleContextHolder.getLocale());
     }
 
 }

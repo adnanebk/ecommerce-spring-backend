@@ -26,15 +26,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category update(Long id, Category category) {
-         return categoryRepository.findById(id)
-                 .map(currentCategory->{
-                     currentCategory.setName(category.getName());
+        return categoryRepository.findById(id)
+                .map(currentCategory -> {
+                    currentCategory.setName(category.getName());
                     return categoryRepository.save(currentCategory);
-                 }).orElseThrow();
+                }).orElseThrow();
     }
 
     @Override
     public void remove(Long id) {
-     categoryRepository.deleteById(id);
+        categoryRepository.deleteById(id);
     }
 }

@@ -27,7 +27,7 @@ public class UserOrderServiceImp implements UserOderService {
     public UserOrder saveOrder(UserOrder userOrder) {
         var appUser = authService.getAuthenticatedUser();
         var creditCard = userOrder.getCreditCard();
-            creditCard.setAppUser(appUser);
+        creditCard.setAppUser(appUser);
         userOrder.setCreditCard(getOrCreateCreditCardIfNotExist(creditCard));
         userOrder.setAppUser(appUser);
         userOrder.setUserOrderItems(orderItemRepo.saveAll(userOrder.getOrderItems()));
@@ -36,10 +36,10 @@ public class UserOrderServiceImp implements UserOderService {
 
     private CreditCard getOrCreateCreditCardIfNotExist(CreditCard creditCard) {
         return creditCardService.getByCardNumber(creditCard.getCardNumber())
-                        .orElseGet(()->{
-                            creditCard.setId(null);
-                            return creditCardService.saveCard(creditCard);
-                        });
+                .orElseGet(() -> {
+                    creditCard.setId(null);
+                    return creditCardService.saveCard(creditCard);
+                });
     }
 
     @Override
@@ -49,7 +49,7 @@ public class UserOrderServiceImp implements UserOderService {
 
     @Override
     public void remove(long id) {
-     this.orderRepository.deleteById(id);
+        this.orderRepository.deleteById(id);
     }
 
 

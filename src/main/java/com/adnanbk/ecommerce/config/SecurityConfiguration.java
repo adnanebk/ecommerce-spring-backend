@@ -45,16 +45,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/h2-console/**","/swagger*/**","/v2/api-docs/**",
-                "/api/auth/login/**","/api/auth/register/**","/api/auth/refresh-token/**",
-                "/uploads/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/products/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/categories/**").permitAll()
+                .antMatchers("/h2-console/**", "/swagger*/**", "/v2/api-docs/**",
+                        "/api/auth/login/**", "/api/auth/register/**", "/api/auth/refresh-token/**",
+                        "/uploads/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .anyRequest().authenticated();
-                http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
-                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
-
 
 
     @Bean

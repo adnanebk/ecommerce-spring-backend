@@ -22,9 +22,10 @@ public class ApiErrorDto {
         this(message, new HashSet<>());
 
     }
-    public ApiErrorDto(String message,String code) {
+
+    public ApiErrorDto(String message, String code) {
         this(message, new HashSet<>());
-        this.code=code;
+        this.code = code;
 
     }
 }

@@ -30,18 +30,18 @@ public class JwtTokenServiceImp implements JwtTokenService {
     @PostConstruct
     public void init() {
         algorithm = Algorithm.HMAC512(secret.getBytes());
-        tokenExpirationTime *=60*1000;
-        refreshTokenExpirationTime *=60*1000*1440;
+        tokenExpirationTime *= 60 * 1000;
+        refreshTokenExpirationTime *= 60 * 1000 * 1440;
     }
 
 
     @Override
     public Tokens generateTokens(String subject) {
-        var expirationDate = new Date(System.currentTimeMillis()+tokenExpirationTime);
-        var refreshExpirationDate = new Date(System.currentTimeMillis()+refreshTokenExpirationTime);
+        var expirationDate = new Date(System.currentTimeMillis() + tokenExpirationTime);
+        var refreshExpirationDate = new Date(System.currentTimeMillis() + refreshTokenExpirationTime);
         String accessToken = generateToken(subject, expirationDate);
         String refreshToken = generateToken(subject, refreshExpirationDate);
-        return new Tokens(accessToken, refreshToken,expirationDate,refreshExpirationDate);
+        return new Tokens(accessToken, refreshToken, expirationDate, refreshExpirationDate);
     }
 
 

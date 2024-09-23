@@ -22,8 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException, UserNotEnabledException {
-     return userRepo.findByEmail(email).map(user->new User(user.getEmail(), user.getPassword(),
-             user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()))
-             .orElseThrow(()->new BadCredentialsException("error.invalid-email-or-password"));
+        return userRepo.findByEmail(email).map(user -> new User(user.getEmail(), user.getPassword(),
+                        user.getRoles().stream().map(role -> new SimpleGrantedAuthority(role.getName())).toList()))
+                .orElseThrow(() -> new BadCredentialsException("error.invalid-email-or-password"));
     }
 }

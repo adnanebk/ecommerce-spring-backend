@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CreditCardMapper {
 
-    @Mapping(target="expirationDate", source = "creditCard.expirationDate",
+    @Mapping(target = "expirationDate", source = "creditCard.expirationDate",
             dateFormat = "MM/yy")
     CreditCardDto toDto(CreditCard creditCard);
 

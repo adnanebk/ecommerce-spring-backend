@@ -49,14 +49,13 @@ public class EcommerceAngApplication {
         resolver.setDefaultLocale(Locale.US);
         return resolver;
     }
+
     @Bean
     public MessageSource messageSource() {
         final ResourceBundleMessageSource source = new ResourceBundleMessageSource();
         source.setBasename("ValidationMessages");
         return source;
     }
-
-
 
 
 }

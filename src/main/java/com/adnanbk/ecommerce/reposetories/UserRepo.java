@@ -12,7 +12,7 @@ import java.util.Optional;
 
 
 public interface UserRepo extends CrudRepository<AppUser, Long> {
-    
+
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
     Optional<AppUser> findByEmail(String email);
 
@@ -20,6 +20,7 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
     @Modifying(clearAutomatically = true)
     @Query("UPDATE AppUser us SET us.password = :password WHERE us.id= :id")
     void updatePassword(Long id, String password);
+
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("UPDATE AppUser us SET us.imageUrl = :fileName WHERE us.email= :email")

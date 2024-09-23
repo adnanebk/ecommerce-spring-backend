@@ -14,9 +14,9 @@ public interface OrderMapper {
 
     UserOrder toEntity(UserOrderDto orderDto);
 
-    @Mapping(target="expirationDate", source = "creditCard.expirationDate",
+    @Mapping(target = "expirationDate", source = "creditCard.expirationDate",
             dateFormat = "MM/yy")
-    CreditCardDto  toCardDto(CreditCard creditCard);
+    CreditCardDto toCardDto(CreditCard creditCard);
 
     @Mapping(target = "expirationDate", expression = "java(java.time.YearMonth.parse(creditCardDto.getExpirationDate(),DateTimeFormatter.ofPattern(\"MM/yy\")).atDay(1))")
     CreditCard toCardEntity(CreditCardDto creditCardDto);

@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImp implements AuthService {
@@ -44,8 +45,7 @@ public class AuthServiceImp implements AuthService {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(appUser.email(), appUser.password()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-        catch (BadCredentialsException e) {
+        } catch (BadCredentialsException e) {
             throw new BadCredentialsException("error.invalid-email-or-password");
         }
 
@@ -68,13 +68,12 @@ public class AuthServiceImp implements AuthService {
     @Override
     public void changePassword(ChangeUserPasswordDto changeUserPasswordDto) {
         var user = this.getAuthenticatedUser();
-            if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
-                throw new InvalidPasswordException("error.invalid-password");
-            var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
-            userRepo.updatePassword(user.getId(),newPassword);
+        if (!passwordEncode.matches(changeUserPasswordDto.getCurrentPassword(), user.getPassword()))
+            throw new InvalidPasswordException("error.invalid-password");
+        var newPassword = passwordEncode.encode(changeUserPasswordDto.getNewPassword());
+        userRepo.updatePassword(user.getId(), newPassword);
 
     }
-
 
 
     private AppUser getUserByEmail(String email) {
@@ -83,8 +82,8 @@ public class AuthServiceImp implements AuthService {
 
     @Override
     public AuthDataDto refreshNewToken(String refreshToken) {
-        String email  = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
-        return   buildAuthData(getUserByEmail(email));
+        String email = this.jwtTokenService.validateTokenAndGetSubject(refreshToken);
+        return buildAuthData(getUserByEmail(email));
     }
 
 
@@ -101,9 +100,10 @@ public class AuthServiceImp implements AuthService {
         user.setRoles(List.of(roleRepository.findByName("ROLE_USER")));
         return userRepo.save(user);
     }
+
     private AuthDataDto buildAuthData(AppUser user) {
-       var tokens = this.jwtTokenService.generateTokens(user.getEmail());
-       return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userMapper.toDto(user));
+        var tokens = this.jwtTokenService.generateTokens(user.getEmail());
+        return new AuthDataDto(tokens.access(), tokens.refresh(), tokens.expirationDate(), userMapper.toDto(user));
 
     }
 

@@ -19,7 +19,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Optional<Product> findBySku(String sku);
 
 
-
     Page<Product> findAll(Pageable pageable);
 
 
@@ -31,7 +30,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                and ( :cat is null or
                (lower(c.name) like lower(concat('%', :cat,'%'))) )
              )""")
-    Page<Product> findPagedProducts(@Param("cat") String category,@Param("sr") String search, Pageable pageable);
+    Page<Product> findPagedProducts(@Param("cat") String category, @Param("sr") String search, Pageable pageable);
 
     List<Product> findAllBySkuIn(List<String> skus);
 }

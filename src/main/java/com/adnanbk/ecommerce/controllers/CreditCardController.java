@@ -32,31 +32,32 @@ public class CreditCardController {
     @PostMapping
     @ApiOperation(value = "create a new user credit card")
     @ResponseStatus(HttpStatus.CREATED)
-    public    CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto) {
-       return Optional.of(creditCardDto)
+    public CreditCardDto saveCreditCard(@RequestBody @Valid CreditCardDto creditCardDto) {
+        return Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
-                .map(card->creditCardService.saveCard(card))
+                .map(card -> creditCardService.saveCard(card))
                 .map(creditCardMapper::toDto).orElseThrow();
 
     }
+
     @PutMapping("/{id}")
     @ApiOperation(value = "update a user credit card")
     public void updateCreditCard(@RequestBody @Valid CreditCardDto creditCardDto, @PathVariable Long id) {
-          Optional.of(creditCardDto)
+        Optional.of(creditCardDto)
                 .map(creditCardMapper::toEntity)
-                .ifPresent(card->creditCardService.update(card,id));
+                .ifPresent(card -> creditCardService.update(card, id));
     }
 
     @PatchMapping("/{id}/active")
     @ApiOperation(value = "active the user credit card")
     public void activateCreditCard(@PathVariable Long id) {
-         creditCardService.activateCreditCard(id);
+        creditCardService.activateCreditCard(id);
     }
 
     @DeleteMapping("/{id}")
     @ApiOperation(value = "remove a user credit card")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeCreditCard( @PathVariable Long id) {
-      creditCardService.removeById(id);
+    public void removeCreditCard(@PathVariable Long id) {
+        creditCardService.removeById(id);
     }
 }

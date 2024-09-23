@@ -39,9 +39,9 @@ public class UserOrderDto {
     private double totalPrice;
 
 
-    private LocalDate dateCreated=LocalDate.now();
+    private LocalDate dateCreated = LocalDate.now();
 
-    private List<OrderItem> orderItems=new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @NotNull
     @Valid

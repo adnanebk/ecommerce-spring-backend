@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Table(name = "credit_card", uniqueConstraints = {@UniqueConstraint(columnNames = "card_number", name = "uniqueCardNumber")})
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-public class CreditCard implements Serializable{
+public class CreditCard implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,7 +28,6 @@ public class CreditCard implements Serializable{
     private String cardNumber;
 
 
-
     private LocalDate expirationDate;
 
     @OneToMany(cascade = CascadeType.ALL
@@ -36,7 +35,7 @@ public class CreditCard implements Serializable{
     )
     private List<UserOrder> userOrders;
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private AppUser appUser;
 

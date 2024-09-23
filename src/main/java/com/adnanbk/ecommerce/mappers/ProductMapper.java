@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring")
 public abstract class ProductMapper {
 
-  @Autowired
-  protected   FileUtil fileUtil;
+    @Autowired
+    protected FileUtil fileUtil;
 
-   @Mapping(target = "images", expression = "java(fileUtil.toImagesUrlS(product.getImage()))")
+    @Mapping(target = "images", expression = "java(fileUtil.toImagesUrlS(product.getImage()))")
     public abstract ProductDto toDto(Product product);
 
     public abstract Product toEntity(ProductDto userDto);

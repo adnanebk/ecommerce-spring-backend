@@ -24,7 +24,7 @@ import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
-    static final String[] HEADERS = {"Sku","Name", "Description", "Price", "Quantity","Category"};
+    static final String[] HEADERS = {"Sku", "Name", "Description", "Price", "Quantity", "Category"};
     static final String SHEET_NAME = "Products";
     static final int SKU_CELL = 0;
     static final int NAME_CELL = 1;
@@ -41,10 +41,10 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     @Override
     public List<Product> excelToList(MultipartFile file) {
-        if(!hasExcelFormat(file))
+        if (!hasExcelFormat(file))
             throw new CustomFileException("Only excel formats are valid");
-        try(InputStream is = file.getInputStream();
-            Workbook workbook = new XSSFWorkbook(is)
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(is)
         ) {
             Sheet sheet = workbook.getSheetAt(0);
             return StreamSupport.stream(sheet.spliterator(), false)
@@ -52,29 +52,28 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                     .skip(1)
                     .map(this::extractProductFromRow)
                     .toList();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new CustomFileException("fail to parse Excel file: " + e.getMessage());
         }
     }
 
     private Product extractProductFromRow(Row currentRow) {
-            return Product.builder()
-                    .name(getCell(NAME_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
-                    .description(getCell(DESCRIPTION_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
-                    .sku(getCell(SKU_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
-                    .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
-                    .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(Double::intValue).orElse(null))
-                    .category(getCell(CATEGORY_CELL, currentRow).map(this::getValueAsStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                    .build();
+        return Product.builder()
+                .name(getCell(NAME_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                .description(getCell(DESCRIPTION_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                .sku(getCell(SKU_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
+                .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
+                .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(Double::intValue).orElse(null))
+                .category(getCell(CATEGORY_CELL, currentRow).map(this::getValueAsStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
+                .build();
     }
 
     public ByteArrayInputStream listToExcel(List<Product> products) {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-              Sheet sheet = createSheet(SHEET_NAME,workbook,HEADERS);
+            Sheet sheet = createSheet(SHEET_NAME, workbook, HEADERS);
             int rowIdx = 1;
-            for(Product product:products){
+            for (Product product : products) {
                 fillRowWithProduct(sheet.createRow(rowIdx++), product);
             }
             workbook.write(out);
@@ -85,7 +84,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
     }
 
 
-    private void fillRowWithProduct( Row row, Product product) {
+    private void fillRowWithProduct(Row row, Product product) {
         row.createCell(NAME_CELL).setCellValue(product.getName());
         row.createCell(DESCRIPTION_CELL).setCellValue(product.getDescription());
         row.createCell(SKU_CELL).setCellValue(product.getSku());

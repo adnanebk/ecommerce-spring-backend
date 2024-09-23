@@ -21,20 +21,19 @@ public class ResponseErrorFactory {
         return null;
     }
 
-    public static   ResponseError create(String fieldName, String errorMessage) {
-        if(fieldName.contains("."))
-            fieldName=fieldName.substring(fieldName.lastIndexOf(".")+1);
+    public static ResponseError create(String fieldName, String errorMessage) {
+        if (fieldName.contains("."))
+            fieldName = fieldName.substring(fieldName.lastIndexOf(".") + 1);
         String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
-        return new ResponseError(fieldName, formattedName+" " +errorMessage);
-    }
-    public static   ResponseError create(Object rootBean, String fieldName, String errorMessage) {
-        if(fieldName.contains("."))
-            fieldName=fieldName.substring(fieldName.lastIndexOf(".")+1);
-        String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
-        return new ResponseError(rootBean,fieldName, formattedName+" " +errorMessage);
+        return new ResponseError(fieldName, formattedName + " " + errorMessage);
     }
 
-
+    public static ResponseError create(Object rootBean, String fieldName, String errorMessage) {
+        if (fieldName.contains("."))
+            fieldName = fieldName.substring(fieldName.lastIndexOf(".") + 1);
+        String formattedName = StringUtil.camelCaseWordsToWordsWithSpaces(fieldName);
+        return new ResponseError(rootBean, fieldName, formattedName + " " + errorMessage);
+    }
 
 
 }

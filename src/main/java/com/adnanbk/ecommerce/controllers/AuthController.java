@@ -34,9 +34,9 @@ public class AuthController {
     public AuthDataDto register(@RequestBody @Valid UserInputDto userDto) {
         return Optional.of(userDto)
                 .map(authService::handleRegister)
-                .map(authDataDto-> {
-                    var user  = authDataDto.appUser();
-                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(),user.getEmail())));
+                .map(authDataDto -> {
+                    var user = authDataDto.appUser();
+                    eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(), user.getEmail())));
                     return authDataDto;
                 })
                 .orElseThrow();
@@ -46,8 +46,9 @@ public class AuthController {
     @ApiOperation(value = "generate new refresh token")
     @ResponseStatus(HttpStatus.CREATED)
     public AuthDataDto refreshNewToken(@RequestBody String refreshToken) {
-             return  this.authService.refreshNewToken(refreshToken);
+        return this.authService.refreshNewToken(refreshToken);
     }
+
     @PostMapping("login")
     @ApiOperation(value = "authenticate a user")
     public AuthDataDto login(@RequestBody @Valid LoginUserDto appUser) {
@@ -58,14 +59,14 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "authenticate a google user")
     public AuthDataDto googleLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleSocialLogin(socialLoginDto,googleService);
+        return authService.handleSocialLogin(socialLoginDto, googleService);
 
     }
 
     @PostMapping("login/facebook")
     @ApiOperation(value = "authenticate a facebook user")
     public AuthDataDto facebookLogin(@RequestBody @Valid SocialLoginDto socialLoginDto) {
-        return authService.handleSocialLogin(socialLoginDto,facebookService);
+        return authService.handleSocialLogin(socialLoginDto, facebookService);
     }
 
 
@@ -79,7 +80,7 @@ public class AuthController {
     @ApiOperation(value = "send a confirmation token to the user email")
     public void sendEmailConfirmation() {
         var user = authService.getAuthenticatedUser();
-        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(),user.getEmail())));
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(new RegistrationEventSource(user.getFirstName(), user.getEmail())));
     }
 
 

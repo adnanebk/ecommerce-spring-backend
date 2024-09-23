@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationEvent;
 @Getter
 @Setter
 public final class OnRegistrationCompleteEvent extends ApplicationEvent {
-    private  RegistrationEventSource eventSource;
+    private RegistrationEventSource eventSource;
 
     public OnRegistrationCompleteEvent(RegistrationEventSource eventSource) {
         super(eventSource);

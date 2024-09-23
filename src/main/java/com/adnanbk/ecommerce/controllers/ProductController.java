@@ -45,46 +45,47 @@ public class ProductController {
     @GetMapping
     @ApiOperation(value = "Get a page of products")
     public Page<ProductDto> getProducts(ProductPageDto productPageDto) {
-        return  productService.getAll(productPageDto,buildPageable(productPageDto))
+        return productService.getAll(productPageDto, buildPageable(productPageDto))
                 .map(productMapper::toDto);
     }
 
     @GetMapping("/sku/{sku}")
     @ApiOperation(value = "Get a product by sku")
-    public ProductDto getBySku(@PathVariable  String sku) {
-        return  productMapper.toDto(productService.getBySku(sku));
+    public ProductDto getBySku(@PathVariable String sku) {
+        return productMapper.toDto(productService.getBySku(sku));
     }
-    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE})
+
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDto addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart List<MultipartFile> files) {
 
-                return Optional.of(productDto)
-                                  .map(productMapper::toEntity)
-                        .map(pr->{
-                            pr.setImage(this.imageService.upload(files));
-                                         return pr;
-                        })
-                                  .map(productService::addProduct)
-                                  .map(productMapper::toDto).orElseThrow();
+        return Optional.of(productDto)
+                .map(productMapper::toEntity)
+                .map(pr -> {
+                    pr.setImage(this.imageService.upload(files));
+                    return pr;
+                })
+                .map(productService::addProduct)
+                .map(productMapper::toDto).orElseThrow();
     }
 
-    @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> files,@PathVariable Long id) {
+    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> files, @PathVariable Long id) {
         return Optional.of(productDto)
-                        .map(productMapper::toEntity)
-            .map(pr->{
-                if(files!=null && !files.isEmpty())
-                 pr.setImage(this.imageService.upload(files));
-                return pr;
-            })
-                        .map(pr->productService.updateProduct(pr,id))
-                        .map(productMapper::toDto).orElseThrow();
+                .map(productMapper::toEntity)
+                .map(pr -> {
+                    if (files != null && !files.isEmpty())
+                        pr.setImage(this.imageService.upload(files));
+                    return pr;
+                })
+                .map(pr -> productService.updateProduct(pr, id))
+                .map(productMapper::toDto).orElseThrow();
     }
 
 
@@ -94,7 +95,7 @@ public class ProductController {
     public List<ProductDto> updateProducts(@Valid @RequestBody List<ProductDto> products) {
         return productService.updateProducts(
                 products.stream().map(productMapper::toEntity).toList()
-                ).stream().map(productMapper::toDto).toList();
+        ).stream().map(productMapper::toDto).toList();
 
     }
 
@@ -110,11 +111,11 @@ public class ProductController {
     @PostMapping("/excel")
     @ApiOperation(value = "add or update products from excel file", notes = "you can download an excel file and fill it")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<Map<Operation,List<ProductDto>>> addOrUpdateProductsFromExcel(@RequestPart  MultipartFile file) {
-        return CompletableFuture.supplyAsync(()->{
-            Map<Operation,List<ProductDto>> result = new EnumMap<>(Operation.class);
-           productService.addOrUpdateFromExcel(file).forEach((op,products)->result.put(op,products.stream().map(productMapper::toDto).toList()));
-           return result;
+    public CompletableFuture<Map<Operation, List<ProductDto>>> addOrUpdateProductsFromExcel(@RequestPart MultipartFile file) {
+        return CompletableFuture.supplyAsync(() -> {
+            Map<Operation, List<ProductDto>> result = new EnumMap<>(Operation.class);
+            productService.addOrUpdateFromExcel(file).forEach((op, products) -> result.put(op, products.stream().map(productMapper::toDto).toList()));
+            return result;
         });
 
     }
@@ -124,15 +125,16 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public CompletableFuture<ResponseEntity<InputStreamResource>>
     downloadExcelFromProducts(@PathVariable List<Long> ids) {
-    return  CompletableFuture.supplyAsync(()->{
-    String filename = "products-" + LocalDate.now() + ".xlsx";
-    InputStreamResource file = new InputStreamResource(productService.convertToExcel(ids));
-    return ResponseEntity.ok()
-            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-            .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-            .body(file);
-});
+        return CompletableFuture.supplyAsync(() -> {
+            String filename = "products-" + LocalDate.now() + ".xlsx";
+            InputStreamResource file = new InputStreamResource(productService.convertToExcel(ids));
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                    .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                    .body(file);
+        });
     }
+
     @DeleteMapping("/{id}")
     @ApiOperation(value = "remove a product")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -140,9 +142,10 @@ public class ProductController {
     public void removeProduct(@PathVariable Long id) {
         productService.removeProduct(id);
     }
-        private Pageable buildPageable(PageDto pageDto) {
-        return PageRequest.of(pageDto.getNumber(),pageDto.getSize(),
-                Sort.by(Sort.Direction.valueOf(pageDto.getSortDirection()),pageDto.getSortProperty()));
+
+    private Pageable buildPageable(PageDto pageDto) {
+        return PageRequest.of(pageDto.getNumber(), pageDto.getSize(),
+                Sort.by(Sort.Direction.valueOf(pageDto.getSortDirection()), pageDto.getSortProperty()));
 
     }
 }

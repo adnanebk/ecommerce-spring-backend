@@ -20,7 +20,7 @@ public class GoogleService implements SocialService {
 
     @Override
     public boolean verify(String authToken) {
-       return Optional.ofNullable(authToken)
+        return Optional.ofNullable(authToken)
                 .map(this::doVerify)
                 .orElse(false);
     }

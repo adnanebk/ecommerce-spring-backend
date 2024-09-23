@@ -26,7 +26,6 @@ public class UserOrder implements Serializable {
     private String fullName;
 
 
-
     private String country;
 
 
