@@ -1,4 +1,4 @@
-[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_ecommerce-angular-backend)](https://sonarcloud.io/summary/new_code?id=adnanebk_ecommerce-angular-backend)
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=adnanebk_ecommerce-spring-backend)](https://sonarcloud.io/summary/new_code?id=adnanebk_ecommerce-spring-backend)
 
 # ecommerce-angular-backend
 
