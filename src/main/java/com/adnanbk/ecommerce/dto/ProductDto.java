@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,9 +35,8 @@ public class ProductDto {
     @NotNull(message = "{error.empty}")
     private BigDecimal unitPrice;
 
-    @Column(name = "image")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String image;
+    private List<String> images;
 
     private boolean active;
 

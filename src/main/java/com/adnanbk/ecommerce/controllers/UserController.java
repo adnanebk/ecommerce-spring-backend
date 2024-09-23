@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,9 +36,8 @@ private final FileUtil fileUtil;
     @PatchMapping("/current/upload-image")
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<ImageDto> updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
-        return this.imageService.upload(file)
-                .thenApplyAsync(fileName->userService.changeUserImage(fileUtil.toImageUrl(fileName),principal.getName()));
+    public ImageDto updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
+        return userService.changeUserImage(fileUtil.toImageUrl(this.imageService.upload(file)),principal.getName());
     }
 
     @PostMapping("/current/enable")

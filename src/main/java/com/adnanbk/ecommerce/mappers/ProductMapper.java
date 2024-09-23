@@ -15,7 +15,7 @@ public abstract class ProductMapper {
   @Autowired
   protected   FileUtil fileUtil;
 
-  @Mapping(target = "image", expression = "java(fileUtil.toImageUrl(product.getImage()))")
+   @Mapping(target = "images", expression = "java(fileUtil.toImagesUrlS(product.getImage()))")
     public abstract ProductDto toDto(Product product);
 
     public abstract Product toEntity(ProductDto userDto);

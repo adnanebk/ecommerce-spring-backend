@@ -2,10 +2,10 @@ package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.services.FileService;
+import com.adnanbk.ecommerce.utils.Constants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,8 +14,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class ImageServiceImp implements FileService {
@@ -40,10 +41,7 @@ public class ImageServiceImp implements FileService {
         }
     }
 
-    @Async
-    public CompletableFuture<String> upload(MultipartFile image) {
-        if(image==null)
-            return CompletableFuture.completedFuture("");
+    public String upload(MultipartFile image) {
         String fileName = trimImageName(image.getOriginalFilename());
         validateImageExtension(fileName);
         Path filePath = this.root.resolve(fileName);
@@ -52,7 +50,12 @@ public class ImageServiceImp implements FileService {
         } catch (IOException e) {
             throw new CustomFileException("we Could not write the file, please try again");
         }
-        return CompletableFuture.completedFuture(fileName);
+        return fileName;
+    }
+
+    @Override
+    public String upload(List<MultipartFile> images) {
+       return  images.stream().map(this::upload).collect(Collectors.joining(Constants.IMAGES_SEPARATOR));
     }
 
     @Override

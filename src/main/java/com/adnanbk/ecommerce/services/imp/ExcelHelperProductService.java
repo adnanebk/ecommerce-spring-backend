@@ -4,7 +4,6 @@ import com.adnanbk.ecommerce.exceptions.CustomFileException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductCategoryRepository;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
-import com.adnanbk.ecommerce.utils.FileUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -25,24 +24,19 @@ import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 
 @Component
 public class ExcelHelperProductService implements ExcelHelperService<Product> {
-    static final String[] HEADERS = {"Sku","Name", "Description", "Price", "Quantity","Category","Image url"};
+    static final String[] HEADERS = {"Sku","Name", "Description", "Price", "Quantity","Category"};
     static final String SHEET_NAME = "Products";
-    public static final String DEFAULT_IMAGE = "newProduct.jpg";
-
     static final int SKU_CELL = 0;
     static final int NAME_CELL = 1;
     static final int DESCRIPTION_CELL = 2;
     static final int UNIT_PRICE_CELL = 3;
     static final int UNITS_IN_STOCK_CELL = 4;
     static final int CATEGORY_CELL = 5;
-    static final int IMAGE_URL_CELL = 6;
 
     private final ProductCategoryRepository categoryRepo;
-    private FileUtil fileUtil;
 
-    public ExcelHelperProductService(ProductCategoryRepository categoryRepo,FileUtil fileUtil) {
+    public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
-        this.fileUtil = fileUtil;
     }
 
     @Override
@@ -64,8 +58,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         }
     }
 
-
-
     private Product extractProductFromRow(Row currentRow) {
             return Product.builder()
                     .name(getCell(NAME_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
@@ -74,7 +66,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                     .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
                     .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(Double::intValue).orElse(null))
                     .category(getCell(CATEGORY_CELL, currentRow).map(this::getValueAsStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
-                    .image(getCell(IMAGE_URL_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(DEFAULT_IMAGE))
                     .build();
     }
 
@@ -101,7 +92,6 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
         row.createCell(UNIT_PRICE_CELL).setCellValue(product.getUnitPrice().doubleValue());
         row.createCell(UNITS_IN_STOCK_CELL).setCellValue(product.getUnitsInStock());
         row.createCell(CATEGORY_CELL).setCellValue(product.getCategory().getName());
-        row.createCell(IMAGE_URL_CELL).setCellValue(fileUtil.toImageUrl(product.getImage()));
     }
 
 }

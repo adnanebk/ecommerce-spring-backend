@@ -19,7 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -60,34 +59,32 @@ public class ProductController {
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<ProductDto> addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart MultipartFile file) {
+    public ProductDto addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart List<MultipartFile> files) {
 
-                return   this.imageService.upload(file).thenApplyAsync(imageName->
-                          Optional.of(productDto)
-                                  .map(pr->{
-                                      pr.setImage(imageName);
-                                      return pr;
-                                  })
+                return Optional.of(productDto)
                                   .map(productMapper::toEntity)
+                        .map(pr->{
+                            pr.setImage(this.imageService.upload(files));
+                                         return pr;
+                        })
                                   .map(productService::addProduct)
-                                  .map(productMapper::toDto).orElseThrow());
+                                  .map(productMapper::toDto).orElseThrow();
     }
 
     @PutMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public CompletableFuture<ProductDto> updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) MultipartFile file,@PathVariable Long id) {
-        return   this.imageService.upload(file).thenApplyAsync(image->
-                Optional.of(productDto)
-                        .map(pr->{
-                            if(StringUtils.hasLength(image))
-                              pr.setImage(image);
-                            return pr;
-                        })
+    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> files,@PathVariable Long id) {
+        return Optional.of(productDto)
                         .map(productMapper::toEntity)
+            .map(pr->{
+                if(files!=null && !files.isEmpty())
+                 pr.setImage(this.imageService.upload(files));
+                return pr;
+            })
                         .map(pr->productService.updateProduct(pr,id))
-                        .map(productMapper::toDto).orElseThrow());
+                        .map(productMapper::toDto).orElseThrow();
     }
 
 
