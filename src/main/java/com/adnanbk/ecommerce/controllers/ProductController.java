@@ -38,7 +38,6 @@ import java.util.concurrent.CompletableFuture;
 @Validated
 public class ProductController {
 
-    private final FileService fileService;
     private final ProductService productService;
     private final ProductMapper productMapper;
 
@@ -60,15 +59,11 @@ public class ProductController {
     @ApiOperation(value = "Add new product", notes = "This endpoint creates a product and bind its category based on category name ",
             response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDto addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart List<MultipartFile> files) {
+    public ProductDto addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart("files") List<MultipartFile> fileImages) {
 
         return Optional.of(productDto)
                 .map(productMapper::toEntity)
-                .map(pr -> {
-                    pr.setImage(this.fileService.upload(files));
-                    return pr;
-                })
-                .map(productService::addProduct)
+                .map(product -> productService.addProduct(product,fileImages))
                 .map(productMapper::toDto).orElseThrow();
     }
 
@@ -76,15 +71,10 @@ public class ProductController {
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> files, @PathVariable Long id) {
+    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> fileImages, @PathVariable Long id) {
         return Optional.of(productDto)
                 .map(productMapper::toEntity)
-                .map(pr -> {
-                    if (files != null && !files.isEmpty())
-                        pr.setImage(this.fileService.upload(files));
-                    return pr;
-                })
-                .map(pr -> productService.updateProduct(pr, id))
+                .map(pr -> productService.updateProduct(pr,fileImages, id))
                 .map(productMapper::toDto).orElseThrow();
     }
 

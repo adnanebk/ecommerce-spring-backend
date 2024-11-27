@@ -23,8 +23,6 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
-    private final FileService fileService;
-    private final ImageUtil imageUtil;
 
     @PatchMapping("/current")
     @ApiOperation(value = "change authenticated user information")
@@ -38,7 +36,7 @@ public class UserController {
     @ApiOperation(value = "add or update a user image", notes = "this endpoint add or update  a user image and return its url", response = String.class)
     @ResponseStatus(HttpStatus.CREATED)
     public ImageDto updateUserImage(@RequestPart("image") MultipartFile file, Principal principal) {
-        return userService.changeUserImage(imageUtil.toImageUrl(this.fileService.upload(file)), principal.getName());
+        return userService.changeUserImage(file, principal.getName());
     }
 
     @PostMapping("/current/enable")

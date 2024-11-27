@@ -44,7 +44,7 @@ public class AppUser implements Serializable {
     private boolean enabled = false;
     private boolean isSocial;
 
-    private String imageUrl;
+    private String imageName;
 
 
     @Column

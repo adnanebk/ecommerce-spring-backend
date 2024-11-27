@@ -26,8 +26,9 @@ public class ImageUtil {
         return url + imageName;
     }
 
-    public List<String> toImagesUrlS(String imageName) {
-        return Arrays.stream(imageName.split(Constants.IMAGES_SEPARATOR)).map(this::toImageUrl).toList();
+    public List<String> toImagesUrlS(String imageNames) {
+        return Arrays.stream(imageNames.split(Constants.IMAGES_SEPARATOR))
+                .map(this::toImageUrl).toList();
     }
 
 

@@ -13,9 +13,9 @@ import java.util.Map;
 
 public interface ProductService {
 
-    Product addProduct(Product product);
+    Product addProduct(Product product, List<MultipartFile> fileImages);
 
-    Product updateProduct(Product product, Long id);
+    Product updateProduct(Product product, List<MultipartFile> fileImages, Long id);
 
     List<Product> updateProducts(List<Product> products);
 

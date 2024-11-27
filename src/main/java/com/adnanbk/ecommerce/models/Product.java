@@ -53,8 +53,8 @@ public class Product {
     @NotNull(message = "{error.empty}")
     private BigDecimal unitPrice;
 
-    @Column(name = "image")
-    private String image;
+    @Column(name = "images")
+    private String imageNames;
 
     @Column(name = "active")
     private boolean active;

@@ -7,14 +7,16 @@ import com.adnanbk.ecommerce.exceptions.ProductSkuAlreadyExistException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
 import com.adnanbk.ecommerce.services.ExcelHelperService;
+import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
+import com.adnanbk.ecommerce.utils.Constants;
+import com.adnanbk.ecommerce.utils.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -31,17 +33,27 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelperService<Product> excelHelper;
+    private final FileService fileService;
+    private final ImageUtil imageUtil;
 
 
     @Override
-    public Product addProduct(Product product) {
+    public Product addProduct(Product product, List<MultipartFile> fileImages) {
+        uploadAndSetProductImages(product, fileImages);
         return productRepo.save(product);
     }
 
     @Override
-    public Product updateProduct(Product product, Long id) {
+    public Product updateProduct(Product product, List<MultipartFile> fileImages, Long id) {
+        if(fileImages!=null && !fileImages.isEmpty())
+            uploadAndSetProductImages(product, fileImages);
+
         return productRepo.findById(id).map(pr -> mapPropertiesAndGet(pr, product))
                 .map(productRepo::save).orElseThrow();
+    }
+
+    private void uploadAndSetProductImages(Product product, List<MultipartFile> fileImages) {
+        product.setImageNames(String.join(Constants.IMAGES_SEPARATOR, fileService.upload(fileImages)));
     }
 
     @Override
@@ -104,8 +116,8 @@ public class ProductServiceImp implements ProductService {
         target.setUnitsInStock(src.getUnitsInStock());
         target.setDescription(src.getDescription());
         target.setActive(src.isActive());
-        if (StringUtils.hasLength(src.getImage()))
-            target.setImage(src.getImage());
+        if (src.getImageNames()!=null && !src.getImageNames().isEmpty())
+            target.setImageNames(src.getImageNames());
         return target;
     }
 }

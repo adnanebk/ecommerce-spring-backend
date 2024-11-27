@@ -23,7 +23,7 @@ public interface UserRepo extends CrudRepository<AppUser, Long> {
 
     @Transactional
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE AppUser us SET us.imageUrl = :fileName WHERE us.email= :email")
+    @Query("UPDATE AppUser us SET us.imageName = :fileName WHERE us.email= :email")
     void updateImage(String email, String fileName);
 
     @Transactional

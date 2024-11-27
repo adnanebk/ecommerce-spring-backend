@@ -91,7 +91,7 @@ public class AuthServiceImp implements AuthService {
         return userRepo.findByEmail(user.email())
                 .orElseGet(() -> saveUser(
                         AppUser.builder().email(user.email()).firstName(user.firstName())
-                                .lastName(user.lastName()).imageUrl(user.image())
+                                .lastName(user.lastName()).imageName(user.image())
                                 .password(StringUtil.generateRandomPassword())
                                 .enabled(true).isSocial(true).build()));
     }
