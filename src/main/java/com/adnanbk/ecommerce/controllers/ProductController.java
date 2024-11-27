@@ -5,7 +5,6 @@ import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
-import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
