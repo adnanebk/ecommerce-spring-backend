@@ -8,7 +8,6 @@ public interface FileService {
 
     String upload(MultipartFile multipartFile);
 
-    String upload(List<MultipartFile> images);
+    List<String> upload(List<MultipartFile> images);
 
-    String load(String filename);
 }

@@ -4,7 +4,7 @@ import com.adnanbk.ecommerce.dto.CategoryDto;
 import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.models.Category;
 import com.adnanbk.ecommerce.models.Product;
-import com.adnanbk.ecommerce.utils.FileUtil;
+import com.adnanbk.ecommerce.utils.ImageUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ProductMapper {
 
     @Autowired
-    protected FileUtil fileUtil;
+    protected ImageUtil imageUtil;
 
     @Mapping(target = "images", expression = "java(fileUtil.toImagesUrlS(product.getImage()))")
     public abstract ProductDto toDto(Product product);

@@ -14,7 +14,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "uploads")
 @Getter
 @Setter
-public class FileUtil {
+public class ImageUtil {
     private String imagesPathUrl;
     private String externalImagesPathUrl;
 

@@ -38,7 +38,7 @@ import java.util.concurrent.CompletableFuture;
 @Validated
 public class ProductController {
 
-    private final FileService imageService;
+    private final FileService fileService;
     private final ProductService productService;
     private final ProductMapper productMapper;
 
@@ -65,7 +65,7 @@ public class ProductController {
         return Optional.of(productDto)
                 .map(productMapper::toEntity)
                 .map(pr -> {
-                    pr.setImage(this.imageService.upload(files));
+                    pr.setImage(this.fileService.upload(files));
                     return pr;
                 })
                 .map(productService::addProduct)
@@ -81,7 +81,7 @@ public class ProductController {
                 .map(productMapper::toEntity)
                 .map(pr -> {
                     if (files != null && !files.isEmpty())
-                        pr.setImage(this.imageService.upload(files));
+                        pr.setImage(this.fileService.upload(files));
                     return pr;
                 })
                 .map(pr -> productService.updateProduct(pr, id))
