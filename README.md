@@ -2,8 +2,6 @@
 
 # ecommerce-angular-backend
 
-This repository has been recreated from an already developed existing one that has been archived due to security issues
-
 
 This is the back end side of the application.
 
