@@ -2,8 +2,6 @@
 
 # ecommerce-angular-backend
 
-This repository has been recreated from an already developed existing one that has been archived due to security issues
-
 
 This is the back end side of the application.
 
@@ -41,7 +39,7 @@ core features :
 
 * and more
 
-I have implemented CI/CD pipelines to automate quality checks using SonarClkoud and the deployment, with the backend deployed to Heroku and the frontend deployed to Netlify
+I have implemented CI/CD pipelines to automate quality checks using Sonar Cloud and the deployment with the use of Heroku and Netlify
 
 The front end side is here https://github.com/adnanebk/ecommece-angular-frontend
 
