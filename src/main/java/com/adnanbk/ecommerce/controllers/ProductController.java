@@ -3,6 +3,7 @@ package com.adnanbk.ecommerce.controllers;
 import com.adnanbk.ecommerce.dto.PageDto;
 import com.adnanbk.ecommerce.dto.ProductDto;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
+import com.adnanbk.ecommerce.dto.ReplacedImages;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.services.ProductService;
@@ -59,7 +60,6 @@ public class ProductController {
             response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ProductDto addProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart("files") List<MultipartFile> fileImages) {
-
         return Optional.of(productDto)
                 .map(productMapper::toEntity)
                 .map(product -> productService.addProduct(product,fileImages))
@@ -70,10 +70,10 @@ public class ProductController {
     @ApiOperation(value = "update product", notes = "This endpoint updates a product and bind its category based on category name"
             , response = ProductDto.class)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> fileImages, @PathVariable Long id) {
+    public ProductDto updateProduct(@Valid @RequestPart("product") ProductDto productDto, @RequestPart(required = false) List<MultipartFile> files, @PathVariable Long id) {
         return Optional.of(productDto)
                 .map(productMapper::toEntity)
-                .map(pr -> productService.updateProduct(pr,fileImages, id))
+                .map(pr -> productService.updateProduct(pr,files, id))
                 .map(productMapper::toDto).orElseThrow();
     }
 
@@ -130,6 +130,14 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void removeProduct(@PathVariable Long id) {
         productService.removeProduct(id);
+    }
+
+    @PutMapping("/{id}/images")
+    @ApiOperation(value = "remove a product")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public void updateImages(@PathVariable Long id,@Valid @RequestBody ReplacedImages replacedImages) {
+        productService.updateImages(id, replacedImages);
     }
 
     private Pageable buildPageable(PageDto pageDto) {

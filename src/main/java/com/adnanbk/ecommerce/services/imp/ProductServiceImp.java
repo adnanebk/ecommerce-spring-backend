@@ -1,16 +1,17 @@
 package com.adnanbk.ecommerce.services.imp;
 
 import com.adnanbk.ecommerce.dto.ProductPageDto;
+import com.adnanbk.ecommerce.dto.ReplacedImages;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.exceptions.ProductSkuAlreadyExistException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
-import com.adnanbk.ecommerce.services.ExcelHelperService;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
 import com.adnanbk.ecommerce.utils.Constants;
 import com.adnanbk.ecommerce.utils.ImageUtil;
+import com.adnanbk.excelconverter.core.excelpojoconverter.ExcelHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.domain.Page;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
-    private final ExcelHelperService<Product> excelHelper;
+    private final ExcelHelper<Product> excelHelper;
     private final FileService fileService;
     private final ImageUtil imageUtil;
 
@@ -68,7 +69,8 @@ public class ProductServiceImp implements ProductService {
 
     @Transactional
     public Map<Operation, List<Product>> addOrUpdateFromExcel(MultipartFile multipartFile) {
-        Map<String, Product> productsMap = excelHelper.excelToList(multipartFile).stream().collect(Collectors.toMap(Product::getSku, Function.identity(), (existed, newest) -> {
+        Map<String, Product> productsMap = excelHelper.toStream(multipartFile)
+                .collect(Collectors.toMap(Product::getSku, Function.identity(), (existed, newest) -> {
             throw new ProductSkuAlreadyExistException("Product sku " + existed.getSku() + " already exists");
         }));
         List<Product> updatableProducts = productRepo.findAllBySkuIn(new ArrayList<>(productsMap.keySet()))
@@ -89,6 +91,17 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    @Transactional
+    public void updateImages(Long id, ReplacedImages replacedImages) {
+        productRepo.findById(id).ifPresent(product -> {
+            List<String> imageNames = imageUtil.toImageNames(replacedImages.imageUrls());
+            imageNames.addAll(fileService.upload(replacedImages.imageFiles()));
+            product.setImageNames(String.join(Constants.IMAGES_SEPARATOR, imageNames));
+            productRepo.save(product);
+        });
+    }
+
+    @Override
     public Page<Product> getAll(ProductPageDto productPage, Pageable pageable) {
         return productRepo.findPagedProducts
                 (productPage.getCategory(), productPage.getSearch()
@@ -97,7 +110,7 @@ public class ProductServiceImp implements ProductService {
 
     @Override
     public ByteArrayInputStream convertToExcel(List<Long> productIds) {
-        return excelHelper.listToExcel(productRepo.findAllById(productIds));
+        return excelHelper.toExcel(productRepo.findAllById(productIds));
     }
 
     private List<Product> mapProductsInDb(List<Product> products) {

@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
@@ -62,7 +61,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
                 .name(getCell(NAME_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
                 .description(getCell(DESCRIPTION_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
                 .sku(getCell(SKU_CELL, currentRow).map(this::getValueAsStringOrThrow).orElse(null))
-                .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(BigDecimal::valueOf).orElse(null))
+                .unitPrice(getCell(UNIT_PRICE_CELL, currentRow).map(this::getValueAsNumberOrThrow).orElse(null))
                 .unitsInStock(getCell(UNITS_IN_STOCK_CELL, currentRow).map(this::getValueAsNumberOrThrow).map(Double::intValue).orElse(null))
                 .category(getCell(CATEGORY_CELL, currentRow).map(this::getValueAsStringOrThrow).map(categoryRepo::findByNameIgnoreCase).orElse(null))
                 .build();

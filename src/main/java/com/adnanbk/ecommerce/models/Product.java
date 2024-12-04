@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.models;
 
 import lombok.*;
+import lombok.experimental.FieldNameConstants;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicUpdate;
@@ -12,7 +13,6 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -21,6 +21,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
+@FieldNameConstants
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamicUpdate // to generate an update sql statement that contains only updated fields
@@ -51,7 +52,7 @@ public class Product {
     @Column(name = "unit_price")
     @DecimalMin("0.0")
     @NotNull(message = "{error.empty}")
-    private BigDecimal unitPrice;
+    private Double unitPrice;
 
     @Column(name = "images")
     private String imageNames;
