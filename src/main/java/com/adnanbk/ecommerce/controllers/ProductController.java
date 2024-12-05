@@ -42,9 +42,9 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    @ApiOperation(value = "Get a page of products")
+    @ApiOperation(value = "Search and get a page of products")
     public Page<ProductDto> getProducts(ProductPageDto productPageDto) {
-        return productService.getAll(productPageDto, buildPageable(productPageDto))
+        return productService.searchBy(productPageDto, buildPageable(productPageDto))
                 .map(productMapper::toDto);
     }
 

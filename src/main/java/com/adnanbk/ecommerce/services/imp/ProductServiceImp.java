@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.services.imp;
 
+import com.adnanbk.ecommerce.specifications.ProductSpecifications;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
 import com.adnanbk.ecommerce.dto.ReplacedImages;
 import com.adnanbk.ecommerce.enums.Operation;
@@ -102,10 +103,10 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Page<Product> getAll(ProductPageDto productPage, Pageable pageable) {
-        return productRepo.findPagedProducts
-                (productPage.getCategory(), productPage.getSearch()
-                        , pageable);
+    @Transactional(readOnly = true)
+    public Page<Product> searchBy(ProductPageDto productPage, Pageable pageable) {
+        var specification = ProductSpecifications.search(productPage.getCategory(),productPage.getSearch());
+        return productRepo.findAll(specification,pageable);
     }
 
     @Override

@@ -23,7 +23,7 @@ public interface ProductService {
 
     void removeProducts(List<Long> productsIds);
 
-    Page<Product> getAll(ProductPageDto productPage, Pageable pageable);
+    Page<Product> searchBy(ProductPageDto productPage, Pageable pageable);
 
     ByteArrayInputStream convertToExcel(List<Long> productsIds);
 

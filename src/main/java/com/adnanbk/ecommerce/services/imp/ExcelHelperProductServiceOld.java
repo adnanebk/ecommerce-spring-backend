@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
 import static com.adnanbk.ecommerce.services.ExcelHelperService.*;
 
 @Component
-public class ExcelHelperProductService implements ExcelHelperService<Product> {
+public class ExcelHelperProductServiceOld implements ExcelHelperService<Product> {
     static final String[] HEADERS = {"Sku", "Name", "Description", "Price", "Quantity", "Category"};
     static final String SHEET_NAME = "Products";
     static final int SKU_CELL = 0;
@@ -34,7 +34,7 @@ public class ExcelHelperProductService implements ExcelHelperService<Product> {
 
     private final ProductCategoryRepository categoryRepo;
 
-    public ExcelHelperProductService(ProductCategoryRepository categoryRepo) {
+    public ExcelHelperProductServiceOld(ProductCategoryRepository categoryRepo) {
         this.categoryRepo = categoryRepo;
     }
 
