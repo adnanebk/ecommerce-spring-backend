@@ -1,5 +1,6 @@
 package com.adnanbk.ecommerce.models;
 
+import com.adnanbk.ecommerce.models.converters.CollectionConverter;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -14,6 +15,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "product",
@@ -55,7 +57,8 @@ public class Product {
     private Double unitPrice;
 
     @Column(name = "images")
-    private String imageNames;
+    @Convert(converter = CollectionConverter.class)
+    private List<String> imageNames;
 
     @Column(name = "active")
     private boolean active;

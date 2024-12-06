@@ -9,7 +9,6 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -28,11 +27,10 @@ public class ImageUtil {
         return url + imageName;
     }
 
-    public List<String> toImagesUrlS(String imageNames) {
-        if(!StringUtils.hasLength(imageNames))
+    public List<String> toImagesUrls(List<String> imageNames) {
+        if(imageNames==null || imageNames.isEmpty())
             return new ArrayList<>();
-        return Arrays.stream(imageNames.split(Constants.IMAGES_SEPARATOR))
-                .map(this::toImageUrl).toList();
+        return imageNames.stream().map(this::toImageUrl).toList();
     }
 
 

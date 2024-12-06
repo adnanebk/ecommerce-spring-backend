@@ -24,7 +24,7 @@ public abstract class ProductMapper {
 
     public ProductDto toDto(Product product){
        ProductDto productDto =  toDtoMapping(product);
-       productDto.setImages(imageUtil.toImagesUrlS(product.getImageNames()));
+       productDto.setImages(imageUtil.toImagesUrls(product.getImageNames()));
        return  productDto;
     }
 

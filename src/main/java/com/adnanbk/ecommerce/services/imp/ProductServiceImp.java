@@ -10,8 +10,6 @@ import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
-import com.adnanbk.ecommerce.utils.Constants;
-import com.adnanbk.ecommerce.utils.ImageUtil;
 import com.adnanbk.excelconverter.core.excelpojoconverter.ExcelHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,7 +34,6 @@ public class ProductServiceImp implements ProductService {
     private final ProductRepository productRepo;
     private final ExcelHelper<Product> excelHelper;
     private final FileService fileService;
-    private final ImageUtil imageUtil;
 
 
     @Override
@@ -46,6 +43,7 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
+    @Transactional
     public Product updateProduct(Product product, List<MultipartFile> fileImages, Long id) {
         if(fileImages!=null && !fileImages.isEmpty())
             uploadAndSetProductImages(product, fileImages);
@@ -55,10 +53,11 @@ public class ProductServiceImp implements ProductService {
     }
 
     private void uploadAndSetProductImages(Product product, List<MultipartFile> fileImages) {
-        product.setImageNames(String.join(Constants.IMAGES_SEPARATOR, fileService.upload(fileImages)));
+        product.setImageNames(fileService.upload(fileImages));
     }
 
     @Override
+    @Transactional
     public List<Product> updateProducts(List<Product> products) {
         return productRepo.saveAll(mapProductsInDb(products));
     }
@@ -95,9 +94,6 @@ public class ProductServiceImp implements ProductService {
     @Transactional
     public void updateImages(Long id, ReplacedImages replacedImages) {
         productRepo.findById(id).ifPresent(product -> {
-            List<String> imageNames = imageUtil.toImageNames(replacedImages.imageUrls());
-            imageNames.addAll(fileService.upload(replacedImages.imageFiles()));
-            product.setImageNames(String.join(Constants.IMAGES_SEPARATOR, imageNames));
             productRepo.save(product);
         });
     }
