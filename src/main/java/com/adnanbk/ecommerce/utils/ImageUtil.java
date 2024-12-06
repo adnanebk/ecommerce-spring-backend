@@ -21,6 +21,8 @@ public class ImageUtil {
 
 
     public String toImageUrl(String imageName) {
+        if(!StringUtils.hasLength(imageName))
+            return "";
         String url = "";
         if (StringUtils.hasLength(imageName) && !imageName.startsWith("http"))
             url = imageName.contains("luv2code") ? externalImagesPathUrl : imagesPathUrl;
