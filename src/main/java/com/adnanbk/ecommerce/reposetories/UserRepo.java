@@ -1,6 +1,7 @@
 package com.adnanbk.ecommerce.reposetories;
 
 import com.adnanbk.ecommerce.models.AppUser;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
@@ -12,8 +13,8 @@ import java.util.Optional;
 
 
 public interface UserRepo extends CrudRepository<AppUser, Long> {
-
     @QueryHints(@QueryHint(name = org.hibernate.annotations.QueryHints.CACHEABLE, value = "true"))
+    @EntityGraph(attributePaths = "roles")
     Optional<AppUser> findByEmail(String email);
 
     @Transactional
