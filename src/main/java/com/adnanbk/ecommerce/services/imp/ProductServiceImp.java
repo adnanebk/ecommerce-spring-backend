@@ -1,8 +1,8 @@
 package com.adnanbk.ecommerce.services.imp;
 
+import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.specifications.ProductSpecifications;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
-import com.adnanbk.ecommerce.dto.ReplacedImages;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.exceptions.ProductSkuAlreadyExistException;
@@ -10,6 +10,7 @@ import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
 import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
+import com.adnanbk.ecommerce.utils.ImageUtil;
 import com.adnanbk.excelconverter.core.excelpojoconverter.ExcelHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -27,6 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "uploads")
 public class ProductServiceImp implements ProductService {
@@ -34,30 +36,24 @@ public class ProductServiceImp implements ProductService {
     private final ProductRepository productRepo;
     private final ExcelHelper<Product> excelHelper;
     private final FileService fileService;
+    private final ImageUtil imageUtil;
 
 
     @Override
     public Product addProduct(Product product, List<MultipartFile> fileImages) {
-        uploadAndSetProductImages(product, fileImages);
+        product.setImageNames(fileService.upload(fileImages));
         return productRepo.save(product);
     }
 
     @Override
-    @Transactional
     public Product updateProduct(Product product, List<MultipartFile> fileImages, Long id) {
         if(fileImages!=null && !fileImages.isEmpty())
-            uploadAndSetProductImages(product, fileImages);
-
+            product.getImageNames().addAll(fileService.upload(fileImages));
         return productRepo.findById(id).map(pr -> mapPropertiesAndGet(pr, product))
                 .map(productRepo::save).orElseThrow();
     }
 
-    private void uploadAndSetProductImages(Product product, List<MultipartFile> fileImages) {
-        product.setImageNames(fileService.upload(fileImages));
-    }
-
     @Override
-    @Transactional
     public List<Product> updateProducts(List<Product> products) {
         return productRepo.saveAll(mapProductsInDb(products));
     }
@@ -67,7 +63,6 @@ public class ProductServiceImp implements ProductService {
         productRepo.deleteAllById(productsIds);
     }
 
-    @Transactional
     public Map<Operation, List<Product>> addOrUpdateFromExcel(MultipartFile multipartFile) {
         Map<String, Product> productsMap = excelHelper.toStream(multipartFile)
                 .collect(Collectors.toMap(Product::getSku, Function.identity(), (existed, newest) -> {
@@ -80,24 +75,35 @@ public class ProductServiceImp implements ProductService {
     }
 
     @Override
-    public Product getBySku(String sku) {
-        return productRepo.findBySku(sku)
-                .orElseThrow(() -> new ProductNotFoundException("product not found with sku" + sku));
-    }
-
-    @Override
     public void removeProduct(Long id) {
         productRepo.deleteById(id);
     }
 
     @Override
-    @Transactional
-    public void updateImages(Long id, ReplacedImages replacedImages) {
+    public ImageDto addImage(MultipartFile imageFile, Long id) {
+        return productRepo.findById(id).map(product -> {
+            String imageName = fileService.upload(imageFile);
+            List<String> imageNames = new ArrayList<>(product.getImageNames());
+            imageNames.add(imageName);
+            product.setImageNames(imageNames);
+            productRepo.save(product);
+            return new ImageDto(imageUtil.toImageUrl(imageName));
+        }).orElseThrow();
+    }
+
+    @Override
+    public void replaceImages(List<String> imageUrls, Long id){
         productRepo.findById(id).ifPresent(product -> {
+            product.setImageNames(imageUrls.stream().map(imageUtil::toImageName).toList());
             productRepo.save(product);
         });
     }
-
+    @Override
+    @Transactional(readOnly = true)
+    public Product getBySku(String sku) {
+        return productRepo.findBySku(sku)
+                .orElseThrow(() -> new ProductNotFoundException("product not found with sku" + sku));
+    }
     @Override
     @Transactional(readOnly = true)
     public Page<Product> searchBy(ProductPageDto productPage, Pageable pageable) {

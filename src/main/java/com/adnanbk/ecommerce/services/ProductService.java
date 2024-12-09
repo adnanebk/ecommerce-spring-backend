@@ -1,14 +1,13 @@
 package com.adnanbk.ecommerce.services;
 
+import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.dto.ProductPageDto;
-import com.adnanbk.ecommerce.dto.ReplacedImages;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.models.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
@@ -34,5 +33,7 @@ public interface ProductService {
 
     void removeProduct(Long id);
 
-    void updateImages(Long id, @Valid ReplacedImages replacedImages);
+    void replaceImages(List<String> imageUrls, Long id);
+
+    ImageDto addImage(MultipartFile imageFile, Long id);
 }

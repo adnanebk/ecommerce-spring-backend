@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,8 +35,7 @@ public class ImageUtil {
     }
 
 
-    public List<String> toImageNames(@NotNull List<String> imageUrls) {
-       return imageUrls.stream().map(url->url.replace(imagesPathUrl,"")
-                .replace(externalImagesPathUrl,"")).toList();
+    public String toImageName( String imageUrl) {
+       return imageUrl.replace(imagesPathUrl,"").replace(externalImagesPathUrl,"");
     }
 }

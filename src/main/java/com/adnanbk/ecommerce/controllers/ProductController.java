@@ -1,9 +1,6 @@
 package com.adnanbk.ecommerce.controllers;
 
-import com.adnanbk.ecommerce.dto.PageDto;
-import com.adnanbk.ecommerce.dto.ProductDto;
-import com.adnanbk.ecommerce.dto.ProductPageDto;
-import com.adnanbk.ecommerce.dto.ReplacedImages;
+import com.adnanbk.ecommerce.dto.*;
 import com.adnanbk.ecommerce.enums.Operation;
 import com.adnanbk.ecommerce.mappers.ProductMapper;
 import com.adnanbk.ecommerce.services.ProductService;
@@ -132,12 +129,20 @@ public class ProductController {
         productService.removeProduct(id);
     }
 
-    @PutMapping("/{id}/images")
-    @ApiOperation(value = "remove a product")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(value = "/{id}/images")
+    @ApiOperation(value = "Add product image")
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void updateImages(@PathVariable Long id,@Valid @RequestBody ReplacedImages replacedImages) {
-        productService.updateImages(id, replacedImages);
+    ImageDto addImage(@PathVariable Long id, @RequestPart MultipartFile imageFile) {
+        return  productService.addImage(imageFile,id);
+    }
+
+    @PutMapping(value = "/{id}/images")
+    @ApiOperation(value = "Replace product image")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    void replaceImages(@PathVariable Long id, @RequestBody List<String> imageUrls) {
+        productService.replaceImages(imageUrls,id);
     }
 
     private Pageable buildPageable(PageDto pageDto) {
