@@ -23,7 +23,7 @@ core features :
 
 * Credit cards management
 
-* Products managements by admin
+* Products management by admin
 
 * Import and export to/from excel
 
