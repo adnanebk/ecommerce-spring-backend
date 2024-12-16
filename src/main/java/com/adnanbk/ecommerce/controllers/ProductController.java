@@ -138,7 +138,7 @@ public class ProductController {
     }
 
     @PutMapping(value = "/{id}/images")
-    @ApiOperation(value = "Replace product image")
+    @ApiOperation(value = "Update all product images")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     void replaceImages(@PathVariable Long id, @RequestBody List<String> imageUrls) {
