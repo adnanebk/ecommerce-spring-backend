@@ -3,14 +3,14 @@ package com.adnanbk.ecommerce.mappers;
 import com.adnanbk.ecommerce.dto.UserInputDto;
 import com.adnanbk.ecommerce.dto.UserOutputDto;
 import com.adnanbk.ecommerce.models.AppUser;
-import com.adnanbk.ecommerce.utils.ImageUtil;
+import com.adnanbk.ecommerce.services.imp.ImageService;
 import org.mapstruct.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(componentModel = "spring")
 public abstract class UserMapper {
     @Autowired
-    protected ImageUtil imageUtil;
+    protected ImageService imageService;
 
     public abstract UserOutputDto toDtoMapping(AppUser user);
 
@@ -20,7 +20,7 @@ public abstract class UserMapper {
 
     public UserOutputDto toDto(AppUser user){
         UserOutputDto userOutputDto =  toDtoMapping(user);
-        userOutputDto.setImageUrl(imageUtil.toImageUrl(user.getImageName()));
+        userOutputDto.setImageUrl(imageService.toUrl(user.getImageName()));
         return  userOutputDto;
     }
 }

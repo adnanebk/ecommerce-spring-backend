@@ -3,10 +3,8 @@ package com.adnanbk.ecommerce.services.imp;
 import com.adnanbk.ecommerce.dto.ImageDto;
 import com.adnanbk.ecommerce.models.AppUser;
 import com.adnanbk.ecommerce.reposetories.UserRepo;
-import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.UserService;
 import com.adnanbk.ecommerce.utils.ConfirmationTokenUtil;
-import com.adnanbk.ecommerce.utils.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,14 +14,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserServiceImpl implements UserService {
 
     private final UserRepo userRepo;
-    private final FileService fileService;
-    private final ImageUtil imageUtil;
+    private final ImageService imageService;
 
     @Override
     public ImageDto changeUserImage(MultipartFile imageFile, String email) {
-        String imageUrl = fileService.upload(imageFile);
-        userRepo.updateImage(email, imageUrl);
-        return new ImageDto(imageUtil.toImageUrl(imageUrl));
+        String imageName = imageService.upload(imageFile);
+        userRepo.updateImage(email, imageName);
+        return new ImageDto(imageService.toUrl(imageName));
     }
 
 

@@ -8,9 +8,7 @@ import com.adnanbk.ecommerce.exceptions.ProductNotFoundException;
 import com.adnanbk.ecommerce.exceptions.ProductSkuAlreadyExistException;
 import com.adnanbk.ecommerce.models.Product;
 import com.adnanbk.ecommerce.reposetories.ProductRepository;
-import com.adnanbk.ecommerce.services.FileService;
 import com.adnanbk.ecommerce.services.ProductService;
-import com.adnanbk.ecommerce.utils.ImageUtil;
 import com.adnanbk.excelconverter.core.excelpojoconverter.ExcelHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -35,20 +33,19 @@ public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
     private final ExcelHelper<Product> excelHelper;
-    private final FileService fileService;
-    private final ImageUtil imageUtil;
+    private final ImageService imageService;
 
 
     @Override
     public Product addProduct(Product product, List<MultipartFile> fileImages) {
-        product.setImageNames(fileService.upload(fileImages));
+        product.setImageNames(imageService.upload(fileImages));
         return productRepo.save(product);
     }
 
     @Override
     public Product updateProduct(Product product, List<MultipartFile> fileImages, Long id) {
         if(fileImages!=null && !fileImages.isEmpty())
-            product.getImageNames().addAll(fileService.upload(fileImages));
+            product.getImageNames().addAll(imageService.upload(fileImages));
         return productRepo.findById(id).map(pr -> mapPropertiesAndGet(pr, product))
                 .map(productRepo::save).orElseThrow();
     }
@@ -82,19 +79,19 @@ public class ProductServiceImp implements ProductService {
     @Override
     public ImageDto addImage(MultipartFile imageFile, Long id) {
         return productRepo.findById(id).map(product -> {
-            String imageName = fileService.upload(imageFile);
+            String imageName = imageService.upload(imageFile);
             List<String> imageNames = new ArrayList<>(product.getImageNames());
             imageNames.add(imageName);
             product.setImageNames(imageNames);
             productRepo.save(product);
-            return new ImageDto(imageUtil.toImageUrl(imageName));
+            return new ImageDto(imageService.toUrl(imageName));
         }).orElseThrow();
     }
 
     @Override
     public void replaceImages(List<String> imageUrls, Long id){
         productRepo.findById(id).ifPresent(product -> {
-            product.setImageNames(imageUrls.stream().map(imageUtil::toImageName).toList());
+            product.setImageNames(imageUrls.stream().map(imageService::toImageName).toList());
             productRepo.save(product);
         });
     }
