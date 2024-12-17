@@ -87,7 +87,11 @@ public class ExceptionsHandler {
         return new ApiErrorDto(formatMessage(ex.getMessage()));
     }
 
-
+    @ExceptionHandler(CustomFileException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorDto customFileException(CustomFileException ex) {
+        return new ApiErrorDto(formatMessage(ex.getMessage()));
+    }
     @ExceptionHandler(InvalidPasswordException.class)
     public ApiErrorDto invalidPasswordException(InvalidPasswordException ex) {
         return new ApiErrorDto(formatMessage(ex.getMessage()), Set.of(new ResponseError("currentPassword", formatMessage(ex.getMessage()))));
