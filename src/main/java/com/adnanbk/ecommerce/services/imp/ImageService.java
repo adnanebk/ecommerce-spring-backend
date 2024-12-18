@@ -26,7 +26,7 @@ public class ImageService implements FileService {
     private String imagesPathUrl;
     private String externalImagesPathUrl;
     private static final List<String> SUPPORTED_EXTENSIONS = List.of("jpg","jpeg","png","webp");
-    private static final double MAX_SIZE_MB = 3;
+    private static final double MAX_SIZE_MB = 3.2;
     public ImageService(FileService fileService) {
         this.fileService = fileService;
     }
@@ -57,14 +57,14 @@ public class ImageService implements FileService {
 
 
     public String toImageName( String imageUrl) {
-       return imageUrl.substring(imageUrl.indexOf('/')+1);
+        return StringUtils.getFilename(imageUrl);
     }
 
     private  void validateImage(MultipartFile multipartFile) {
         String extension = FileNameUtils.getExtension(multipartFile.getOriginalFilename());
-        var sizeInMb = multipartFile.getSize()/(1000*1000);
+        var sizeInMb = (double)multipartFile.getSize()/(1000*1000);
         if(sizeInMb>MAX_SIZE_MB)
-            throw new CustomFileException("File is to large, maximum size is "+MAX_SIZE_MB+".xxMB");
+            throw new CustomFileException("File is to large, maximum size is "+MAX_SIZE_MB+"MB");
         if(!SUPPORTED_EXTENSIONS.contains(extension))
             throw new CustomFileException("Invalid file type, we support only "+ String.join(", ", SUPPORTED_EXTENSIONS));
     }
