@@ -45,7 +45,7 @@ public class ProductServiceImp implements ProductService {
     @Override
     public Product updateProduct(Product product, List<MultipartFile> fileImages, Long id) {
         if(fileImages!=null && !fileImages.isEmpty())
-            product.getImageNames().addAll(imageService.upload(fileImages));
+            product.setImageNames(imageService.upload(fileImages));
         return productRepo.findById(id).map(pr -> mapPropertiesAndGet(pr, product))
                 .map(productRepo::save).orElseThrow();
     }
