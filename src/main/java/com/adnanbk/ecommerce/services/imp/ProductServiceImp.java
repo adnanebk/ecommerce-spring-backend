@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "uploads")
 public class ProductServiceImp implements ProductService {
 
     private final ProductRepository productRepo;
